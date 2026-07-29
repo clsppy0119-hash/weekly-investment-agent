@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fb">
+  <title>每週投資建議 Agent</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #667085;
+      --line: #e5eaf2;
+      --card: rgba(255, 255, 255, .92);
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --green: #067647;
+      --red: #b42318;
+      --shadow: 0 18px 50px rgba(23, 32, 51, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Inter, "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(37, 99, 235, .10), transparent 30rem),
+        radial-gradient(circle at 92% 12%, rgba(14, 165, 233, .08), transparent 25rem),
+        #f4f7fb;
+    }
+    button { font: inherit; }
+    .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 42px 0 56px; }
+    header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; margin-bottom: 26px; }
+    .eyebrow { color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 8px 0 6px; font-size: clamp(28px, 4vw, 42px); letter-spacing: -.04em; }
+    .subtitle { margin: 0; color: var(--muted); }
+    .demo {
+      padding: 9px 13px;
+      border: 1px solid #cbd8f5;
+      border-radius: 999px;
+      color: #1d4ed8;
+      background: rgba(255, 255, 255, .7);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+    .card {
+      border: 1px solid rgba(255, 255, 255, .8);
+      border-radius: 20px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+    .metric { padding: 21px; }
+    .label { color: var(--muted); font-size: 13px; font-weight: 650; }
+    .value { margin-top: 9px; font-size: clamp(21px, 2.5vw, 29px); font-weight: 800; letter-spacing: -.03em; }
+    .positive { color: var(--green); }
+    .workspace { display: grid; grid-template-columns: .9fr 1.45fr; gap: 14px; }
+    .panel { padding: 24px; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+    h2 { margin: 0; font-size: 19px; letter-spacing: -.02em; }
+    .holdings { display: grid; gap: 18px; }
+    .holding-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .asset { font-weight: 720; }
+    .weight { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .track { height: 8px; overflow: hidden; border-radius: 999px; background: #edf1f7; }
+    .fill { height: 100%; width: var(--w); border-radius: inherit; background: linear-gradient(90deg, #2563eb, #60a5fa); }
+    .advice-card { min-height: 410px; display: flex; flex-direction: column; }
+    .status { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 13px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #98a2b3; }
+    .dot.ready { background: #12b76a; box-shadow: 0 0 0 4px rgba(18, 183, 106, .12); }
+    #advice {
+      flex: 1;
+      min-height: 220px;
+      margin: 0 0 20px;
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      color: #344054;
+      background: #fbfcfe;
+      line-height: 1.75;
+      white-space: pre-line;
+    }
+    .placeholder { color: #98a2b3; }
+    .action {
+      align-self: flex-end;
+      border: 0;
+      border-radius: 13px;
+      padding: 13px 20px;
+      color: white;
+      background: var(--blue);
+      font-weight: 780;
+      cursor: pointer;
+      box-shadow: 0 9px 20px rgba(37, 99, 235, .24);
+      transition: transform .15s ease, background .15s ease;
+    }
+    .action:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .action:active { transform: translateY(0); }
+    .action:focus-visible { outline: 3px solid rgba(37, 99, 235, .3); outline-offset: 3px; }
+    footer { margin-top: 18px; color: var(--muted); font-size: 12px; text-align: center; }
+    @media (max-width: 820px) {
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .workspace { grid-template-columns: 1fr; }
+      header { flex-direction: column; }
+    }
+    @media (max-width: 480px) {
+      .shell { width: min(100% - 20px, 1160px); padding-top: 25px; }
+      .metrics { grid-template-columns: 1fr; }
+      .metric, .panel { padding: 19px; }
+      .action { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <div class="eyebrow">Weekly Portfolio Brief</div>
+        <h1>每週投資建議 Agent</h1>
+        <p class="subtitle">用簡單規則整理持倉，給出清楚、可執行的每週摘要。</p>
+      </div>
+      <div class="demo">示範資料｜不會自動下單</div>
+    </header>
+
+    <section class="metrics" aria-label="投資組合摘要">
+      <article class="card metric"><div class="label">投資組合總資產</div><div class="value">NT$ 1,000,000</div></article>
+      <article class="card metric"><div class="label">現金比例</div><div class="value">20%</div></article>
+      <article class="card metric"><div class="label">持倉檔數</div><div class="value">3</div></article>
+      <article class="card metric"><div class="label">本週漲跌</div><div class="value positive">+1.2%</div></article>
+    </section>
+
+    <section class="workspace">
+      <article class="card panel">
+        <div class="panel-head"><h2>持倉配置</h2><span class="label">100%</span></div>
+        <div class="holdings">
+          <div><div class="holding-line"><span class="asset">台積電</span><span class="weight">35%</span></div><div class="track"><div class="fill" style="--w:35%"></div></div></div>
+          <div><div class="holding-line"><span class="asset">0050</span><span class="weight">30%</span></div><div class="track"><div class="fill" style="--w:30%"></div></div></div>
+          <div><div class="holding-line"><span class="asset">比特幣</span><span class="weight">15%</span></div><div class="track"><div class="fill" style="--w:15%"></div></div></div>
+          <div><div class="holding-line"><span class="asset">現金</span><span class="weight">20%</span></div><div class="track"><div class="fill" style="--w:20%"></div></div></div>
+        </div>
+      </article>
+
+      <article class="card panel advice-card">
+        <div class="panel-head">
+          <h2>本週投資建議</h2>
+          <div class="status"><span class="dot" id="dot"></span><span id="status">等待分析</span></div>
+        </div>
+        <div id="advice" class="placeholder" aria-live="polite">按下「產生本週建議」，查看示範持倉的研究摘要。</div>
+        <button class="action" id="generate" type="button">產生本週建議</button>
+      </article>
+    </section>
+
+    <footer>內容僅供研究與介面測試，不構成投資建議。</footer>
+  </main>
+
+  <script>
+    const button = document.querySelector("#generate");
+    const advice = document.querySelector("#advice");
+    const status = document.querySelector("#status");
+    const dot = document.querySelector("#dot");
+
+    button.addEventListener("click", () => {
+      button.disabled = true;
+      button.textContent = "分析中…";
+      status.textContent = "整理持倉";
+
+      window.setTimeout(() => {
+        advice.classList.remove("placeholder");
+        advice.textContent =
+`本週策略：維持持倉，暫不追價。
+
+• 台積電與 0050：續抱；本週已有上漲，避免一次加碼。
+• 比特幣：波動較大，維持目前 15% 部位，不使用槓桿。
+• 現金：保留 20%，等待更好的風險報酬機會。
+
+風險提醒：目前使用示範資料與內建規則，尚未串接即時行情。`;
+        status.textContent = "分析完成";
+        dot.classList.add("ready");
+        button.textContent = "重新產生建議";
+        button.disabled = false;
+      }, 650);
+    });
+  </script>
+</body>
+</html>
