@@ -74,6 +74,17 @@
     .money-input:focus { border-color: #7da2f5; box-shadow: 0 0 0 3px rgba(37, 99, 235, .11); }
     .allocation-note { margin: 14px 0 0; color: var(--muted); font-size: 12px; }
     .profile-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 14px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .strategy-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+    .secondary-action {
+      border: 1px solid #bfd0f6;
+      border-radius: 12px;
+      padding: 11px 16px;
+      color: #1d4ed8;
+      background: white;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .secondary-action:hover { background: var(--blue-soft); }
     .select-input {
       width: 100%;
       border: 1px solid var(--line);
@@ -183,6 +194,16 @@
       </div>
       <div class="profile-grid">
         <div class="field">
+          <label for="strategyInput">投資策略</label>
+          <select class="select-input" id="strategyInput">
+            <option value="etf">核心 ETF</option>
+            <option value="balanced" selected>均衡配置</option>
+            <option value="growth">成長型</option>
+            <option value="defensive">防守型</option>
+            <option value="crypto">加密衛星</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="horizonInput">投資期限</label>
           <select class="select-input" id="horizonInput">
             <option value="short">1 年內可能用錢</option>
@@ -202,7 +223,12 @@
           <label for="monthlyInput">每月可投入金額（NT$）</label>
           <input class="money-input" id="monthlyInput" type="number" min="0" step="1000" value="20000">
         </div>
+        <div class="field">
+          <label for="capitalInput">可配置總資金（NT$）</label>
+          <input class="money-input" id="capitalInput" type="number" min="0" step="1000" value="1000000">
+        </div>
       </div>
+      <div class="strategy-actions"><button class="secondary-action" id="applyStrategy" type="button">依策略套用建議金額</button></div>
       <p class="allocation-note">所有資料只在這個瀏覽器頁面中計算，不會上傳或自動交易。</p>
     </section>
 
@@ -257,6 +283,9 @@
     const horizonInput = document.querySelector("#horizonInput");
     const riskInput = document.querySelector("#riskInput");
     const monthlyInput = document.querySelector("#monthlyInput");
+    const capitalInput = document.querySelector("#capitalInput");
+    const strategyInput = document.querySelector("#strategyInput");
+    const applyStrategy = document.querySelector("#applyStrategy");
     const comparisonBody = document.querySelector("#comparisonBody");
     const monthlyPlan = document.querySelector("#monthlyPlan");
     const profileLabels = {
@@ -277,15 +306,34 @@
     }
 
     function targetAllocation() {
-      const profiles = {
-        conservative: { tsmc: 15, etf: 55, btc: 5, cash: 25 },
+      const strategies = {
+        etf: { tsmc: 15, etf: 65, btc: 5, cash: 15 },
         balanced: { tsmc: 25, etf: 45, btc: 15, cash: 15 },
-        aggressive: { tsmc: 35, etf: 35, btc: 20, cash: 10 }
+        growth: { tsmc: 40, etf: 35, btc: 15, cash: 10 },
+        defensive: { tsmc: 10, etf: 35, btc: 5, cash: 50 },
+        crypto: { tsmc: 20, etf: 35, btc: 30, cash: 15 }
       };
-      const target = { ...profiles[riskInput.value] };
+      const limits = {
+        conservative: { btcMax: 5, cashMin: 25 },
+        balanced: { btcMax: 15, cashMin: 15 },
+        aggressive: { btcMax: 25, cashMin: 10 }
+      };
+      const target = { ...strategies[strategyInput.value] };
+      const limit = limits[riskInput.value];
+      if (target.btc > limit.btcMax) {
+        target.etf += target.btc - limit.btcMax;
+        target.btc = limit.btcMax;
+      }
+      if (target.cash < limit.cashMin) {
+        const needed = limit.cashMin - target.cash;
+        const fromEtf = Math.min(needed, Math.max(0, target.etf - 20));
+        target.etf -= fromEtf;
+        target.tsmc -= needed - fromEtf;
+        target.cash = limit.cashMin;
+      }
       if (horizonInput.value === "short") {
-        target.cash += 15;
-        target.etf -= 15;
+        target.cash += 10;
+        target.etf -= 10;
       } else if (horizonInput.value === "long") {
         target.cash -= 5;
         target.etf += 5;
@@ -332,7 +380,27 @@
 
     Object.values(fields).forEach((input) => input.addEventListener("input", updateDashboard));
     [horizonInput, riskInput].forEach((input) => input.addEventListener("change", updateDashboard));
+    strategyInput.addEventListener("change", updateDashboard);
     monthlyInput.addEventListener("input", updateDashboard);
+    capitalInput.addEventListener("input", () => {
+      dot.classList.remove("ready");
+      status.textContent = "等待分析";
+    });
+    applyStrategy.addEventListener("click", () => {
+      const capital = Math.max(0, Number(capitalInput.value) || 0);
+      if (!capital) {
+        advice.classList.remove("placeholder");
+        advice.textContent = "請先輸入可配置總資金，再套用策略。";
+        return;
+      }
+      const target = targetAllocation();
+      Object.keys(fields).forEach((key) => {
+        fields[key].value = Math.round(capital * target[key] / 100);
+      });
+      updateDashboard();
+      advice.classList.remove("placeholder");
+      advice.textContent = "已依你選擇的策略、期限與風險偏好套用建議金額；你仍可逐項修改。";
+    });
 
     button.addEventListener("click", () => {
       const allocation = updateDashboard();
