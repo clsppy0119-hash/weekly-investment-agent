@@ -73,6 +73,26 @@
     }
     .money-input:focus { border-color: #7da2f5; box-shadow: 0 0 0 3px rgba(37, 99, 235, .11); }
     .allocation-note { margin: 14px 0 0; color: var(--muted); font-size: 12px; }
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 14px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .select-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 13px;
+      color: var(--ink);
+      background: #fbfcfe;
+      font: inherit;
+      outline: none;
+    }
+    .select-input:focus { border-color: #7da2f5; box-shadow: 0 0 0 3px rgba(37, 99, 235, .11); }
+    .comparison { margin-top: 14px; padding: 24px; }
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .comparison-table th, .comparison-table td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+    .comparison-table th:first-child, .comparison-table td:first-child { text-align: left; }
+    .comparison-table th { color: var(--muted); font-size: 12px; }
+    .gap-up { color: var(--green); font-weight: 700; }
+    .gap-down { color: var(--red); font-weight: 700; }
+    .next-money { margin: 16px 0 0; padding: 14px 16px; border-radius: 13px; background: var(--blue-soft); color: #1e40af; line-height: 1.6; }
     .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
     h2 { margin: 0; font-size: 19px; letter-spacing: -.02em; }
     .holdings { display: grid; gap: 18px; }
@@ -117,6 +137,7 @@
     @media (max-width: 820px) {
       .metrics { grid-template-columns: repeat(2, 1fr); }
       .allocation-grid { grid-template-columns: repeat(2, 1fr); }
+      .profile-grid { grid-template-columns: 1fr; }
       .workspace { grid-template-columns: 1fr; }
       header { flex-direction: column; }
     }
@@ -160,6 +181,28 @@
         <div class="field"><label for="btcInput">比特幣（NT$）</label><input class="money-input" id="btcInput" type="number" min="0" step="1000" value="150000"></div>
         <div class="field"><label for="cashInput">現金（NT$）</label><input class="money-input" id="cashInput" type="number" min="0" step="1000" value="200000"></div>
       </div>
+      <div class="profile-grid">
+        <div class="field">
+          <label for="horizonInput">投資期限</label>
+          <select class="select-input" id="horizonInput">
+            <option value="short">1 年內可能用錢</option>
+            <option value="medium" selected>1～5 年</option>
+            <option value="long">5 年以上</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="riskInput">風險偏好</label>
+          <select class="select-input" id="riskInput">
+            <option value="conservative">保守型</option>
+            <option value="balanced" selected>平衡型</option>
+            <option value="aggressive">積極型</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="monthlyInput">每月可投入金額（NT$）</label>
+          <input class="money-input" id="monthlyInput" type="number" min="0" step="1000" value="20000">
+        </div>
+      </div>
       <p class="allocation-note">所有資料只在這個瀏覽器頁面中計算，不會上傳或自動交易。</p>
     </section>
 
@@ -184,6 +227,17 @@
       </article>
     </section>
 
+    <section class="card comparison" aria-labelledby="comparisonTitle">
+      <div class="panel-head">
+        <div><h2 id="comparisonTitle">目前配置 vs 建議配置</h2><div class="label" style="margin-top:5px">建議比例會依投資期限與風險偏好調整</div></div>
+      </div>
+      <table class="comparison-table">
+        <thead><tr><th>資產</th><th>目前</th><th>建議</th><th>差距</th></tr></thead>
+        <tbody id="comparisonBody"></tbody>
+      </table>
+      <p class="next-money" id="monthlyPlan">輸入資料後，這裡會顯示下個月資金的優先方向。</p>
+    </section>
+
     <footer>內容僅供研究與介面測試，不構成投資建議。</footer>
   </main>
 
@@ -200,6 +254,16 @@
     };
     const names = { tsmc: "台積電", etf: "0050", btc: "比特幣", cash: "現金" };
     const money = new Intl.NumberFormat("zh-TW", { maximumFractionDigits: 0 });
+    const horizonInput = document.querySelector("#horizonInput");
+    const riskInput = document.querySelector("#riskInput");
+    const monthlyInput = document.querySelector("#monthlyInput");
+    const comparisonBody = document.querySelector("#comparisonBody");
+    const monthlyPlan = document.querySelector("#monthlyPlan");
+    const profileLabels = {
+      conservative: "保守型",
+      balanced: "平衡型",
+      aggressive: "積極型"
+    };
 
     function readAllocation() {
       const amounts = Object.fromEntries(
@@ -210,6 +274,42 @@
         Object.entries(amounts).map(([key, amount]) => [key, total ? amount / total * 100 : 0])
       );
       return { amounts, total, ratios };
+    }
+
+    function targetAllocation() {
+      const profiles = {
+        conservative: { tsmc: 15, etf: 55, btc: 5, cash: 25 },
+        balanced: { tsmc: 25, etf: 45, btc: 15, cash: 15 },
+        aggressive: { tsmc: 35, etf: 35, btc: 20, cash: 10 }
+      };
+      const target = { ...profiles[riskInput.value] };
+      if (horizonInput.value === "short") {
+        target.cash += 15;
+        target.etf -= 15;
+      } else if (horizonInput.value === "long") {
+        target.cash -= 5;
+        target.etf += 5;
+      }
+      return target;
+    }
+
+    function updateComparison(ratios) {
+      const target = targetAllocation();
+      comparisonBody.innerHTML = Object.keys(fields).map((key) => {
+        const gap = target[key] - ratios[key];
+        const gapClass = gap > 0.1 ? "gap-up" : gap < -0.1 ? "gap-down" : "";
+        const gapText = `${gap > 0 ? "+" : ""}${gap.toFixed(1)}%`;
+        return `<tr><td>${names[key]}</td><td>${ratios[key].toFixed(1)}%</td><td>${target[key].toFixed(1)}%</td><td class="${gapClass}">${gapText}</td></tr>`;
+      }).join("");
+
+      const monthly = Math.max(0, Number(monthlyInput.value) || 0);
+      const priority = Object.entries(target)
+        .map(([key, targetRatio]) => [key, targetRatio - ratios[key]])
+        .sort((a, b) => b[1] - a[1])[0];
+      monthlyPlan.textContent = monthly
+        ? `下個月可投入 NT$ ${money.format(monthly)}：目前最優先補足「${names[priority[0]]}」，它與建議比例相差 ${Math.max(0, priority[1]).toFixed(1)}%。`
+        : "目前沒有填寫每月新增資金；調整配置時宜採分批方式，避免一次大幅換倉。";
+      return target;
     }
 
     function updateDashboard() {
@@ -224,12 +324,15 @@
         document.querySelector(`#${key}Weight`).textContent = `${ratios[key].toFixed(1)}%`;
         document.querySelector(`#${key}Bar`).style.setProperty("--w", `${ratios[key]}%`);
       });
+      updateComparison(ratios);
       dot.classList.remove("ready");
       status.textContent = "等待分析";
       return { amounts, total, ratios };
     }
 
     Object.values(fields).forEach((input) => input.addEventListener("input", updateDashboard));
+    [horizonInput, riskInput].forEach((input) => input.addEventListener("change", updateDashboard));
+    monthlyInput.addEventListener("input", updateDashboard);
 
     button.addEventListener("click", () => {
       const allocation = updateDashboard();
@@ -244,23 +347,28 @@
 
       window.setTimeout(() => {
         const { ratios } = allocation;
+        const target = targetAllocation();
         const observations = [];
-        if (ratios.cash < 10) observations.push("• 現金低於 10%：緩衝空間偏少，建議先提高現金水位。");
-        else if (ratios.cash > 40) observations.push("• 現金高於 40%：配置偏保守，可等待機會再分批投入。");
-        else observations.push(`• 現金 ${ratios.cash.toFixed(1)}%：保留了合理的調整空間。`);
+        if (ratios.cash < target.cash) observations.push(`• 現金低於你的建議值 ${target.cash}%：優先提高緩衝資金。`);
+        else observations.push(`• 現金 ${ratios.cash.toFixed(1)}%：已達目前條件下的建議水位。`);
 
-        if (ratios.btc > 20) observations.push("• 比特幣超過 20%：波動曝險偏高，建議不要再加碼並評估降低比例。");
-        else if (ratios.btc > 0) observations.push(`• 比特幣 ${ratios.btc.toFixed(1)}%：維持小部位，不使用槓桿。`);
+        if (ratios.btc > target.btc) observations.push(`• 比特幣高於${profileLabels[riskInput.value]}建議值 ${target.btc}%：暫停加碼並評估降低比例。`);
+        else if (ratios.btc > 0) observations.push(`• 比特幣 ${ratios.btc.toFixed(1)}%：仍在你的風險偏好範圍內。`);
 
         const concentrated = Object.entries(ratios)
-          .filter(([key, ratio]) => key !== "cash" && ratio > 45)
+          .filter(([key, ratio]) => key !== "cash" && ratio > target[key] + 10)
           .map(([key]) => names[key]);
-        if (concentrated.length) observations.push(`• ${concentrated.join("、")} 超過 45%：單一資產集中度偏高，暫停加碼。`);
-        else observations.push("• 單一風險資產未超過 45%，集中度目前尚可。");
+        if (concentrated.length) observations.push(`• ${concentrated.join("、")} 明顯高於個人化建議比例：新增資金先不要投入這些項目。`);
+        else observations.push("• 各項資產與個人化建議比例差距尚可。");
 
-        const stance = ratios.cash < 10 || ratios.btc > 20 || concentrated.length
+        const stance = ratios.cash < target.cash || ratios.btc > target.btc || concentrated.length
           ? "本週策略：優先降低風險，不追價。"
           : "本週策略：維持配置，採分批方式調整。";
+        const monthly = Math.max(0, Number(monthlyInput.value) || 0);
+        const priority = Object.entries(target)
+          .map(([key, targetRatio]) => [key, targetRatio - ratios[key]])
+          .sort((a, b) => b[1] - a[1])[0][0];
+        if (monthly) observations.push(`• 每月新增 NT$ ${money.format(monthly)}：本月優先配置到${names[priority]}。`);
         advice.classList.remove("placeholder");
         advice.textContent = `${stance}\n\n${observations.join("\n")}\n\n風險提醒：目前依你輸入的配置與內建規則分析，尚未串接即時行情。`;
         status.textContent = "分析完成";
