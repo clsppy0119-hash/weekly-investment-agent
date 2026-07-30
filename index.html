@@ -12,7 +12,7 @@
     .workspace { display:grid; grid-template-columns:.9fr 1.45fr; gap:14px; } .allocation-card,.comparison { margin-bottom:14px; } .panel-head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }.allocation-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; } .profile-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px; padding-top:18px; border-top:1px solid var(--line); }
     .field label { display:block; margin-bottom:7px; color:var(--muted); font-size:13px; font-weight:650; } .money-input,.select-input,.text-input { width:100%; border:1px solid var(--line); border-radius:12px; padding:12px 13px; color:var(--ink); background:#fbfcfe; font:inherit; outline:none; font-variant-numeric:tabular-nums; } .money-input:focus,.select-input:focus,.text-input:focus { border-color:#7da2f5; box-shadow:0 0 0 3px rgba(37,99,235,.11); }
     .button-row { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px; margin-top:14px; } button { font:inherit; cursor:pointer; } .secondary-action { border:1px solid #bfd0f6; border-radius:12px; padding:11px 16px; color:#1d4ed8; background:white; font-weight:750; } .secondary-action:hover { background:var(--soft); } .danger-action { border-color:#f5c2c7; color:var(--red); } .danger-action:hover { background:#fff4f4; }.market-data { margin-top:18px; padding-top:18px; border-top:1px solid var(--line); }.market-data h2 { margin-bottom:5px; }.quote-list { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px; }.quote-card { padding:12px; border:1px solid var(--line); border-radius:13px; background:#fbfcfe; }.quote-card strong { display:block; margin-top:5px; font-size:18px; }.market-status { margin:12px 0 0; color:var(--muted); font-size:13px; line-height:1.6; }
-    .asset-manager { margin-top:18px; padding-top:18px; border-top:1px solid var(--line); }.asset-manager p { margin:6px 0 12px; }.add-grid { display:grid; grid-template-columns:1.2fr 1fr auto; gap:10px; }.custom-assets { display:grid; gap:10px; margin-top:12px; }.custom-row { display:grid; grid-template-columns:1.25fr .75fr .7fr .85fr 1fr auto; gap:10px; align-items:end; padding:12px; border:1px solid var(--line); border-radius:14px; background:#fbfcfe; }
+    .asset-manager { margin-top:18px; padding-top:18px; border-top:1px solid var(--line); }.asset-manager p { margin:6px 0 12px; }.add-grid { display:grid; grid-template-columns:1.2fr 1fr auto; gap:10px; }.custom-assets { display:grid; gap:10px; margin-top:12px; }.custom-row { display:grid; grid-template-columns:1.25fr .9fr .8fr .85fr 1fr auto; gap:10px; align-items:end; padding:12px; border:1px solid var(--line); border-radius:14px; background:#fbfcfe; }.legacy-core,.legacy-market,.legacy-actions,.legacy-analysis,section[aria-labelledby="comparisonTitle"],section[aria-labelledby="adjustmentTitle"] { display:none; }
     .holdings { display:grid; gap:18px; }.holding-line { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }.asset { font-weight:720; }.weight { color:var(--muted); font-variant-numeric:tabular-nums; }.track { height:8px; overflow:hidden; border-radius:999px; background:#edf1f7; }.fill { height:100%; width:var(--w); border-radius:inherit; background:linear-gradient(90deg,#2563eb,#60a5fa); }
     .advice-card { min-height:410px; display:flex; flex-direction:column; }.status { display:flex; gap:8px; align-items:center; color:var(--muted); font-size:13px; }.dot { width:8px; height:8px; border-radius:50%; background:#98a2b3; }.dot.ready { background:#12b76a; box-shadow:0 0 0 4px rgba(18,183,106,.12); } #advice { flex:1; min-height:220px; margin:0 0 20px; padding:19px; border:1px solid var(--line); border-radius:15px; color:#344054; background:#fbfcfe; line-height:1.75; white-space:pre-line; }.placeholder { color:#98a2b3; }.action { align-self:flex-end; border:0; border-radius:13px; padding:13px 20px; color:white; background:var(--blue); font-weight:780; box-shadow:0 9px 20px rgba(37,99,235,.24); }.action:hover { background:#1d4ed8; }
     .comparison-table { width:100%; border-collapse:collapse; font-size:14px; }.comparison-table th,.comparison-table td { padding:12px 10px; border-bottom:1px solid var(--line); text-align:right; }.comparison-table th:first-child,.comparison-table td:first-child { text-align:left; }.comparison-table th { color:var(--muted); font-size:12px; }.gap-up { color:var(--green); font-weight:700; }.gap-down { color:var(--red); font-weight:700; }.next-money { margin:16px 0 0; padding:14px 16px; border-radius:13px; background:var(--soft); color:#1e40af; line-height:1.6; }.adjustments { display:grid; gap:10px; }.adjustment-row { display:grid; grid-template-columns:1.2fr .8fr 1fr; gap:12px; align-items:center; padding:14px; border:1px solid var(--line); border-radius:14px; background:#fbfcfe; }.adjustment-action { font-weight:800; }.adjustment-action.add { color:var(--green); }.adjustment-action.reduce { color:var(--red); }.adjustment-action.hold { color:var(--muted); }.risk-note { margin-top:12px; padding:13px 15px; border-radius:13px; background:#fff7ed; color:#9a3412; line-height:1.6; font-size:14px; }.performance-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }.performance-summary div { padding:14px; border-radius:14px; background:#fbfcfe; border:1px solid var(--line); }.performance-summary strong { display:block; margin-top:6px; font-size:20px; }.profit { color:var(--green); }.loss { color:var(--red); }.performance-cost { min-width:120px; text-align:right; }.history-list { display:grid; gap:12px; }.history-item { padding:16px; border:1px solid var(--line); border-radius:15px; background:#fbfcfe; }.history-item summary { cursor:pointer; font-weight:750; }.history-meta { margin:7px 0 12px; color:var(--muted); font-size:13px; }.history-text { margin:0; white-space:pre-line; line-height:1.7; color:#344054; }.history-empty { margin:0; color:#98a2b3; }.history-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:12px; } footer { margin-top:18px; color:var(--muted); font-size:12px; text-align:center; }
@@ -25,11 +25,11 @@
     <section class="metrics" aria-label="投資組合摘要"><article class="card metric"><div class="label">投資組合總資產</div><div class="value" id="totalValue">NT$ 1,000,000</div></article><article class="card metric"><div class="label">現金比例</div><div class="value" id="cashRatio">20%</div></article><article class="card metric"><div class="label">持倉檔數</div><div class="value" id="holdingCount">3</div></article><article class="card metric"><div class="label">本週漲跌</div><div class="value positive">+1.2%</div></article></section>
     <section class="card allocation-card" aria-labelledby="allocationTitle">
       <div class="panel-head"><div><h2 id="allocationTitle">輸入資金配置</h2><div class="label" style="margin-top:5px">輸入目前投入金額，比例會自動更新；設定會自動保存在此瀏覽器。</div></div></div>
-      <div class="allocation-grid">
-        <div class="field"><label for="tsmcInput">台積電（NT$）</label><input class="money-input core-input" id="tsmcInput" type="number" min="0" step="1000" value="350000"></div>
-        <div class="field"><label for="etfInput">0050（NT$）</label><input class="money-input core-input" id="etfInput" type="number" min="0" step="1000" value="300000"></div>
-        <div class="field"><label for="btcInput">比特幣（NT$）</label><input class="money-input core-input" id="btcInput" type="number" min="0" step="1000" value="150000"></div>
-        <div class="field"><label for="cashInput">現金（NT$）</label><input class="money-input core-input" id="cashInput" type="number" min="0" step="1000" value="200000"></div>
+      <div class="allocation-grid legacy-core">
+        <div class="field"><label for="tsmcInput">台積電（NT$）</label><input class="money-input core-input" id="tsmcInput" type="number" min="0" step="1000" value="0"></div>
+        <div class="field"><label for="etfInput">0050（NT$）</label><input class="money-input core-input" id="etfInput" type="number" min="0" step="1000" value="0"></div>
+        <div class="field"><label for="btcInput">比特幣（NT$）</label><input class="money-input core-input" id="btcInput" type="number" min="0" step="1000" value="0"></div>
+        <div class="field"><label for="cashInput">現金（NT$）</label><input class="money-input core-input" id="cashInput" type="number" min="0" step="1000" value="0"></div>
       </div>
       <div class="profile-grid">
         <div class="field"><label for="strategyInput">投資策略</label><select class="select-input" id="strategyInput"><option value="etf">核心 ETF</option><option value="balanced" selected>均衡配置</option><option value="growth">成長型</option><option value="defensive">防守型</option><option value="crypto">加密衛星</option></select></div>
@@ -38,13 +38,13 @@
         <div class="field"><label for="monthlyInput">每月可投入金額（NT$）</label><input class="money-input" id="monthlyInput" type="number" min="0" step="1000" value="20000"></div>
         <div class="field"><label for="capitalInput">可配置總資金（自動計算，NT$）</label><input class="money-input" id="capitalInput" type="number" min="0" step="1000" value="1000000" readonly aria-describedby="capitalNote"></div>
       </div>
-      <div class="market-data">
+      <div class="market-data legacy-market">
         <h2>市場價格更新</h2><p class="label">填入持有數量後，可將公開資料來源取得的價格套用到目前市值。台股採最近交易日收盤價；比特幣採現貨參考價。</p>
         <div class="allocation-grid"><div class="field"><label for="tsmcUnits">台積電股數</label><input class="money-input market-unit" id="tsmcUnits" type="number" min="0" step="1" placeholder="例如：1000"></div><div class="field"><label for="etfUnits">0050 單位數</label><input class="money-input market-unit" id="etfUnits" type="number" min="0" step="1" placeholder="例如：1000"></div><div class="field"><label for="btcUnits">比特幣數量</label><input class="money-input market-unit" id="btcUnits" type="number" min="0" step="0.00000001" placeholder="例如：0.05"></div></div>
         <div class="button-row"><button class="secondary-action" id="refreshPrices" type="button">更新台股與比特幣價格</button></div><p class="market-status" id="marketStatus">尚未取得市場價格。未填持有數量時，只顯示報價、不改寫市值。</p><div class="quote-list" id="quoteList"></div>
       </div>
-      <div class="button-row"><button class="secondary-action" id="applyStrategy" type="button">依策略套用建議金額</button><button class="secondary-action" id="saveButton" type="button">立即儲存設定</button><button class="secondary-action danger-action" id="resetButton" type="button">清除已儲存設定</button></div>
-      <div class="asset-manager"><h2>自訂投資標的</h2><p class="label">可加入任何股票、ETF、基金或加密資產；其金額會計入總資產與配置比例。</p><div id="customAssets" class="custom-assets"></div><div class="button-row" style="justify-content:flex-start"><button class="secondary-action" id="refreshCustomPrices" type="button">更新自訂台股價格</button></div><div class="add-grid"><div class="field"><label for="assetNameInput">標的名稱</label><input class="text-input" id="assetNameInput" placeholder="例如：VOO、輝達、黃金"></div><div class="field"><label for="assetAmountInput">目前金額（NT$）</label><input class="money-input" id="assetAmountInput" type="number" min="0" step="1000" placeholder="0"></div><button class="secondary-action" id="addAsset" type="button">新增標的</button></div></div>
+      <div class="button-row legacy-actions"><button class="secondary-action" id="applyStrategy" type="button">依策略套用建議金額</button><button class="secondary-action" id="saveButton" type="button">立即儲存設定</button><button class="secondary-action danger-action" id="resetButton" type="button">清除已儲存設定</button></div>
+      <div class="asset-manager"><h2>我的資產</h2><p class="label">所有資產都由你自行新增。選擇自動報價後，填入代號與持有數量，按下更新即可自動計算目前市值。</p><div id="customAssets" class="custom-assets"></div><div class="button-row" style="justify-content:flex-start"><button class="secondary-action" id="refreshCustomPrices" type="button">更新所有自訂資產價格</button><button class="secondary-action" id="saveButton" type="button">立即儲存設定</button></div><div class="add-grid"><div class="field"><label for="assetNameInput">標的名稱</label><input class="text-input" id="assetNameInput" placeholder="例如：台積電、BTC、VOO、現金"></div><div class="field"><label for="assetAmountInput">目前金額（NT$）</label><input class="money-input" id="assetAmountInput" type="number" min="0" step="1000" placeholder="可先留空，更新價格後自動填入"></div><button class="secondary-action" id="addAsset" type="button">新增資產</button></div></div>
       <p class="allocation-note" id="capitalNote">可配置總資金會自動加總所有目前輸入的配置，包括自訂標的；所有資料只在這個瀏覽器頁面中計算與儲存，不會上傳或自動交易。</p>
     </section>
     <section class="workspace"><article class="card panel"><div class="panel-head"><h2>持倉配置</h2><span class="label" id="allocationTotal">100%</span></div><div class="holdings" id="holdingsList"></div></article><article class="card panel advice-card"><div class="panel-head"><h2>本週投資建議</h2><div class="status"><span class="dot" id="dot"></span><span id="status">等待分析</span></div></div><div id="advice" class="placeholder" aria-live="polite">按下「產生本週建議」，查看依你的配置產生的研究摘要。</div><button class="action" id="generate" type="button">產生本週建議</button></article></section>
@@ -66,7 +66,7 @@
     let marketSettings = { tsmcUnits:0, etfUnits:0, btcUnits:0 };
     let marketQuotes = {};
     function number(value) { return Math.max(0, Number(value) || 0); }
-    function allAssets() { return [...coreAssets.map(a => ({...a, amount:number(document.querySelector(`#${a.input}`).value)})), ...customAssets.map(a => ({...a,key:a.id,amount:number(a.amount)}))]; }
+    function allAssets() { return [...coreAssets.map(a => ({...a, amount:number(document.querySelector(`#${a.input}`).value)})).filter(a=>a.amount>0), ...customAssets.map(a => ({...a,key:a.id,amount:number(a.amount)}))]; }
     function setSaveState(text="已自動儲存") { saveState.textContent = text; }
     function persist() { const data = { core:Object.fromEntries(coreAssets.map(a=>[a.key,number(document.querySelector(`#${a.input}`).value)])), customAssets, costBases, marketSettings, strategy:strategyInput.value, horizon:horizonInput.value, risk:riskInput.value, monthly:number(monthlyInput.value), capital:number(capitalInput.value) }; localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); setSaveState("已儲存於此瀏覽器"); }
     function getHistory() { try { const history=JSON.parse(localStorage.getItem(HISTORY_KEY)); return Array.isArray(history)?history:[]; } catch { return []; } }
@@ -111,6 +111,26 @@
       updateDashboard();
     },true);
     restore();renderCustomAssets();updateDashboard(false);renderHistory();renderQuotes();
+  </script>
+  <script>
+    // 新版只以使用者自行建立的資產作為投資組合；舊版預設資產不再列入計算。
+    document.querySelectorAll(".legacy-core .core-input").forEach(input => { input.value = 0; });
+    updateDashboard();
+    document.querySelector("#generate").addEventListener("click", () => {
+      const allocation = updateDashboard();
+      if (!allocation.total) return;
+      const autoAssets = customAssets.filter(asset => asset.market === "twse");
+      const largest = [...allocation.assets].sort((a,b) => b.amount - a.amount)[0];
+      const notes = [
+        `目前共有 ${allocation.assets.length} 項自訂資產，合計市值 NT$ ${money.format(allocation.total)}。`,
+        largest ? `最大部位為「${largest.name}」，占比 ${(allocation.ratios[largest.key] || 0).toFixed(1)}%。` : "",
+        autoAssets.length ? `已設定 ${autoAssets.length} 項台股自動報價；可隨時按「更新所有自訂資產價格」重新計算市值。` : "尚未設定自動報價資產；可在資產列選擇「台股自動報價」、填入代號與股數。"
+      ].filter(Boolean);
+      advice.classList.remove("placeholder");
+      advice.textContent = `本週配置摘要\n\n${notes.map(note => `• ${note}`).join("\n")}\n\n此工具依你輸入的資產與公開報價計算，僅供研究參考，不構成投資建議。`;
+      status.textContent = "分析完成";
+      dot.classList.add("ready");
+    });
   </script>
 </body>
 </html>
