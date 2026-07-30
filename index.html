@@ -147,7 +147,7 @@
           <div class="field"><label>持有股數</label><input class="money-input custom-units" type="number" min="0" step="1" placeholder="0" value="${asset.units || ""}"></div>
           <div class="field"><label>買入股價（NT$）</label><input class="money-input custom-buy-price" type="number" min="0" step="0.01" placeholder="0" value="${buyPrice || ""}"></div>
           <div class="field"><label>目前股價（NT$）</label><input class="money-input custom-current-price" type="number" min="0" step="0.01" placeholder="更新報價或手動填入" value="${currentPrice || ""}"></div>
-          <div class="field"><label>損益（NT$）</label><div class="money-input ${profit >= 0 ? "profit" : "loss"}" style="min-height:46px">${profit >= 0 ? "+" : ""}${money.format(profit)}</div></div>
+          <div class="field"><label>損益（NT$）</label><div class="money-input custom-profit ${profit >= 0 ? "profit" : "loss"}" style="min-height:46px">${profit >= 0 ? "+" : ""}${money.format(profit)}</div></div>
           <button class="secondary-action danger-action remove-asset" type="button">移除</button>
         </div>`;
       }).join("");
@@ -156,9 +156,10 @@
         row.querySelector(".custom-name").addEventListener("input", event => { asset.name = event.target.value.trim() || "未命名標的"; refresh(); });
         row.querySelector(".custom-market").addEventListener("change", event => { asset.market = event.target.value; renderCustomAssets(); refresh(); });
         row.querySelector(".custom-ticker").addEventListener("input", event => { asset.ticker = event.target.value.replace(/[^0-9]/g, "").slice(0, 6); persist(); });
-        row.querySelector(".custom-units").addEventListener("input", event => { asset.units = number(event.target.value); const nextUnits = number(event.target.value); const buy = number(row.querySelector(".custom-buy-price").value); const current = number(row.querySelector(".custom-current-price").value); costBases[asset.id] = Math.round(nextUnits * buy); asset.amount = Math.round(nextUnits * current); updateDashboard(); });
-        row.querySelector(".custom-buy-price").addEventListener("input", event => { costBases[asset.id] = Math.round(number(asset.units) * number(event.target.value)); updateDashboard(); });
-        row.querySelector(".custom-current-price").addEventListener("input", event => { asset.amount = Math.round(number(asset.units) * number(event.target.value)); updateDashboard(); });
+        const updateRowProfit = () => { const profit = asset.amount - number(costBases[asset.id]); const target = row.querySelector(".custom-profit"); target.textContent = `${profit >= 0 ? "+" : ""}${money.format(profit)}`; target.className = `money-input custom-profit ${profit >= 0 ? "profit" : "loss"}`; };
+        row.querySelector(".custom-units").addEventListener("input", event => { asset.units = number(event.target.value); const nextUnits = number(event.target.value); const buy = number(row.querySelector(".custom-buy-price").value); const current = number(row.querySelector(".custom-current-price").value); costBases[asset.id] = Math.round(nextUnits * buy); asset.amount = Math.round(nextUnits * current); updateRowProfit(); updateDashboard(); });
+        row.querySelector(".custom-buy-price").addEventListener("input", event => { costBases[asset.id] = Math.round(number(asset.units) * number(event.target.value)); updateRowProfit(); updateDashboard(); });
+        row.querySelector(".custom-current-price").addEventListener("input", event => { asset.amount = Math.round(number(asset.units) * number(event.target.value)); updateRowProfit(); updateDashboard(); });
         row.querySelector(".remove-asset").addEventListener("click", () => { customAssets = customAssets.filter(item => item.id !== asset.id); delete costBases[asset.id]; renderCustomAssets(); refresh(); });
       });
     };
