@@ -1,6 +1,9 @@
 name: Long-term research Telegram
 on:
   workflow_dispatch:
+  schedule:
+    # 08:15 台北時間；僅在長線研究門檻達標時才會推播。
+    - cron: "15 0 * * 1-5"
 permissions:
   contents: read
 jobs:
@@ -9,8 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build long-term research
-        run: REPORT_MODE=long REPORT_OUTPUT=long-research.txt python daily_report.py
+        run: REPORT_MODE=long LONG_AUTO=1 REPORT_OUTPUT=long-research.txt python daily_report.py
+      - name: Check research threshold
+        id: threshold
+        run: |
+          if [ -s long-research.txt ]; then echo "send=true" >> "$GITHUB_OUTPUT"; else echo "send=false" >> "$GITHUB_OUTPUT"; fi
       - name: Push research to Telegram
+        if: steps.threshold.outputs.send == 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

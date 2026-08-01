@@ -97,6 +97,13 @@ for key, title in styles:
     lines = [candidate_line(item) for item in items] or ["• 暫無資料完整度足夠的候選，請待資料更新後再檢視。"]
     sections.extend(["", f"【{title}｜優先研究候選】", *lines])
 
+auto_long = report_mode == "long" and os.environ.get("LONG_AUTO") == "1"
+long_ready = any(item[0] >= 80 and item[1] >= 70 for item in candidates("value", quotes, fundamentals))
+if auto_long and not long_ready:
+    with open(os.environ.get("REPORT_OUTPUT", "long-research.txt"), "w", encoding="utf-8") as output:
+        output.write("")
+    raise SystemExit(0)
+
 report = "\n".join([
     f"台股{report_title}｜{today}",
     f"行情更新：{data.get('updatedAt', '暫無時間')}",
