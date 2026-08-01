@@ -87,11 +87,7 @@ def quote_line(item):
     return f"• {row.get('name', code)}（{code}）｜{row['price']:.2f}｜{row.get('change', 0):+.2f}"
 
 
-styles = [
-    ("value", "長期價值投資"),
-    ("swing", "短線／波段操作"),
-    ("dividend", "股息成長投資"),
-]
+styles = [("value", "長期價值投資")]
 sections = []
 for key, title in styles:
     items = candidates(key, quotes, fundamentals)
@@ -99,7 +95,7 @@ for key, title in styles:
     sections.extend(["", f"【{title}｜優先研究候選】", *lines])
 
 report = "\n".join([
-    f"台股每日投資日報｜{today}",
+    f"台股每日投資日報｜長期價值投資｜{today}",
     f"行情更新：{data.get('updatedAt', '暫無時間')}",
     "",
     "【今日漲幅前段】",
