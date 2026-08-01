@@ -101,4 +101,62 @@ fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(d
   fundamentals = data.fundamentals || {};
   renderStrategy(positions().filter(item => item.shares > 0));
 }).catch(() => {});
+</script><script>
+/* Client-side investment analysis using closing prices and existing fundamentals. */
+(() => {
+  const forecastCache = new Map();
+  const num = v => Number(v);
+  const avg = xs => xs.reduce((s,x) => s + x, 0) / xs.length;
+  const qtile = (xs,p) => { const a=[...xs].sort((x,y)=>x-y), i=(a.length-1)*p, l=Math.floor(i), h=Math.ceil(i); return l===h?a[l]:a[l]+(a[h]-a[l])*(i-l); };
+  const sd = xs => { const m=avg(xs); return Math.sqrt(avg(xs.map(x=>(x-m)**2))); };
+  const pc = n => `${n>=0?'+':''}${(n*100).toFixed(1)}%`;
+  async function getHistory(code) {
+    if (!forecastCache.has(code)) {
+      const start = `${new Date().getFullYear()-4}-01-01`;
+      forecastCache.set(code, fetch(`https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${encodeURIComponent(code)}&start_date=${start}`).then(r=>{if(!r.ok)throw Error();return r.json()}).then(d=>(d.data||[]).map(x=>({date:x.date,close:num(x.close),volume:num(x.Trading_Volume)})).filter(x=>x.close>0).sort((a,b)=>a.date.localeCompare(b.date))));
+    }
+    return forecastCache.get(code);
+  }
+  function features(rows,i) {
+    if(i<25)return null;
+    const r=[]; for(let x=i-19;x<=i;x++)r.push(Math.log(rows[x].close/rows[x-1].close));
+    const ma=avg(rows.slice(i-19,i+1).map(x=>x.close)), v5=avg(rows.slice(i-4,i+1).map(x=>x.volume||0)), v20=avg(rows.slice(i-19,i+1).map(x=>x.volume||0));
+    return [Math.log(rows[i].close/rows[i-5].close),Math.log(rows[i].close/rows[i-20].close),rows[i].close/ma-1,sd(r),v20?v5/v20-1:0];
+  }
+  function predict(rows,target,horizon,end=target-1) {
+    const now=features(rows,target); if(!now||target<100)return null;
+    const samples=[]; for(let i=25;i<=end-horizon;i++){const f=features(rows,i);if(!f)continue;const scales=[.08,.18,.15,.03,1], dist=Math.sqrt(f.reduce((s,x,k)=>s+((x-now[k])/scales[k])**2,0)), change=rows[i+horizon].close/rows[i].close-1;if(Math.abs(change)<=.35)samples.push({dist,change});}
+    const near=samples.sort((a,b)=>a.dist-b.dist).slice(0,50); if(near.length<20)return null;
+    const changes=near.map(x=>x.change); return {n:near.length,up:changes.filter(x=>x>0).length/changes.length,mid:qtile(changes,.5),lo:qtile(changes,.2),hi:qtile(changes,.8)};
+  }
+  function backtest(rows,horizon) {
+    const outcome=[]; for(let i=Math.max(120,rows.length-130);i<rows.length-horizon;i+=2){const p=predict(rows,i,horizon,i-1);if(p)outcome.push((p.up>=.5)===(rows[i+horizon].close>=rows[i].close));}
+    return {n:outcome.length,accuracy:outcome.length?outcome.filter(Boolean).length/outcome.length:NaN};
+  }
+  function forecast(code,rows) {
+    const i=rows.length-1, price=rows[i].close, a=predict(rows,i,5), b=predict(rows,i,20); if(!a||!b)return `<div class="strategy"><b>${q(code)?.name||code}（${code}）</b><br><span class="hint">歷史資料不足，至少需要約 6 個月交易日。</span></div>`;
+    const test=backtest(rows,20), confidence=test.accuracy>=.58&&test.n>=25?'較高':test.accuracy>=.52?'中等':'較低', line=(name,x)=>`${name}：上漲機率 <b>${Math.round(x.up*100)}%</b>・中位數 ${pc(x.mid)}<br>可能區間 ${money(price*(1+x.lo))} ～ ${money(price*(1+x.hi))}`;
+    return `<div class="strategy"><div class="strategy-head"><b>${q(code)?.name||code}（${code}）</b><span class="strategy-tag">信心${confidence}</span></div><span class="hint">收盤 ${money(price)}・資料至 ${rows[i].date}</span><br>${line('5 個交易日',a)}<br>${line('20 個交易日',b)}<br><span class="hint">20 日走勢回測：${test.n} 次、方向正確率 ${Number.isFinite(test.accuracy)?Math.round(test.accuracy*100)+'%':'資料不足'}；相似樣本 ${b.n} 筆。</span></div>`;
+  }
+  async function loadForecasts(codes) {
+    const target=document.querySelector('#forecastList'); if(!target)return;
+    target.innerHTML='<div class="strategy"><span class="hint">正在載入歷史收盤資料並計算統計預測…</span></div>';
+    const cards=await Promise.all(codes.slice(0,8).map(async code=>{try{return forecast(code,await getHistory(code));}catch{return `<div class="strategy"><b>${q(code)?.name||code}（${code}）</b><br><span class="hint">暫時無法取得歷史資料，請稍後再試。</span></div>`;}}));
+    if(document.querySelector('#forecastList')===target)target.innerHTML=cards.join('');
+  }
+  function analysis(items) {
+    const total=items.reduce((s,x)=>s+x.market,0), biggest=items.reduce((m,x)=>!m||x.market>m.market?x:m,null), weight=biggest&&total?biggest.market/total*100:0;
+    const health=!items.length?'新增持股後，會依集中度與持股數計算健康度。':weight>=50?`注意：${biggest.name} 占投資組合 ${weight.toFixed(1)}%，集中風險偏高。`:weight>=30?`留意：${biggest.name} 占 ${weight.toFixed(1)}%，建議避免單一部位繼續快速提高。`:`持股分散度正常：最大單一部位 ${biggest.name} 占 ${weight.toFixed(1)}%。`;
+    const cards=items.map(x=>{const f=fundamentals[x.code]||{}, trend=Number.isFinite(q(x.code)?.ma20)?q(x.code).price>=q(x.code).ma20?'收盤在20日均線上':'收盤低於20日均線':'均線資料累積中';return `<div class="strategy"><div class="strategy-head"><b>${x.name}（${x.code}）</b><span class="strategy-tag">分析</span></div><b>${Number.isFinite(f.revenueYoY)?f.revenueYoY>=10?'營收成長正向':f.revenueYoY<0?'營收轉弱':'成長平穩':'營收待補'}・${Number.isFinite(f.roe)?f.roe>=15&&f.debtRatio<60?'體質穩健':'持續觀察':'體質待補'}</b><br><span class="hint">營收年增 ${metric(f.revenueYoY,'%')}・EPS ${metric(f.eps)}・ROE ${metric(f.roe,'%')}・負債比 ${metric(f.debtRatio,'%')}<br>本益比 ${metric(f.pe)}・股價淨值比 ${metric(f.pb)}・殖利率 ${metric(f.dividendYield,'%')}・${trend}</span></div>`}).join('');
+    return `<h2 style="margin:16px 0 4px">投資組合健康度</h2><div class="strategy"><b>${health}</b><br><span class="hint">依持股市值計算；實際風險仍應搭配產業與資產配置判斷。</span></div><h2 style="margin:16px 0 4px">持股投資分析</h2>${cards||'<div class="strategy">尚無持股，先從新增交易開始。</div>'}`;
+  }
+  const previous=renderDecisionTools;
+  renderDecisionTools=function(items){
+    previous(items);
+    const candidates=Object.keys(fundamentals).filter(code=>/^\d{4}$/.test(code)&&q(code)&&!items.some(x=>x.code===code)).map(code=>({code,r:stockScore(code,state.investStyle||'value')})).filter(x=>x.r.available>=4&&x.r.score>=60).sort((a,b)=>b.r.score-a.r.score).slice(0,5).map(x=>x.code);
+    const codes=[...new Set([...items.map(x=>x.code),...candidates])];
+    document.querySelector('#strategy').insertAdjacentHTML('beforeend',`${analysis(items)}<h2 style="margin:16px 0 4px">5／20 日統計預測</h2><p class="label">以近 4 年日收盤價找尋相似走勢，並以未來實際結果統計。僅供研究，不是保證獲利。</p><div id="forecastList"></div><div class="source-note"><b>預測資料與限制</b><br><span class="hint">歷史收盤價來自 FinMind；目前使用未還原權息價格，除權息、減資或分割附近的結果可能失真。持股損益仍以市場原始收盤價計算。</span></div>`);
+    if(codes.length)loadForecasts(codes);
+  };
+})();
 </script><style>[hidden]{display:none!important}.tabs button.active{background:var(--blue);color:#fff;border-color:var(--blue)}@media(max-width:600px){.tabs button.active{background:var(--blue);color:#fff}}</style></body></html>
