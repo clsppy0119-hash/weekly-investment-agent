@@ -41,6 +41,26 @@ jobs:
             try: return float(str(value).replace(",", ""))
             except (TypeError, ValueError): return None
 
+          # 興櫃股票不在上櫃主板行情表中，另外由櫃買中心興櫃當日行情表匯入。
+          emerging_url = "https://www.tpex.org.tw/openapi/v1/tpex_esb_latest_statistics"
+          request = urllib.request.Request(emerging_url, headers={"User-Agent": "weekly-investment-agent"})
+          with urllib.request.urlopen(request, timeout=30) as response: emerging_rows = json.load(response)
+          for row in emerging_rows:
+            code = str(row.get("SecuritiesCompanyCode", "")).strip()
+            name = str(row.get("CompanyName", "")).strip()
+            price = number(row.get("LatestPrice"))
+            volume = number(row.get("TransactionVolume"))
+            previous = number(row.get("PreviousAveragePrice"))
+            if code and name and price is not None:
+              quotes[code] = {
+                "name": name,
+                "price": price,
+                "volume": volume or 0,
+                "change": price - previous if previous is not None else 0,
+                "market": "emerging",
+              }
+              fundamentals.setdefault(code, {}).setdefault("market", "emerging")
+
           for url, market in [("https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL", "twse"), ("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_peratio_analysis", "tpex")]:
             request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
             with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
