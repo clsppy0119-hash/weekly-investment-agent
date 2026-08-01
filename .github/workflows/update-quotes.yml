@@ -1,6 +1,10 @@
 name: Update Taiwan stock quotes
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/update-quotes.yml"
   schedule:
     - cron: "15 7 * * 1-5"
 permissions:
@@ -16,6 +20,7 @@ jobs:
           import json, urllib.request
           from datetime import datetime, timezone, timedelta
           quotes = {}
+          fundamentals = {}
           for url, market in [("https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL", "twse"), ("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes", "tpex")]:
             request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
             with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
@@ -25,8 +30,27 @@ jobs:
               price = row.get("ClosingPrice", "") if market == "twse" else row.get("Close", "")
               try: quotes[str(code).strip()] = {"name": str(name).strip(), "price": float(str(price).replace(",", ""))}
               except (TypeError, ValueError): pass
+          def number(value):
+            try: return float(str(value).replace(",", ""))
+            except (TypeError, ValueError): return None
+
+          for url, market in [("https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL", "twse"), ("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_peratio_analysis", "tpex")]:
+            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
+            with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
+            for row in rows:
+              if market == "twse":
+                code = str(row.get("Code", "")).strip()
+                pe, dividend_yield, pb = number(row.get("PEratio")), number(row.get("DividendYield")), number(row.get("PBratio"))
+                dividend_per_share = None
+              else:
+                code = str(row.get("SecuritiesCompanyCode", "")).strip()
+                pe, dividend_yield, pb = number(row.get("PriceEarningRatio")), number(row.get("YieldRatio")), number(row.get("PriceBookRatio"))
+                dividend_per_share = number(row.get("DividendPerShare"))
+              if code:
+                fundamentals[code] = {"pe": pe, "pb": pb, "dividendYield": dividend_yield, "dividendPerShare": dividend_per_share, "market": market}
+
           tz = timezone(timedelta(hours=8))
-          with open("quotes.json", "w", encoding="utf-8") as f: json.dump({"updatedAt": datetime.now(tz).strftime("%Y-%m-%d %H:%M Taipei time"), "quotes": quotes}, f, ensure_ascii=False, indent=2)
+          with open("quotes.json", "w", encoding="utf-8") as f: json.dump({"updatedAt": datetime.now(tz).strftime("%Y-%m-%d %H:%M Taipei time"), "quotes": quotes, "fundamentals": fundamentals}, f, ensure_ascii=False, indent=2)
           PY
       - name: Commit refreshed data
         run: |

@@ -37,4 +37,38 @@ $('#investStyle').onchange=()=>{state.investStyle=$('#investStyle').value;save()
   }
   selectTab('overview');
 })();
+</script><script>
+// 官方估值與殖利率資料：由 GitHub Actions 每日整理 TWSE／TPEx OpenAPI。
+let fundamentals = {};
+const metric = (value, suffix = '') => Number.isFinite(value) ? `${value.toFixed(2)}${suffix}` : '暫無資料';
+renderStrategy = function(items) {
+  const style = state.investStyle || 'value';
+  const meta = {
+    value:{name:'長期價值',focus:'優先檢查本益比、股價淨值比、持股損益與部位集中度。估值低不等於一定便宜，仍需搭配獲利品質。'},
+    swing:{name:'短線／波段',focus:'以價格損益與停損停利為主，估值資料只作為風險背景，不直接預測短期漲跌。'},
+    dividend:{name:'股息成長',focus:'優先檢查官方殖利率、部位集中度與成本安全邊際；歷史殖利率不保證未來配息。'}
+  }[style];
+  $('#investStyle').value = style;
+  const total = items.reduce((sum,item) => sum + item.market, 0);
+  const cards = items.map(item => {
+    const f = fundamentals[item.code] || {};
+    const pnlRate = item.book ? item.unrealized / item.book * 100 : 0;
+    const weight = total ? item.market / total * 100 : 0;
+    let advice;
+    if (style === 'value') {
+      advice = Number.isFinite(f.pe) && f.pe > 35 ? '本益比偏高，先確認獲利成長能否支撐目前估值。' : Number.isFinite(f.pe) && f.pe > 0 && f.pe <= 15 ? '本益比相對不高，但仍要確認獲利是否穩定、是否有一次性收益。' : weight > 35 ? '單一持股比重偏高，留意集中風險。' : pnlRate <= -10 ? '重新檢查公司基本面與原始買進理由。' : '估值未出現明確警訊，持續追蹤獲利與部位比重。';
+    } else if (style === 'dividend') {
+      advice = Number.isFinite(f.dividendYield) && f.dividendYield >= 5 ? `官方殖利率為 ${f.dividendYield.toFixed(2)}%，仍需確認配息能否持續。` : Number.isFinite(f.dividendYield) && f.dividendYield < 2 ? '殖利率偏低，若以現金流為目標需再評估。' : weight > 35 ? '股息部位偏集中，留意產業與配息中斷風險。' : '殖利率資料沒有明顯訊號，繼續觀察配息與現金流。';
+    } else {
+      advice = pnlRate >= 10 ? '波段漲幅已擴大，設定移動停利並避免追價。' : pnlRate <= -7 ? '跌幅超過波段風險線，檢查趨勢是否轉弱。' : '價格仍在成本附近，等待趨勢與成交量確認。';
+    }
+    return `<div class="strategy"><div class="strategy-head"><b>${item.name}</b><span class="strategy-tag">${meta.name}</span></div><span class="${pnlRate>=0?'positive':'negative'}">損益 ${pnlRate>=0?'+':''}${pnlRate.toFixed(1)}%</span>・部位 ${weight.toFixed(1)}%<br><span class="hint">本益比 ${metric(f.pe)}｜殖利率 ${metric(f.dividendYield,'%')}｜股價淨值比 ${metric(f.pb)}</span><br>${advice}</div>`;
+  }).join('');
+  const source = `<div class="source-note"><b>建議依據與資料來源</b><br><span class="hint">${meta.focus}<br>報價、上市估值與殖利率：臺灣證券交易所 OpenAPI；上櫃資料：證券櫃檯買賣中心 OpenAPI。資料時間：${updatedAt||'等待更新'}。殖利率主要依最近年度股利與目前價格計算；此為規則式風險提示，不是獲利保證。</span></div>`;
+  $('#strategy').innerHTML = items.length ? cards + source : `<div class="strategy">新增交易後，將依「${meta.name}」顯示部位建議。</div>${source}`;
+};
+fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(data => {
+  fundamentals = data.fundamentals || {};
+  renderStrategy(positions().filter(item => item.shares > 0));
+}).catch(() => {});
 </script><style>[hidden]{display:none!important}.tabs button.active{background:var(--blue);color:#fff;border-color:var(--blue)}@media(max-width:600px){.tabs button.active{background:var(--blue);color:#fff}}</style></body></html>
