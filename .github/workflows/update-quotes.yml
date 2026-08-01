@@ -20,10 +20,12 @@ jobs:
           import json, urllib.request
           from datetime import datetime, timezone, timedelta
           quotes = {}
-          fundamentals = {}
           try:
-            with open("quotes.json", encoding="utf-8") as existing_file: history = json.load(existing_file).get("history", {})
-          except (FileNotFoundError, json.JSONDecodeError): history = {}
+            with open("quotes.json", encoding="utf-8") as existing_file: existing = json.load(existing_file)
+          except (FileNotFoundError, json.JSONDecodeError): existing = {}
+          history = existing.get("history", {})
+          # 保留上一期有效財報；每日資料源缺少個股時，不再把舊值清空。
+          fundamentals = {code: dict(values) for code, values in existing.get("fundamentals", {}).items()}
           for url, market in [("https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL", "twse"), ("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes", "tpex")]:
             request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
             with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
@@ -52,7 +54,7 @@ jobs:
                 pe, dividend_yield, pb = number(row.get("PriceEarningRatio")), number(row.get("YieldRatio")), number(row.get("PriceBookRatio"))
                 dividend_per_share = number(row.get("DividendPerShare"))
               if code:
-                fundamentals[code] = {"pe": pe, "pb": pb, "dividendYield": dividend_yield, "dividendPerShare": dividend_per_share, "market": market}
+                fundamentals.setdefault(code, {}).update({"pe": pe, "pb": pb, "dividendYield": dividend_yield, "dividendPerShare": dividend_per_share, "market": market})
 
           def pick(row, *parts):
             for key, value in row.items():
@@ -68,7 +70,9 @@ jobs:
                 fundamentals[code].update({"revenueYoY": number(pick(row, "去年同月增減")), "cumulativeRevenueYoY": number(pick(row, "前期比較增減")), "revenuePeriod": row.get("資料年月", "")})
 
           income = {}
-          for url in ["https://openapi.twse.com.tw/v1/opendata/t187ap06_L_ci", "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap06_O_ci"]:
+          income_urls = [f"https://openapi.twse.com.tw/v1/opendata/t187ap06_L_{kind}" for kind in ["ci", "basi", "bd", "fh", "ins", "mim"]]
+          income_urls += [f"https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap06_O_{kind}" for kind in ["ci", "basi", "bd", "fh", "ins", "mim"]]
+          for url in income_urls:
             request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
             with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
             for row in rows:
@@ -77,10 +81,14 @@ jobs:
                 season = number(row.get("季別") or row.get("Season"))
                 net_income = number(pick(row, "本期淨利", "淨損"))
                 eps = number(pick(row, "基本每股盈餘"))
-                fundamentals[code].update({"eps": eps, "financialPeriod": f'{row.get("年度") or row.get("Year") or ""}Q{int(season) if season else ""}'})
+                new_values = {"financialPeriod": f'{row.get("年度") or row.get("Year") or ""}Q{int(season) if season else ""}', "financialSource": "TWSE/TPEx"}
+                if eps is not None: new_values["eps"] = eps
+                fundamentals[code].update(new_values)
                 income[code] = {"netIncome": net_income, "season": season}
 
-          for url in ["https://openapi.twse.com.tw/v1/opendata/t187ap07_L_ci", "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap07_O_ci"]:
+          balance_urls = [f"https://openapi.twse.com.tw/v1/opendata/t187ap07_L_{kind}" for kind in ["ci", "basi", "bd", "fh", "ins", "mim"]]
+          balance_urls += [f"https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap07_O_{kind}" for kind in ["ci", "basi", "bd", "fh", "ins", "mim"]]
+          for url in balance_urls:
             request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
             with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
             for row in rows:
@@ -90,7 +98,8 @@ jobs:
                 net_income = income.get(code, {}).get("netIncome"); season = income.get(code, {}).get("season")
                 roe = net_income / equity * 100 * 4 / season if net_income is not None and equity and season else None
                 debt_ratio = liabilities / assets * 100 if liabilities is not None and assets else None
-                fundamentals[code].update({"roe": roe, "debtRatio": debt_ratio, "cashFlow": None})
+                if roe is not None: fundamentals[code]["roe"] = roe
+                if debt_ratio is not None: fundamentals[code]["debtRatio"] = debt_ratio
 
           tz = timezone(timedelta(hours=8))
           today = datetime.now(tz).strftime("%Y-%m-%d")

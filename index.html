@@ -70,30 +70,56 @@ renderStrategy = function(items) {
 const fundamentalStrategyRenderer = renderStrategy;
 function stockScore(code, style) {
   const f = fundamentals[code] || {}, quote = q(code) || {};
-  let score = 40, reasons = [], available = 0;
-  if (Number.isFinite(f.pe)) { available++; if (f.pe > 0 && f.pe <= 15) { score += 10; reasons.push('估值相對不高'); } else if (f.pe > 35) { score -= 12; reasons.push('本益比偏高'); } }
-  if (Number.isFinite(f.revenueYoY)) { available++; if (f.revenueYoY > 100) { score += 5; reasons.push('營收年增極高，需查核基期或一次性因素'); } else if (f.revenueYoY >= 10) { score += 12; reasons.push('單月營收年增'); } else if (f.revenueYoY >= 0) score += 5; else if (f.revenueYoY < -10) { score -= 18; reasons.push('單月營收衰退'); } }
-  if (Number.isFinite(f.eps)) { available++; if (f.eps > 0) { score += 8; reasons.push('本期 EPS 為正'); } else { score -= 18; reasons.push('本期 EPS 非正值'); } }
-  if (Number.isFinite(f.roe)) { available++; if (f.roe > 60) { score += 5; reasons.push('年化 ROE 極高，需查核權益基數或一次性收益'); } else if (f.roe >= 15) { score += 12; reasons.push('年化 ROE 較佳'); } else if (f.roe >= 8) score += 6; else if (f.roe < 5) { score -= 10; reasons.push('年化 ROE 偏低'); } }
-  if (Number.isFinite(f.debtRatio)) { available++; if (f.debtRatio < 50) score += 5; else if (f.debtRatio > 70) { score -= 10; reasons.push('負債比偏高'); } }
-  if (style === 'dividend' && Number.isFinite(f.dividendYield)) { if (f.dividendYield >= 3 && f.dividendYield <= 8) score += 8; else if (f.dividendYield > 10) { score -= 5; reasons.push('高殖利率可能有陷阱'); } }
-  if (style === 'swing') { if (Number.isFinite(quote.ma20)) { available++; score += quote.price >= quote.ma20 ? 10 : -10; reasons.push(quote.price >= quote.ma20 ? '站上月線' : '低於月線'); } else if (Number.isFinite(quote.change)) score += quote.change > 0 ? 3 : -3; }
-  return {score:Math.max(0,Math.min(100,Math.round(score))), available, reasons, f, quote};
+  const weights = {
+    value:{revenue:15,eps:15,roe:15,debt:15,pe:15,pb:10,dividend:5,trend20:10},
+    swing:{revenue:10,eps:5,roe:5,debt:5,pe:5,trend20:25,trend5:20,change:25},
+    dividend:{revenue:10,eps:15,roe:15,debt:15,pe:10,pb:5,dividend:25,trend20:5}
+  }[style] || null;
+  const metricScores = {
+    revenue:Number.isFinite(f.revenueYoY)?(f.revenueYoY>=20?90:f.revenueYoY>=10?80:f.revenueYoY>=0?65:f.revenueYoY>=-10?45:20):null,
+    eps:Number.isFinite(f.eps)?(f.eps>0?70:15):null,
+    roe:Number.isFinite(f.roe)?(f.roe>=20?90:f.roe>=15?80:f.roe>=8?65:f.roe>=5?45:25):null,
+    debt:Number.isFinite(f.debtRatio)?(f.debtRatio<=30?90:f.debtRatio<=50?75:f.debtRatio<=70?50:20):null,
+    pe:Number.isFinite(f.pe)&&f.pe>0?(f.pe<=12?85:f.pe<=20?75:f.pe<=30?60:f.pe<=45?40:20):null,
+    pb:Number.isFinite(f.pb)&&f.pb>0?(f.pb<=1.5?85:f.pb<=3?70:f.pb<=6?50:30):null,
+    dividend:Number.isFinite(f.dividendYield)?(f.dividendYield>=3&&f.dividendYield<=8?85:f.dividendYield>10?45:f.dividendYield>=2?65:35):null,
+    trend20:Number.isFinite(quote.ma20)?(quote.price>=quote.ma20?75:35):null,
+    trend5:Number.isFinite(quote.ma5)?(quote.price>=quote.ma5?75:35):null,
+    change:Number.isFinite(quote.change)?(quote.change>0?Math.min(90,65+quote.change*3):Math.max(15,50+quote.change*3)):null
+  };
+  let weighted = 0, availableWeight = 0, reasons = [];
+  Object.entries(weights).forEach(([key, weight]) => { const value=metricScores[key]; if(Number.isFinite(value)){weighted+=value*weight;availableWeight+=weight;} });
+  const score = availableWeight ? Math.round(weighted/availableWeight) : 0;
+  if(Number.isFinite(f.revenueYoY)) reasons.push(f.revenueYoY>=10?'營收成長正向':f.revenueYoY<0?'營收衰退':'營收平穩');
+  if(Number.isFinite(f.roe)) reasons.push(f.roe>=15?'ROE 較佳':f.roe<5?'ROE 偏低':'ROE 中性');
+  if(Number.isFinite(f.debtRatio)&&f.debtRatio>70) reasons.push('負債比偏高');
+  if(Number.isFinite(f.pe)) reasons.push(f.pe<=20?'估值相對合理':f.pe>45?'本益比偏高':'估值中性');
+  if(Number.isFinite(quote.ma20)) reasons.push(quote.price>=quote.ma20?'站上20日均線':'低於20日均線');
+  const completeness = availableWeight;
+  const confidence = completeness>=90?'高':completeness>=70?'中等':completeness>=50?'低':'不足';
+  return {score,available:Object.values(metricScores).filter(Number.isFinite).length,availableWeight:completeness,confidence,reasons,f,quote,metricScores};
 }
 function renderDecisionTools(items) {
   const style = state.investStyle || 'value', total = items.reduce((sum,item) => sum + item.market, 0);
   const holdingCards = items.map(item => {
     const result = stockScore(item.code, style), weight = total ? item.market / total * 100 : 0, pnl = item.book ? item.unrealized / item.book * 100 : 0;
+    const concentration = weight>=50?15:weight>=35?35:weight>=25?65:90;
+    const valuation = Number.isFinite(result.metricScores.pe)?result.metricScores.pe:50;
+    const pnlRisk = pnl<=-20?25:pnl<=-10?50:pnl>=30?60:80;
+    const styleFit = result.score;
+    const positionScore = Math.round(result.score*.4+valuation*.2+concentration*.2+pnlRisk*.1+styleFit*.1);
     let action = '等待更多資料';
-    if (weight >= 35) action = '避免加碼：目前部位已偏集中';
-    else if (result.score >= 75 && result.available >= 4 && pnl > -15 && weight < 25) action = '可考慮小額分批：加碼後仍應控制單一持股比重';
-    else if (result.score < 55 || (Number.isFinite(result.f.revenueYoY) && result.f.revenueYoY < -10) || (Number.isFinite(result.f.eps) && result.f.eps <= 0)) action = '暫不加碼：基本面或評分尚未通過';
-    return `<div class="strategy"><div class="strategy-head"><b>${item.name}｜加碼判斷</b><span class="strategy-tag">${result.score} 分</span></div><b>${action}</b><br><span class="hint">營收年增 ${metric(result.f.revenueYoY,'%')}｜EPS ${metric(result.f.eps)}｜年化 ROE ${metric(result.f.roe,'%')}｜負債比 ${metric(result.f.debtRatio,'%')}｜資料完整 ${result.available}/6</span></div>`;
+    if(result.availableWeight<50) action='資料不足：只列入觀察，不提供加碼判斷';
+    else if(weight>=35) action='避免加碼：公司評分與持股集中風險應分開考量';
+    else if(result.confidence!=='低'&&result.score>=75&&positionScore>=70&&pnl>-15) action='可考慮小額分批：加碼後仍應控制單一持股比重';
+    else if(result.score<55||(Number.isFinite(result.f.revenueYoY)&&result.f.revenueYoY<-10)||(Number.isFinite(result.f.eps)&&result.f.eps<=0)) action='暫不加碼：基本面或股票品質尚未通過';
+    else action='維持觀察：等待更完整資料或更佳價格';
+    return `<div class="strategy"><div class="strategy-head"><b>${item.name}｜股票品質 ${result.score} 分</b><span class="strategy-tag">部位適合度 ${positionScore} 分</span></div><b>${action}</b><br><span class="hint">可信度：${result.confidence}（有效權重 ${result.availableWeight}%）｜財報期間 ${result.f.financialPeriod||'尚未取得'}<br>營收年增 ${metric(result.f.revenueYoY,'%')}｜EPS ${metric(result.f.eps)}｜年化 ROE ${metric(result.f.roe,'%')}｜負債比 ${metric(result.f.debtRatio,'%')}</span></div>`;
   }).join('');
   const heldCodes = new Set(items.map(item => item.code));
-  const candidates = Object.keys(fundamentals).filter(code => /^\d{4}$/.test(code) && q(code) && !heldCodes.has(code)).map(code => ({code,...stockScore(code,style)})).filter(item => item.available >= 4 && item.score >= 60).sort((a,b) => b.score - a.score).slice(0,5);
-  const candidateCards = candidates.length ? candidates.map(item => `<div class="strategy"><div class="strategy-head"><b>${q(item.code).name}（${item.code}）</b><span class="strategy-tag">${item.score} 分</span></div><b>${item.score>=75?'優先研究候選':'持續觀察'}</b><br><span class="hint">${item.reasons.slice(0,3).join('、')||'綜合條件中性'}｜營收年增 ${metric(item.f.revenueYoY,'%')}｜EPS ${metric(item.f.eps)}｜ROE ${metric(item.f.roe,'%')}｜殖利率 ${metric(item.f.dividendYield,'%')}</span></div>`).join('') : '<div class="strategy">目前沒有資料完整度足夠的候選股。</div>';
-  const technicalNote = `<div class="source-note"><b>資料完整度說明</b><br><span class="hint">月營收、EPS、ROE 與負債比已接入官方資料。均線與成交量會從本次更新開始每日累積，滿 5／20 個交易日後自動納入短線評分。官方彙總資料目前未提供一致的個股營業現金流欄位，因此現金流暫不計分，避免以缺漏資料誤導。</span></div>`;
+  const candidates = Object.keys(fundamentals).filter(code => /^\d{4}$/.test(code) && q(code) && !heldCodes.has(code)).map(code => ({code,...stockScore(code,style)})).filter(item => item.availableWeight >= 70 && item.score >= 60).sort((a,b) => b.score - a.score).slice(0,5);
+  const candidateCards = candidates.length ? candidates.map(item => `<div class="strategy"><div class="strategy-head"><b>${q(item.code).name}（${item.code}）</b><span class="strategy-tag">${item.score} 分・可信度${item.confidence}</span></div><b>${item.score>=75?'優先研究候選':'持續觀察'}</b><br><span class="hint">${item.reasons.slice(0,3).join('、')||'綜合條件中性'}｜有效權重 ${item.availableWeight}%｜營收年增 ${metric(item.f.revenueYoY,'%')}｜EPS ${metric(item.f.eps)}｜ROE ${metric(item.f.roe,'%')}</span></div>`).join('') : '<div class="strategy">目前沒有可信度達 70% 的候選股。</div>';
+  const technicalNote = `<div class="source-note"><b>評分與可信度說明</b><br><span class="hint">缺少的資料不計零分，而是依有效指標重新分配權重。有效權重 90% 以上為高可信度、70%～89% 為中等、50%～69% 為低；低於 50% 不提供買進或加碼判斷。股票品質與個人部位適合度分開計算。</span></div>`;
   $('#strategy').insertAdjacentHTML('afterbegin', `<h2 style="margin:12px 0 4px">現有持股加碼判斷</h2>${holdingCards||'<div class="strategy">目前沒有持股可評估。</div>'}<h2 style="margin:16px 0 4px">優先研究候選</h2><p class="label">從上市與上櫃普通股中依目前投資方式排序；候選不等於保證買進。</p>${candidateCards}${technicalNote}`);
 }
 renderStrategy = function(items) { fundamentalStrategyRenderer(items); renderDecisionTools(items); };
@@ -175,7 +201,7 @@ fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(d
   const previous=renderDecisionTools;
   renderDecisionTools=function(items){
     previous(items);
-    const candidates=Object.keys(fundamentals).filter(code=>/^\d{4}$/.test(code)&&q(code)&&!items.some(x=>x.code===code)).map(code=>({code,r:stockScore(code,state.investStyle||'value')})).filter(x=>x.r.available>=4&&x.r.score>=60).sort((a,b)=>b.r.score-a.r.score).slice(0,5).map(x=>x.code);
+    const candidates=Object.keys(fundamentals).filter(code=>/^\d{4}$/.test(code)&&q(code)&&!items.some(x=>x.code===code)).map(code=>({code,r:stockScore(code,state.investStyle||'value')})).filter(x=>x.r.availableWeight>=70&&x.r.score>=60).sort((a,b)=>b.r.score-a.r.score).slice(0,5).map(x=>x.code);
     const codes=[...new Set([...items.map(x=>x.code),...candidates])];
     document.querySelector('#strategy').insertAdjacentHTML('beforeend',`${analysis(items)}<h2 style="margin:16px 0 4px">5／20 日統計預測</h2><p class="label">以近 4 年還原日收盤價找尋相似走勢，並以未來實際結果統計。僅供研究，不是保證獲利。</p><div id="forecastList"></div><div class="source-note"><b>預測資料與限制</b><br><span class="hint">歷史收盤價、股利除權息與分割資料來自 FinMind。預測會自動回推還原現金／股票股利及分割；減資、現金增資等複雜公司行動仍會標示為限制。持股損益一律維持市場原始收盤價計算。</span></div>`);
     if(codes.length)loadForecasts(codes);
