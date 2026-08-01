@@ -113,7 +113,29 @@ fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(d
   async function getHistory(code) {
     if (!forecastCache.has(code)) {
       const start = `${new Date().getFullYear()-4}-01-01`;
-      forecastCache.set(code, fetch(`https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${encodeURIComponent(code)}&start_date=${start}`).then(r=>{if(!r.ok)throw Error();return r.json()}).then(d=>(d.data||[]).map(x=>({date:x.date,close:num(x.close),volume:num(x.Trading_Volume)})).filter(x=>x.close>0).sort((a,b)=>a.date.localeCompare(b.date))));
+      const base='https://api.finmindtrade.com/api/v4/data';
+      const data=(dataset, extra='')=>fetch(`${base}?dataset=${dataset}&data_id=${encodeURIComponent(code)}&start_date=${start}${extra}`).then(r=>{if(!r.ok)throw Error();return r.json()}).then(x=>x.data||[]);
+      forecastCache.set(code, Promise.all([data('TaiwanStockPrice'),data('TaiwanStockDividend'),data('TaiwanStockSplitPrice')]).then(([prices, dividends, splits])=>{
+        const rows=prices.map(x=>({date:x.date,close:num(x.close),volume:num(x.Trading_Volume)})).filter(x=>x.close>0).sort((a,b)=>a.date.localeCompare(b.date));
+        const events=[];
+        dividends.forEach(x=>{
+          const date=x.CashExDividendTradingDate||x.StockExDividendTradingDate;
+          const cash=num(x.CashEarningsDistribution)+num(x.CashStatutorySurplus), stock=num(x.StockEarningsDistribution)+num(x.StockStatutorySurplus);
+          if(date&&(cash>0||stock>0))events.push({date,cash:cash||0,stock:stock||0,type:'股利'});
+        });
+        splits.forEach(x=>{if(x.date&&num(x.before_price)>0&&num(x.after_price)>0)events.push({date:x.date,factor:num(x.after_price)/num(x.before_price),type:x.type||'分割'});});
+        events.sort((a,b)=>b.date.localeCompare(a.date)).forEach(event=>{
+          const index=rows.findIndex(row=>row.date>=event.date);
+          if(index<1)return;
+          const before=rows[index-1].close;
+          const factor=event.factor||Math.max(.01,(before-event.cash)/(before*(1+event.stock)));
+          if(!(factor>0&&factor<3))return;
+          for(let i=0;i<index;i++)rows[i].close*=factor;
+        });
+        rows.adjustmentEvents=events.length;
+        rows.adjustmentTypes=[...new Set(events.map(x=>x.type))].join('、')||'無';
+        return rows;
+      }));
     }
     return forecastCache.get(code);
   }
@@ -136,7 +158,7 @@ fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(d
   function forecast(code,rows) {
     const i=rows.length-1, price=rows[i].close, a=predict(rows,i,5), b=predict(rows,i,20); if(!a||!b)return `<div class="strategy"><b>${q(code)?.name||code}（${code}）</b><br><span class="hint">歷史資料不足，至少需要約 6 個月交易日。</span></div>`;
     const test=backtest(rows,20), confidence=test.accuracy>=.58&&test.n>=25?'較高':test.accuracy>=.52?'中等':'較低', line=(name,x)=>`${name}：上漲機率 <b>${Math.round(x.up*100)}%</b>・中位數 ${pc(x.mid)}<br>可能區間 ${money(price*(1+x.lo))} ～ ${money(price*(1+x.hi))}`;
-    return `<div class="strategy"><div class="strategy-head"><b>${q(code)?.name||code}（${code}）</b><span class="strategy-tag">信心${confidence}</span></div><span class="hint">收盤 ${money(price)}・資料至 ${rows[i].date}</span><br>${line('5 個交易日',a)}<br>${line('20 個交易日',b)}<br><span class="hint">20 日走勢回測：${test.n} 次、方向正確率 ${Number.isFinite(test.accuracy)?Math.round(test.accuracy*100)+'%':'資料不足'}；相似樣本 ${b.n} 筆。</span></div>`;
+    return `<div class="strategy"><div class="strategy-head"><b>${q(code)?.name||code}（${code}）</b><span class="strategy-tag">信心${confidence}</span></div><span class="hint">還原收盤 ${money(price)}・資料至 ${rows[i].date}</span><br>${line('5 個交易日',a)}<br>${line('20 個交易日',b)}<br><span class="hint">20 日走勢回測：${test.n} 次、方向正確率 ${Number.isFinite(test.accuracy)?Math.round(test.accuracy*100)+'%':'資料不足'}；相似樣本 ${b.n} 筆。已還原 ${rows.adjustmentEvents||0} 筆公司行動（${rows.adjustmentTypes||'無'}）。</span></div>`;
   }
   async function loadForecasts(codes) {
     const target=document.querySelector('#forecastList'); if(!target)return;
@@ -155,7 +177,7 @@ fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(d
     previous(items);
     const candidates=Object.keys(fundamentals).filter(code=>/^\d{4}$/.test(code)&&q(code)&&!items.some(x=>x.code===code)).map(code=>({code,r:stockScore(code,state.investStyle||'value')})).filter(x=>x.r.available>=4&&x.r.score>=60).sort((a,b)=>b.r.score-a.r.score).slice(0,5).map(x=>x.code);
     const codes=[...new Set([...items.map(x=>x.code),...candidates])];
-    document.querySelector('#strategy').insertAdjacentHTML('beforeend',`${analysis(items)}<h2 style="margin:16px 0 4px">5／20 日統計預測</h2><p class="label">以近 4 年日收盤價找尋相似走勢，並以未來實際結果統計。僅供研究，不是保證獲利。</p><div id="forecastList"></div><div class="source-note"><b>預測資料與限制</b><br><span class="hint">歷史收盤價來自 FinMind；目前使用未還原權息價格，除權息、減資或分割附近的結果可能失真。持股損益仍以市場原始收盤價計算。</span></div>`);
+    document.querySelector('#strategy').insertAdjacentHTML('beforeend',`${analysis(items)}<h2 style="margin:16px 0 4px">5／20 日統計預測</h2><p class="label">以近 4 年還原日收盤價找尋相似走勢，並以未來實際結果統計。僅供研究，不是保證獲利。</p><div id="forecastList"></div><div class="source-note"><b>預測資料與限制</b><br><span class="hint">歷史收盤價、股利除權息與分割資料來自 FinMind。預測會自動回推還原現金／股票股利及分割；減資、現金增資等複雜公司行動仍會標示為限制。持股損益一律維持市場原始收盤價計算。</span></div>`);
     if(codes.length)loadForecasts(codes);
   };
 })();
