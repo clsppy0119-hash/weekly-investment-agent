@@ -1,6 +1,11 @@
 name: Long-term research Telegram
 on:
   workflow_dispatch:
+    inputs:
+      force_report:
+        description: "手動測試時產生報告"
+        required: false
+        default: "true"
   schedule:
     # 08:15 台北時間；僅在長線研究門檻達標時才會推播。
     - cron: "15 0 * * 1-5"
@@ -12,7 +17,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build long-term research
-        run: REPORT_MODE=long LONG_AUTO=1 REPORT_OUTPUT=long-research.txt python daily_report.py
+        env:
+          FORCE_REPORT: ${{ inputs.force_report == 'true' && '1' || '0' }}
+        run: python long_research_report.py
       - name: Check research threshold
         id: threshold
         run: |
