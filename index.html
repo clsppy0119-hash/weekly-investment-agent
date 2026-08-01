@@ -70,13 +70,13 @@ renderStrategy = function(items) {
 const fundamentalStrategyRenderer = renderStrategy;
 function stockScore(code, style) {
   const f = fundamentals[code] || {}, quote = q(code) || {};
-  let score = 50, reasons = [], available = 0;
-  if (Number.isFinite(f.pe)) { available++; if (f.pe > 0 && f.pe <= 15) { score += 14; reasons.push('估值相對不高'); } else if (f.pe > 35) { score -= 12; reasons.push('本益比偏高'); } }
-  if (Number.isFinite(f.revenueYoY)) { available++; if (f.revenueYoY >= 10) { score += 15; reasons.push('單月營收年增'); } else if (f.revenueYoY < -10) { score -= 18; reasons.push('單月營收衰退'); } }
-  if (Number.isFinite(f.eps)) { available++; if (f.eps > 0) { score += 10; reasons.push('本期 EPS 為正'); } else { score -= 18; reasons.push('本期 EPS 非正值'); } }
-  if (Number.isFinite(f.roe)) { available++; if (f.roe >= 15) { score += 14; reasons.push('年化 ROE 較佳'); } else if (f.roe < 5) { score -= 10; reasons.push('年化 ROE 偏低'); } }
-  if (Number.isFinite(f.debtRatio)) { available++; if (f.debtRatio < 50) score += 7; else if (f.debtRatio > 70) { score -= 10; reasons.push('負債比偏高'); } }
-  if (style === 'dividend' && Number.isFinite(f.dividendYield)) { if (f.dividendYield >= 3 && f.dividendYield <= 8) score += 12; else if (f.dividendYield > 10) { score -= 5; reasons.push('高殖利率可能有陷阱'); } }
+  let score = 40, reasons = [], available = 0;
+  if (Number.isFinite(f.pe)) { available++; if (f.pe > 0 && f.pe <= 15) { score += 10; reasons.push('估值相對不高'); } else if (f.pe > 35) { score -= 12; reasons.push('本益比偏高'); } }
+  if (Number.isFinite(f.revenueYoY)) { available++; if (f.revenueYoY > 100) { score += 5; reasons.push('營收年增極高，需查核基期或一次性因素'); } else if (f.revenueYoY >= 10) { score += 12; reasons.push('單月營收年增'); } else if (f.revenueYoY >= 0) score += 5; else if (f.revenueYoY < -10) { score -= 18; reasons.push('單月營收衰退'); } }
+  if (Number.isFinite(f.eps)) { available++; if (f.eps > 0) { score += 8; reasons.push('本期 EPS 為正'); } else { score -= 18; reasons.push('本期 EPS 非正值'); } }
+  if (Number.isFinite(f.roe)) { available++; if (f.roe > 60) { score += 5; reasons.push('年化 ROE 極高，需查核權益基數或一次性收益'); } else if (f.roe >= 15) { score += 12; reasons.push('年化 ROE 較佳'); } else if (f.roe >= 8) score += 6; else if (f.roe < 5) { score -= 10; reasons.push('年化 ROE 偏低'); } }
+  if (Number.isFinite(f.debtRatio)) { available++; if (f.debtRatio < 50) score += 5; else if (f.debtRatio > 70) { score -= 10; reasons.push('負債比偏高'); } }
+  if (style === 'dividend' && Number.isFinite(f.dividendYield)) { if (f.dividendYield >= 3 && f.dividendYield <= 8) score += 8; else if (f.dividendYield > 10) { score -= 5; reasons.push('高殖利率可能有陷阱'); } }
   if (style === 'swing') { if (Number.isFinite(quote.ma20)) { available++; score += quote.price >= quote.ma20 ? 10 : -10; reasons.push(quote.price >= quote.ma20 ? '站上月線' : '低於月線'); } else if (Number.isFinite(quote.change)) score += quote.change > 0 ? 3 : -3; }
   return {score:Math.max(0,Math.min(100,Math.round(score))), available, reasons, f, quote};
 }
