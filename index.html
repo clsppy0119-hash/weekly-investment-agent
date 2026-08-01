@@ -67,6 +67,36 @@ renderStrategy = function(items) {
   const source = `<div class="source-note"><b>建議依據與資料來源</b><br><span class="hint">${meta.focus}<br>報價、上市估值與殖利率：臺灣證券交易所 OpenAPI；上櫃資料：證券櫃檯買賣中心 OpenAPI。資料時間：${updatedAt||'等待更新'}。殖利率主要依最近年度股利與目前價格計算；此為規則式風險提示，不是獲利保證。</span></div>`;
   $('#strategy').innerHTML = items.length ? cards + source : `<div class="strategy">新增交易後，將依「${meta.name}」顯示部位建議。</div>${source}`;
 };
+const fundamentalStrategyRenderer = renderStrategy;
+function stockScore(code, style) {
+  const f = fundamentals[code] || {}, quote = q(code) || {};
+  let score = 50, reasons = [], available = 0;
+  if (Number.isFinite(f.pe)) { available++; if (f.pe > 0 && f.pe <= 15) { score += 14; reasons.push('估值相對不高'); } else if (f.pe > 35) { score -= 12; reasons.push('本益比偏高'); } }
+  if (Number.isFinite(f.revenueYoY)) { available++; if (f.revenueYoY >= 10) { score += 15; reasons.push('單月營收年增'); } else if (f.revenueYoY < -10) { score -= 18; reasons.push('單月營收衰退'); } }
+  if (Number.isFinite(f.eps)) { available++; if (f.eps > 0) { score += 10; reasons.push('本期 EPS 為正'); } else { score -= 18; reasons.push('本期 EPS 非正值'); } }
+  if (Number.isFinite(f.roe)) { available++; if (f.roe >= 15) { score += 14; reasons.push('年化 ROE 較佳'); } else if (f.roe < 5) { score -= 10; reasons.push('年化 ROE 偏低'); } }
+  if (Number.isFinite(f.debtRatio)) { available++; if (f.debtRatio < 50) score += 7; else if (f.debtRatio > 70) { score -= 10; reasons.push('負債比偏高'); } }
+  if (style === 'dividend' && Number.isFinite(f.dividendYield)) { if (f.dividendYield >= 3 && f.dividendYield <= 8) score += 12; else if (f.dividendYield > 10) { score -= 5; reasons.push('高殖利率可能有陷阱'); } }
+  if (style === 'swing') { if (Number.isFinite(quote.ma20)) { available++; score += quote.price >= quote.ma20 ? 10 : -10; reasons.push(quote.price >= quote.ma20 ? '站上月線' : '低於月線'); } else if (Number.isFinite(quote.change)) score += quote.change > 0 ? 3 : -3; }
+  return {score:Math.max(0,Math.min(100,Math.round(score))), available, reasons, f, quote};
+}
+function renderDecisionTools(items) {
+  const style = state.investStyle || 'value', total = items.reduce((sum,item) => sum + item.market, 0);
+  const holdingCards = items.map(item => {
+    const result = stockScore(item.code, style), weight = total ? item.market / total * 100 : 0, pnl = item.book ? item.unrealized / item.book * 100 : 0;
+    let action = '等待更多資料';
+    if (weight >= 35) action = '避免加碼：目前部位已偏集中';
+    else if (result.score >= 75 && result.available >= 4 && pnl > -15 && weight < 25) action = '可考慮小額分批：加碼後仍應控制單一持股比重';
+    else if (result.score < 55 || (Number.isFinite(result.f.revenueYoY) && result.f.revenueYoY < -10) || (Number.isFinite(result.f.eps) && result.f.eps <= 0)) action = '暫不加碼：基本面或評分尚未通過';
+    return `<div class="strategy"><div class="strategy-head"><b>${item.name}｜加碼判斷</b><span class="strategy-tag">${result.score} 分</span></div><b>${action}</b><br><span class="hint">營收年增 ${metric(result.f.revenueYoY,'%')}｜EPS ${metric(result.f.eps)}｜年化 ROE ${metric(result.f.roe,'%')}｜負債比 ${metric(result.f.debtRatio,'%')}｜資料完整 ${result.available}/6</span></div>`;
+  }).join('');
+  const heldCodes = new Set(items.map(item => item.code));
+  const candidates = Object.keys(fundamentals).filter(code => /^\d{4}$/.test(code) && q(code) && !heldCodes.has(code)).map(code => ({code,...stockScore(code,style)})).filter(item => item.available >= 4 && item.score >= 60).sort((a,b) => b.score - a.score).slice(0,5);
+  const candidateCards = candidates.length ? candidates.map(item => `<div class="strategy"><div class="strategy-head"><b>${q(item.code).name}（${item.code}）</b><span class="strategy-tag">${item.score} 分</span></div><b>${item.score>=75?'優先研究候選':'持續觀察'}</b><br><span class="hint">${item.reasons.slice(0,3).join('、')||'綜合條件中性'}｜營收年增 ${metric(item.f.revenueYoY,'%')}｜EPS ${metric(item.f.eps)}｜ROE ${metric(item.f.roe,'%')}｜殖利率 ${metric(item.f.dividendYield,'%')}</span></div>`).join('') : '<div class="strategy">目前沒有資料完整度足夠的候選股。</div>';
+  const technicalNote = `<div class="source-note"><b>資料完整度說明</b><br><span class="hint">月營收、EPS、ROE 與負債比已接入官方資料。均線與成交量會從本次更新開始每日累積，滿 5／20 個交易日後自動納入短線評分。官方彙總資料目前未提供一致的個股營業現金流欄位，因此現金流暫不計分，避免以缺漏資料誤導。</span></div>`;
+  $('#strategy').insertAdjacentHTML('afterbegin', `<h2 style="margin:12px 0 4px">現有持股加碼判斷</h2>${holdingCards||'<div class="strategy">目前沒有持股可評估。</div>'}<h2 style="margin:16px 0 4px">優先研究候選</h2><p class="label">從上市與上櫃普通股中依目前投資方式排序；候選不等於保證買進。</p>${candidateCards}${technicalNote}`);
+}
+renderStrategy = function(items) { fundamentalStrategyRenderer(items); renderDecisionTools(items); };
 fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(data => {
   fundamentals = data.fundamentals || {};
   renderStrategy(positions().filter(item => item.shares > 0));
