@@ -21,6 +21,9 @@ jobs:
           from datetime import datetime, timezone, timedelta
           quotes = {}
           fundamentals = {}
+          try:
+            with open("quotes.json", encoding="utf-8") as existing_file: history = json.load(existing_file).get("history", {})
+          except (FileNotFoundError, json.JSONDecodeError): history = {}
           for url, market in [("https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL", "twse"), ("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes", "tpex")]:
             request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
             with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
@@ -28,7 +31,9 @@ jobs:
               code = row.get("Code", "") if market == "twse" else row.get("SecuritiesCompanyCode", "")
               name = row.get("Name", "") if market == "twse" else row.get("CompanyName") or row.get("SecuritiesCompanyName", "")
               price = row.get("ClosingPrice", "") if market == "twse" else row.get("Close", "")
-              try: quotes[str(code).strip()] = {"name": str(name).strip(), "price": float(str(price).replace(",", ""))}
+              volume = row.get("TradeVolume", "") if market == "twse" else row.get("TradingShares", "")
+              change = row.get("Change", "")
+              try: quotes[str(code).strip()] = {"name": str(name).strip(), "price": float(str(price).replace(",", "")), "volume": float(str(volume).replace(",", "")), "change": float(str(change).replace(",", "").replace("+", ""))}
               except (TypeError, ValueError): pass
           def number(value):
             try: return float(str(value).replace(",", ""))
@@ -49,8 +54,56 @@ jobs:
               if code:
                 fundamentals[code] = {"pe": pe, "pb": pb, "dividendYield": dividend_yield, "dividendPerShare": dividend_per_share, "market": market}
 
+          def pick(row, *parts):
+            for key, value in row.items():
+              if all(part in key for part in parts): return value
+            return None
+
+          for url in ["https://openapi.twse.com.tw/v1/opendata/t187ap05_L", "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap05_O"]:
+            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
+            with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
+            for row in rows:
+              code = str(row.get("公司代號") or row.get("SecuritiesCompanyCode") or "").strip()
+              if code and code in fundamentals:
+                fundamentals[code].update({"revenueYoY": number(pick(row, "去年同月增減")), "cumulativeRevenueYoY": number(pick(row, "前期比較增減")), "revenuePeriod": row.get("資料年月", "")})
+
+          income = {}
+          for url in ["https://openapi.twse.com.tw/v1/opendata/t187ap06_L_ci", "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap06_O_ci"]:
+            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
+            with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
+            for row in rows:
+              code = str(row.get("公司代號") or row.get("SecuritiesCompanyCode") or "").strip()
+              if code and code in fundamentals:
+                season = number(row.get("季別") or row.get("Season"))
+                net_income = number(pick(row, "本期淨利", "淨損"))
+                eps = number(pick(row, "基本每股盈餘"))
+                fundamentals[code].update({"eps": eps, "financialPeriod": f'{row.get("年度") or row.get("Year") or ""}Q{int(season) if season else ""}'})
+                income[code] = {"netIncome": net_income, "season": season}
+
+          for url in ["https://openapi.twse.com.tw/v1/opendata/t187ap07_L_ci", "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap07_O_ci"]:
+            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
+            with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
+            for row in rows:
+              code = str(row.get("公司代號") or row.get("SecuritiesCompanyCode") or "").strip()
+              if code and code in fundamentals:
+                assets = number(pick(row, "資產總")); liabilities = number(pick(row, "負債總")); equity = number(pick(row, "權益總"))
+                net_income = income.get(code, {}).get("netIncome"); season = income.get(code, {}).get("season")
+                roe = net_income / equity * 100 * 4 / season if net_income is not None and equity and season else None
+                debt_ratio = liabilities / assets * 100 if liabilities is not None and assets else None
+                fundamentals[code].update({"roe": roe, "debtRatio": debt_ratio, "cashFlow": None})
+
           tz = timezone(timedelta(hours=8))
-          with open("quotes.json", "w", encoding="utf-8") as f: json.dump({"updatedAt": datetime.now(tz).strftime("%Y-%m-%d %H:%M Taipei time"), "quotes": quotes, "fundamentals": fundamentals}, f, ensure_ascii=False, indent=2)
+          today = datetime.now(tz).strftime("%Y-%m-%d")
+          for code, quote in quotes.items():
+            series = history.setdefault(code, [])
+            point = {"date": today, "close": quote["price"], "volume": quote["volume"]}
+            if series and series[-1].get("date") == today: series[-1] = point
+            else: series.append(point)
+            history[code] = series[-120:]
+            closes = [item["close"] for item in history[code]]
+            quote["ma5"] = sum(closes[-5:]) / 5 if len(closes) >= 5 else None
+            quote["ma20"] = sum(closes[-20:]) / 20 if len(closes) >= 20 else None
+          with open("quotes.json", "w", encoding="utf-8") as f: json.dump({"updatedAt": datetime.now(tz).strftime("%Y-%m-%d %H:%M Taipei time"), "quotes": quotes, "fundamentals": fundamentals, "history": history}, f, ensure_ascii=False, indent=2)
           PY
       - name: Commit refreshed data
         run: |
