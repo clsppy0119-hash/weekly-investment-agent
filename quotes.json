@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-01 19:26 Taipei time",
+  "updatedAt": "2026-08-01 22:03 Taipei time",
   "quotes": {
     "00400A": {
       "name": "主動國泰動能高息",
@@ -46370,7 +46370,8 @@
       "financialPeriod": "115Q2",
       "roe": 27.53250444940739,
       "debtRatio": 46.42130323805404,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "1233": {
       "pe": 35.24,
@@ -47155,7 +47156,8 @@
       "financialPeriod": "115Q2",
       "roe": 27.543568453975592,
       "debtRatio": 42.046590970539796,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "1503": {
       "pe": 29.06,
@@ -47840,7 +47842,8 @@
       "financialPeriod": "115Q2",
       "roe": 11.993699426090783,
       "debtRatio": 32.061371801983746,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "1725": {
       "pe": 18.46,
@@ -47995,7 +47998,8 @@
       "financialPeriod": "115Q2",
       "roe": 22.688420153896057,
       "debtRatio": 37.933895124546645,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "1776": {
       "pe": 34.49,
@@ -48200,7 +48204,8 @@
       "financialPeriod": "115Q2",
       "roe": 17.464318734420072,
       "debtRatio": 35.77454832201521,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2007": {
       "pe": null,
@@ -48285,7 +48290,8 @@
       "financialPeriod": "115Q2",
       "roe": 12.437205581065545,
       "debtRatio": 15.808353978392608,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2017": {
       "pe": null,
@@ -48800,7 +48806,8 @@
       "financialPeriod": "115Q2",
       "roe": 22.553202157173782,
       "debtRatio": 59.604372244126466,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2302": {
       "pe": 46.52,
@@ -48825,7 +48832,8 @@
       "financialPeriod": "115Q2",
       "roe": 26.284120513339776,
       "debtRatio": 33.341985637574375,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2305": {
       "pe": 111.48,
@@ -48850,7 +48858,8 @@
       "financialPeriod": "115Q2",
       "roe": 29.126199287970657,
       "debtRatio": 53.57775470079575,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2312": {
       "pe": 28.85,
@@ -48965,7 +48974,8 @@
       "financialPeriod": "115Q2",
       "roe": 7.834735663718593,
       "debtRatio": 38.43654479999405,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2330": {
       "pe": 32.6,
@@ -49010,7 +49020,8 @@
       "financialPeriod": "115Q2",
       "roe": 30.72158164859887,
       "debtRatio": 35.77321276616327,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2338": {
       "pe": null,
@@ -49355,7 +49366,8 @@
       "financialPeriod": "115Q2",
       "roe": 52.169031811369024,
       "debtRatio": 63.22801305840192,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2385": {
       "pe": 11.96,
@@ -49430,7 +49442,8 @@
       "financialPeriod": "115Q2",
       "roe": 28.20880326050399,
       "debtRatio": 40.50216509389477,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2397": {
       "pe": 23.15,
@@ -49585,7 +49598,8 @@
       "financialPeriod": "115Q2",
       "roe": 2.618031603699848,
       "debtRatio": 49.05474292479466,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2420": {
       "pe": 13.65,
@@ -49760,7 +49774,8 @@
       "financialPeriod": "115Q2",
       "roe": 6.8562198717970775,
       "debtRatio": 54.439344785268496,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2440": {
       "pe": null,
@@ -49785,7 +49800,8 @@
       "financialPeriod": "115Q2",
       "roe": 12.314638890127833,
       "debtRatio": 18.34314386816842,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2442": {
       "pe": 3.7,
@@ -49830,7 +49846,8 @@
       "financialPeriod": "115Q2",
       "roe": 5.550157618511944,
       "debtRatio": 42.17598480416897,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2451": {
       "pe": 5.1,
@@ -49845,7 +49862,8 @@
       "financialPeriod": "115Q2",
       "roe": 104.0728258328507,
       "debtRatio": 28.679982924350973,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2453": {
       "pe": 16.94,
@@ -49870,7 +49888,8 @@
       "financialPeriod": "115Q2",
       "roe": 22.64295697802593,
       "debtRatio": 45.05776945082058,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2455": {
       "pe": 71.57,
@@ -49885,7 +49904,8 @@
       "financialPeriod": "115Q2",
       "roe": 22.131651137293808,
       "debtRatio": 35.398259810279754,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2457": {
       "pe": null,
@@ -50070,7 +50090,8 @@
       "financialPeriod": "115Q2",
       "roe": 31.908918535831393,
       "debtRatio": 65.4186716270742,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2481": {
       "pe": 37.3,
@@ -50920,7 +50941,8 @@
       "market": "twse",
       "revenueYoY": 5.0897631181400484,
       "cumulativeRevenueYoY": 23.66419272939579,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "debtRatio": 66.24146916441492
     },
     "2820": {
       "pe": 11.02,
@@ -50940,7 +50962,8 @@
       "market": "twse",
       "revenueYoY": 7.2661756193891796,
       "cumulativeRevenueYoY": 8.035062163524959,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "debtRatio": 52.670240177794525
     },
     "2834": {
       "pe": 13.89,
@@ -51000,7 +51023,8 @@
       "market": "twse",
       "revenueYoY": 3.2753339234387897,
       "cumulativeRevenueYoY": 14.39614013899355,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "debtRatio": 62.41062389702813
     },
     "2851": {
       "pe": 6.66,
@@ -51010,7 +51034,8 @@
       "market": "twse",
       "revenueYoY": 6.042792392910144,
       "cumulativeRevenueYoY": 148.42994297669986,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "debtRatio": 60.24533914206548
     },
     "2852": {
       "pe": 8.77,
@@ -51020,7 +51045,8 @@
       "market": "twse",
       "revenueYoY": -6.80829044686296,
       "cumulativeRevenueYoY": -3.077392112368535,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "debtRatio": 52.72673039207242
     },
     "2855": {
       "pe": 9.69,
@@ -51040,7 +51066,8 @@
       "market": "twse",
       "revenueYoY": 187.20364314572126,
       "cumulativeRevenueYoY": 335.29297346058127,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "debtRatio": 95.06595654596016
     },
     "2880": {
       "pe": 21.11,
@@ -51265,7 +51292,8 @@
       "financialPeriod": "115Q2",
       "roe": 28.504122708061296,
       "debtRatio": 83.10807492470904,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "2913": {
       "pe": null,
@@ -51360,7 +51388,8 @@
       "financialPeriod": "115Q2",
       "roe": 13.687558457926583,
       "debtRatio": 58.254852831296965,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3005": {
       "pe": 13.99,
@@ -51385,7 +51414,8 @@
       "financialPeriod": "115Q2",
       "roe": 83.89746070041352,
       "debtRatio": 36.837806031413706,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3008": {
       "pe": 25.19,
@@ -51520,7 +51550,8 @@
       "financialPeriod": "115Q2",
       "roe": 21.446138830261525,
       "debtRatio": 52.869096293316574,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3024": {
       "pe": 134.44,
@@ -51645,7 +51676,8 @@
       "financialPeriod": "115Q2",
       "roe": 4.6925132899337,
       "debtRatio": 28.622667982670258,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3036": {
       "pe": 13.94,
@@ -51670,7 +51702,8 @@
       "financialPeriod": "115Q2",
       "roe": 29.31890614135455,
       "debtRatio": 59.22634162365821,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3038": {
       "pe": 22.13,
@@ -51825,7 +51858,8 @@
       "financialPeriod": "115Q2",
       "roe": 30.426106976341984,
       "debtRatio": 11.468648764393157,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3055": {
       "pe": null,
@@ -52110,7 +52144,8 @@
       "financialPeriod": "115Q2",
       "roe": 4.619335149911465,
       "debtRatio": 29.797646344882683,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3312": {
       "pe": 25.81,
@@ -52135,7 +52170,8 @@
       "financialPeriod": "115Q2",
       "roe": -20.11835553430538,
       "debtRatio": 67.31797030433168,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3338": {
       "pe": 39.73,
@@ -52190,7 +52226,8 @@
       "financialPeriod": "115Q2",
       "roe": 0.46121708140483814,
       "debtRatio": 50.00579383468489,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3406": {
       "pe": 14.58,
@@ -52265,7 +52302,8 @@
       "financialPeriod": "115Q2",
       "roe": 47.551641442909606,
       "debtRatio": 63.98233920382403,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3447": {
       "pe": 18.92,
@@ -52330,7 +52368,8 @@
       "financialPeriod": "115Q2",
       "roe": 0.7815764145384035,
       "debtRatio": 36.12557583310065,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3515": {
       "pe": 12.27,
@@ -52455,7 +52494,8 @@
       "financialPeriod": "115Q2",
       "roe": 22.26515614957526,
       "debtRatio": 28.211379186399604,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3576": {
       "pe": 38.81,
@@ -53210,7 +53250,8 @@
       "financialPeriod": "115Q2",
       "roe": 10.994976228115062,
       "debtRatio": 10.758389546339389,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "4585": {
       "pe": 214.02,
@@ -53585,7 +53626,8 @@
       "financialPeriod": "115Q2",
       "roe": 6.848362609121711,
       "debtRatio": 25.025113116702425,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "4976": {
       "pe": null,
@@ -53660,7 +53702,8 @@
       "financialPeriod": "115Q2",
       "roe": 6.012184726035435,
       "debtRatio": 28.021451728434766,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "5215": {
       "pe": 15.92,
@@ -54265,7 +54308,8 @@
       "financialPeriod": "115Q2",
       "roe": 7.118050342350219,
       "debtRatio": 48.31635873936797,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6177": {
       "pe": 6.33,
@@ -54370,7 +54414,8 @@
       "financialPeriod": "115Q2",
       "roe": 10.881498576436773,
       "debtRatio": 29.67722484201788,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6205": {
       "pe": 32.44,
@@ -54545,7 +54590,8 @@
       "financialPeriod": "115Q2",
       "roe": 6.713791720701033,
       "debtRatio": 24.15178406232816,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6272": {
       "pe": 9.92,
@@ -55440,7 +55486,8 @@
       "financialPeriod": "115Q2",
       "roe": 12.673900270471067,
       "debtRatio": 15.243412763781402,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6805": {
       "pe": 34.46,
@@ -55495,7 +55542,8 @@
       "financialPeriod": "115Q2",
       "roe": 18.324108520097994,
       "debtRatio": 40.74594652718573,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6835": {
       "pe": 240.38,
@@ -55807,7 +55855,8 @@
       "financialPeriod": "115Q2",
       "roe": 11.929543000192023,
       "debtRatio": 71.59296005733083,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6949": {
       "pe": null,
@@ -56069,7 +56118,8 @@
       "financialPeriod": "115Q2",
       "roe": 26.168073951117805,
       "debtRatio": 38.2787800323087,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "7768": {
       "pe": 82.08,
@@ -56154,7 +56204,8 @@
       "financialPeriod": "115Q2",
       "roe": -2.9556512586959305,
       "debtRatio": 2.862983710167412,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "7803": {
       "pe": null,
@@ -56286,7 +56337,8 @@
       "financialPeriod": "115Q2",
       "roe": 7.420167081247178,
       "debtRatio": 32.382671008225756,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "8045": {
       "pe": 79.29,
@@ -56491,7 +56543,8 @@
       "financialPeriod": "115Q2",
       "roe": -7.716073051902965,
       "debtRatio": 69.49907063443787,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "8222": {
       "pe": 58.77,
@@ -56526,7 +56579,8 @@
       "financialPeriod": "115Q2",
       "roe": 12.818110932968871,
       "debtRatio": 19.47124949837533,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "8271": {
       "pe": 5.55,
@@ -56541,7 +56595,8 @@
       "financialPeriod": "115Q2",
       "roe": 96.0548619899866,
       "debtRatio": 55.84458804701582,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "8341": {
       "pe": 16.26,
@@ -56656,7 +56711,8 @@
       "financialPeriod": "115Q2",
       "roe": 30.41837218084156,
       "debtRatio": 70.80578989449864,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "8462": {
       "pe": 18.16,
@@ -57301,7 +57357,8 @@
       "financialPeriod": "115Q2",
       "roe": 5.370505896680098,
       "debtRatio": 13.20326629401835,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "1580": {
       "pe": 8.93,
@@ -57326,7 +57383,8 @@
       "financialPeriod": "115Q2",
       "roe": 1.8582916757226688,
       "debtRatio": 38.407394298426894,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "1586": {
       "pe": 155.0,
@@ -57411,7 +57469,8 @@
       "financialPeriod": "115Q2",
       "roe": 8.88951046736691,
       "debtRatio": 40.72302197800049,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "1781": {
       "pe": null,
@@ -58006,7 +58065,8 @@
       "financialPeriod": "115Q2",
       "roe": 17.09296288990313,
       "debtRatio": 33.68861329722686,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3093": {
       "pe": 49.37,
@@ -58111,7 +58171,8 @@
       "financialPeriod": "115Q2",
       "roe": 10.874728662383555,
       "debtRatio": 30.860002773974465,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3147": {
       "pe": 24.86,
@@ -58176,7 +58237,8 @@
       "financialPeriod": "115Q2",
       "roe": 14.01266539809171,
       "debtRatio": 19.127707170461388,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3171": {
       "pe": 13.31,
@@ -58271,7 +58333,8 @@
       "financialPeriod": "115Q2",
       "roe": 11.607778325773559,
       "debtRatio": 52.50192432473696,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3213": {
       "pe": 17.18,
@@ -58446,7 +58509,8 @@
       "financialPeriod": "115Q2",
       "roe": 21.197281558206182,
       "debtRatio": 52.5152856935518,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3265": {
       "pe": 25.26,
@@ -58711,7 +58775,8 @@
       "financialPeriod": "115Q2",
       "roe": -5.149565143543163,
       "debtRatio": 11.255335621741246,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3357": {
       "pe": 19.96,
@@ -58766,7 +58831,8 @@
       "financialPeriod": "115Q2",
       "roe": -2.4803704177983867,
       "debtRatio": 19.801716360994703,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3373": {
       "pe": null,
@@ -59041,7 +59107,8 @@
       "financialPeriod": "115Q2",
       "roe": -4.899080061884788,
       "debtRatio": 30.233478871172707,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3512": {
       "pe": 11.26,
@@ -59086,7 +59153,8 @@
       "financialPeriod": "115Q2",
       "roe": 27.201243846291323,
       "debtRatio": 2.115191946061672,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3522": {
       "pe": null,
@@ -59141,7 +59209,8 @@
       "financialPeriod": "115Q2",
       "roe": 68.14576535590999,
       "debtRatio": 43.118462256246346,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3531": {
       "pe": 93.75,
@@ -59236,7 +59305,8 @@
       "financialPeriod": "115Q2",
       "roe": 66.26368103974112,
       "debtRatio": 14.908336321243892,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "3556": {
       "pe": 19.97,
@@ -59831,7 +59901,8 @@
       "financialPeriod": "115Q2",
       "roe": 11.607799187162502,
       "debtRatio": 34.01947294927251,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "4154": {
       "pe": null,
@@ -60876,7 +60947,8 @@
       "financialPeriod": "115Q2",
       "roe": -6.880224160165335,
       "debtRatio": 21.556807729198393,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "4973": {
       "pe": 13.72,
@@ -60931,7 +61003,8 @@
       "financialPeriod": "115Q2",
       "roe": 16.30989174308828,
       "debtRatio": 46.39264393832225,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "5009": {
       "pe": 15.9,
@@ -61176,7 +61249,8 @@
       "financialPeriod": "115Q2",
       "roe": -14.29582190581782,
       "debtRatio": 16.801508256877025,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "5274": {
       "pe": 123.24,
@@ -61251,7 +61325,8 @@
       "financialPeriod": "115Q2",
       "roe": 14.37453378792084,
       "debtRatio": 19.7384748603028,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "5301": {
       "pe": null,
@@ -61376,7 +61451,8 @@
       "financialPeriod": "115Q2",
       "roe": 1.3518674251793223,
       "debtRatio": 20.173781460572997,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "5345": {
       "pe": null,
@@ -61421,7 +61497,8 @@
       "financialPeriod": "115Q2",
       "roe": 59.02833557640318,
       "debtRatio": 40.590752128319465,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "5353": {
       "pe": 20.56,
@@ -61476,7 +61553,8 @@
       "financialPeriod": "115Q2",
       "roe": -1.102388928890272,
       "debtRatio": 44.47897331361169,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "5381": {
       "pe": 34.24,
@@ -61861,7 +61939,8 @@
       "financialPeriod": "115Q2",
       "roe": -0.7929072632839241,
       "debtRatio": 51.3450296002574,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "5529": {
       "pe": 7.11,
@@ -62026,7 +62105,8 @@
       "financialPeriod": "115Q2",
       "roe": 16.126325499350653,
       "debtRatio": 33.042772051071175,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "5903": {
       "pe": 27.23,
@@ -62361,7 +62441,8 @@
       "financialPeriod": "115Q2",
       "roe": 4.7427409336565844,
       "debtRatio": 13.080565840651667,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6148": {
       "pe": 21.03,
@@ -62426,7 +62507,8 @@
       "financialPeriod": "115Q2",
       "roe": -12.026620469387172,
       "debtRatio": 52.28326326988644,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6160": {
       "pe": null,
@@ -63011,7 +63093,8 @@
       "financialPeriod": "115Q2",
       "roe": 29.82282576240962,
       "debtRatio": 48.545651264849745,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6275": {
       "pe": 15.11,
@@ -63086,7 +63169,8 @@
       "financialPeriod": "115Q2",
       "roe": 27.433298647765124,
       "debtRatio": 39.267338592413175,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6294": {
       "pe": 10.25,
@@ -63191,7 +63275,8 @@
       "financialPeriod": "115Q2",
       "roe": -31.111990154711673,
       "debtRatio": 42.3703462604492,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6461": {
       "pe": null,
@@ -63286,7 +63371,8 @@
       "financialPeriod": "115Q2",
       "roe": 5.711963215740493,
       "debtRatio": 58.066779218032394,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6488": {
       "pe": 52.75,
@@ -63391,7 +63477,8 @@
       "financialPeriod": "115Q2",
       "roe": 16.41089343192572,
       "debtRatio": 28.040166764700324,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6512": {
       "pe": null,
@@ -63556,7 +63643,8 @@
       "financialPeriod": "115Q2",
       "roe": 35.903752353995685,
       "debtRatio": 53.506110654467165,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6568": {
       "pe": 32.75,
@@ -63951,7 +64039,8 @@
       "financialPeriod": "115Q2",
       "roe": 10.122489433065828,
       "debtRatio": 37.10072733590726,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6692": {
       "pe": null,
@@ -64176,7 +64265,8 @@
       "financialPeriod": "115Q2",
       "roe": 1.2141754562556197,
       "debtRatio": 52.578564822663864,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6763": {
       "pe": 9.82,
@@ -64511,7 +64601,8 @@
       "financialPeriod": "115Q2",
       "roe": 30.045746718062656,
       "debtRatio": 36.077343216850906,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "6910": {
       "pe": 13.86,
@@ -65156,7 +65247,8 @@
       "financialPeriod": "115Q2",
       "roe": 2.9353997584404734,
       "debtRatio": 7.304856301951998,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "8042": {
       "pe": 31.53,
@@ -65361,7 +65453,8 @@
       "financialPeriod": "115Q2",
       "roe": 40.47130745780857,
       "debtRatio": 41.37950020634075,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "8084": {
       "pe": null,
@@ -65666,7 +65759,8 @@
       "financialPeriod": "115Q2",
       "roe": 8.809232950905098,
       "debtRatio": 25.92534000217682,
-      "cashFlow": null
+      "cashFlow": null,
+      "financialSource": "TWSE/TPEx"
     },
     "8284": {
       "pe": 14.0,
