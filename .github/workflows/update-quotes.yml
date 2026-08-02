@@ -14,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Record current strategy candidates
+        env:
+          REPORT_OUTPUT: strategy-snapshot.txt
+        run: python daily_report.py
       - name: Download official closing prices
         run: |
           python - <<'PY'
@@ -134,10 +138,14 @@ jobs:
             quote["ma20"] = sum(closes[-20:]) / 20 if len(closes) >= 20 else None
           with open("quotes.json", "w", encoding="utf-8") as f: json.dump({"updatedAt": datetime.now(tz).strftime("%Y-%m-%d %H:%M Taipei time"), "quotes": quotes, "fundamentals": fundamentals, "history": history}, f, ensure_ascii=False, indent=2)
           PY
+      - name: Refresh strategy outcomes
+        env:
+          REPORT_OUTPUT: strategy-snapshot.txt
+        run: python daily_report.py
       - name: Commit refreshed data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add quotes.json
+          git add quotes.json strategy_data/recommendations.json
           git diff --cached --quiet || git commit -m "Update Taiwan stock quotes"
           git push

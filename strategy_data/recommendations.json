@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "recommendations": [
+    {
+      "id": "2026-08-02:short:swing:2451",
+      "date": "2026-08-02",
+      "mode": "short",
+      "style": "swing",
+      "rank": 1,
+      "code": "2451",
+      "name": "創見",
+      "entryPrice": 293.0,
+      "score": 88,
+      "coverage": 55,
+      "strategyVersion": "1.0",
+      "quoteUpdatedAt": "2026-08-01 23:44 Taipei time",
+      "outcomes": {
+        "5": {
+          "status": "pending",
+          "observations": 0
+        },
+        "20": {
+          "status": "pending",
+          "observations": 0
+        },
+        "60": {
+          "status": "pending",
+          "observations": 0
+        }
+      }
+    },
+    {
+      "id": "2026-08-02:short:swing:3006",
+      "date": "2026-08-02",
+      "mode": "short",
+      "style": "swing",
+      "rank": 2,
+      "code": "3006",
+      "name": "晶豪科",
+      "entryPrice": 180.0,
+      "score": 86,
+      "coverage": 55,
+      "strategyVersion": "1.0",
+      "quoteUpdatedAt": "2026-08-01 23:44 Taipei time",
+      "outcomes": {
+        "5": {
+          "status": "pending",
+          "observations": 0
+        },
+        "20": {
+          "status": "pending",
+          "observations": 0
+        },
+        "60": {
+          "status": "pending",
+          "observations": 0
+        }
+      }
+    },
+    {
+      "id": "2026-08-02:short:swing:2303",
+      "date": "2026-08-02",
+      "mode": "short",
+      "style": "swing",
+      "rank": 3,
+      "code": "2303",
+      "name": "聯電",
+      "entryPrice": 121.0,
+      "score": 85,
+      "coverage": 55,
+      "strategyVersion": "1.0",
+      "quoteUpdatedAt": "2026-08-01 23:44 Taipei time",
+      "outcomes": {
+        "5": {
+          "status": "pending",
+          "observations": 0
+        },
+        "20": {
+          "status": "pending",
+          "observations": 0
+        },
+        "60": {
+          "status": "pending",
+          "observations": 0
+        }
+      }
+    }
+  ],
+  "lastReviewedAt": "2026-08-02"
+}

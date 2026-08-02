@@ -2,6 +2,8 @@ import json
 import os
 from datetime import datetime, timedelta, timezone
 
+from strategy_tracker import record_recommendations, review_summary
+
 
 TZ_TAIPEI = timezone(timedelta(hours=8))
 
@@ -92,8 +94,10 @@ report_mode = os.environ.get("REPORT_MODE", "short")
 styles = [("value", "長期價值投資")] if report_mode == "long" else [("swing", "短線／波段操作")]
 report_title = "長線研究報告" if report_mode == "long" else "短線早報"
 sections = []
+ranked_by_style = {}
 for key, title in styles:
     items = candidates(key, quotes, fundamentals)
+    ranked_by_style[key] = items
     lines = [candidate_line(item) for item in items] or ["• 暫無資料完整度足夠的候選，請待資料更新後再檢視。"]
     sections.extend(["", f"【{title}｜優先研究候選】", *lines])
 
@@ -117,6 +121,9 @@ report = "\n".join([
     "",
     "以上為規則式研究排序，僅供研究參考，不構成買賣建議或報酬保證。",
 ])
+
+tracking_state = record_recommendations(today, report_mode, ranked_by_style, data)
+report += "\n\n" + review_summary(tracking_state)
 
 with open(os.environ.get("REPORT_OUTPUT", "daily-report.txt"), "w", encoding="utf-8") as output:
     output.write(report)
