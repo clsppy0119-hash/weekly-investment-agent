@@ -1,0 +1,40 @@
+name: One-year TWSE backtest
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Download one year of official TWSE data
+        run: python backtest.py collect --days 365
+      - name: Run train validation test backtest
+        run: python backtest.py report
+      - name: Upload backtest result
+        uses: actions/upload-artifact@v4
+        with:
+          name: one-year-twse-backtest
+          path: backtest_data/
+      - name: Push result to Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.parse, urllib.request
+          text = open("backtest_data/one_year_backtest.md", encoding="utf-8").read()
+          url = f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage"
+          body = urllib.parse.urlencode({"chat_id": os.environ["TELEGRAM_CHAT_ID"], "text": text[:3900]}).encode()
+          with urllib.request.urlopen(urllib.request.Request(url, data=body), timeout=30) as response:
+              result = json.load(response)
+          if not result.get("ok"):
+              raise RuntimeError(result)
+          PY
