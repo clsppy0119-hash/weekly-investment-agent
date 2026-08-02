@@ -1,4 +1,4 @@
-"""Incrementally enrich Taiwan semiconductor fundamentals from public FinMind data."""
+"""Incrementally enrich Taiwan stocks from public FinMind fundamentals."""
 
 from __future__ import annotations
 
@@ -12,8 +12,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 API = "https://api.finmindtrade.com/api/v4/data"
-SECTOR = "半導體業"
-STRATEGY = "semiconductor-first-v2"
+STRATEGY = "industry-queue-v3"
+CORE = ("eps", "roe", "debtRatio")
 
 
 def load(path: Path) -> dict:
@@ -46,6 +46,21 @@ def candidate_codes(tracker: Path, extra: str) -> list[str]:
         newest = max(str(row.get("date", "")) for row in rows)
         codes.update(str(row.get("code", "")) for row in rows if str(row.get("date", "")) == newest)
     return sorted(code for code in codes if code.isdigit())
+
+
+def stage_for(industry: str, market: str) -> str:
+    if industry == "半導體業":
+        return "半導體"
+    if any(word in industry for word in ("電子", "電腦", "通信", "光電", "資訊", "數位")):
+        return "電子其他"
+    if "金融" in industry:
+        return "金融"
+    if market == "emerging":
+        return "興櫃"
+    return "傳產與其他"
+
+
+STAGES = ("半導體", "電子其他", "金融", "傳產與其他", "興櫃")
 
 
 def latest(rows: list[dict], kind: str) -> tuple[str | None, float | None]:
@@ -97,57 +112,72 @@ def main() -> None:
     parser.add_argument("--codes", default="")
     parser.add_argument("--coverage", type=Path, default=ROOT / "data" / "fundamentals-coverage.json")
     parser.add_argument("--progress", type=Path, default=ROOT / "data" / "fundamentals-progress.json")
-    parser.add_argument("--batch-size", type=int, default=12)
+    parser.add_argument("--batch-size", type=int, default=30)
     args = parser.parse_args()
 
     market = load(args.quotes)
     quotes, fundamentals = market.get("quotes", {}), market.setdefault("fundamentals", {})
     stock_info = fetch("TaiwanStockInfo")
-    sector_rows = [row for row in stock_info if str(row.get("industry_category", "")) == SECTOR and str(row.get("stock_id", "")) in quotes]
-    industry_by_code = {str(row["stock_id"]): str(row.get("industry_category", SECTOR)) for row in sector_rows}
-    universe = sorted(industry_by_code)
-    for code, industry in industry_by_code.items():
-        fundamentals.setdefault(code, {}).setdefault("industry", industry)
+    metadata = {
+        str(row["stock_id"]): {"industry": str(row.get("industry_category") or "未分類"), "market": str(row.get("type") or "")}
+        for row in stock_info if str(row.get("stock_id", "")) in quotes
+    }
+    for code, info in metadata.items():
+        fundamentals.setdefault(code, {}).setdefault("industry", info["industry"])
+        fundamentals[code].setdefault("market", info["market"])
+    by_stage = {stage: sorted(code for code, info in metadata.items() if stage_for(info["industry"], info["market"]) == stage) for stage in STAGES}
 
-    priority = [code for code in candidate_codes(args.tracker, args.codes) if code in industry_by_code]
     progress = load(args.progress)
-    cursor = int(progress.get("cursor", 0)) % max(1, len(universe))
-    rotated = universe[cursor:] + universe[:cursor]
-    selected = list(dict.fromkeys(priority + rotated))[: max(1, args.batch_size)]
-    next_cursor = (cursor + len([code for code in selected if code in universe])) % max(1, len(universe))
+    reviewed = {stage: set(progress.get("reviewedCodes", {}).get(stage, [])) for stage in STAGES}
+    active_index = int(progress.get("activeStageIndex", 0)) % len(STAGES)
+    while active_index < len(STAGES) - 1 and len(reviewed[STAGES[active_index]]) >= len(by_stage[STAGES[active_index]]):
+        active_index += 1
+    active_stage = STAGES[active_index]
+    stage_codes = by_stage[active_stage]
+    pending = [code for code in stage_codes if code not in reviewed[active_stage]]
+    priority = [code for code in candidate_codes(args.tracker, args.codes) if code in pending]
+    selected = list(dict.fromkeys(priority + pending))[: max(1, args.batch_size)]
+
     start = f"{date.today().year - 5}-01-01"
     results, failures = {}, {}
     with ThreadPoolExecutor(max_workers=3) as pool:
-        futures = [pool.submit(enrich, code, start, industry_by_code[code]) for code in selected]
+        futures = [pool.submit(enrich, code, start, metadata[code]["industry"]) for code in selected]
         for future in as_completed(futures):
             code, values, error = future.result()
+            reviewed[active_stage].add(code)
             if error:
                 failures[code] = error
             else:
                 results[code] = values
                 fundamentals.setdefault(code, {}).update({key: value for key, value in values.items() if value is not None})
 
-    enriched_codes = [code for code in universe if all(key in fundamentals.get(code, {}) for key in ("eps", "roe", "debtRatio"))]
+    total_codes = sorted(metadata)
+    complete_codes = [code for code in total_codes if all(key in fundamentals.get(code, {}) for key in CORE)]
+    stage_counts = {stage: {"total": len(codes), "reviewed": len(reviewed[stage]), "remaining": max(0, len(codes) - len(reviewed[stage]))} for stage, codes in by_stage.items()}
     progress_payload = {
         "strategy": STRATEGY,
-        "sector": SECTOR,
-        "cursor": next_cursor,
+        "activeStage": active_stage,
+        "activeStageIndex": active_index,
+        "reviewedCodes": {stage: sorted(codes) for stage, codes in reviewed.items()},
         "lastBatch": selected,
         "updatedAt": datetime.now(timezone.utc).isoformat(),
     }
     coverage = {
-        "scope": "半導體全產業分批補齊；每次優先處理候選股，再輪替全產業，非全市場覆蓋率。",
+        "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
         "strategy": STRATEGY,
         "updatedAt": datetime.now(timezone.utc).isoformat(),
-        "universeCodes": len(universe),
+        "activeStage": active_stage,
+        "universeCodes": len(total_codes),
+        "currentStageCodes": len(stage_codes),
         "queriedCodes": selected,
         "priorityCodes": priority,
         "successfulCodes": len(results),
-        "enrichedCodes": len(enriched_codes),
-        "remainingCodes": max(0, len(universe) - len(enriched_codes)),
+        "enrichedCodes": len(complete_codes),
+        "remainingCodes": max(0, len(total_codes) - len(complete_codes)),
+        "stageCoverage": stage_counts,
         "failures": failures,
-        "metrics": {key: sum(1 for code in universe if fundamentals.get(code, {}).get(key) is not None) for key in ("eps", "roe", "debtRatio")},
-        "fiveYearHistory": sum(1 for code in universe if fundamentals.get(code, {}).get("financialHistoryYears", 0) >= 5),
+        "metrics": {key: sum(1 for code in total_codes if fundamentals.get(code, {}).get(key) is not None) for key in CORE},
+        "fiveYearHistory": sum(1 for code in total_codes if fundamentals.get(code, {}).get("financialHistoryYears", 0) >= 5),
     }
     save(args.quotes, market)
     save(args.progress, progress_payload)

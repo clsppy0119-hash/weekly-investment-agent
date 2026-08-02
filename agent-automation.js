@@ -12,7 +12,8 @@
     if(!data||document.querySelector('#fundamentalCoverage'))return;
     const total=data.universeCodes||data.semiconductorCodes?.length||0,metric=key=>`${data.metrics?.[key]||0}/${total}`;
     const section=document.createElement('section');section.id='fundamentalCoverage';section.className='card panel';
-    section.innerHTML=`<h2>半導體財務資料覆蓋率</h2><p class="label">範圍：半導體全產業分批補齊，候選股優先；不是全市場完整度。</p><div class="strategy"><b>核心指標已備 ${data.enrichedCodes??data.successfulCodes??0}/${total} 檔</b><br><span class="hint">本批成功 ${data.successfulCodes||0} 檔・尚待補齊 ${data.remainingCodes??'暫無'} 檔<br>TTM EPS ${metric('eps')}・TTM ROE ${metric('roe')}・負債比 ${metric('debtRatio')}・近五年期間 ${data.fiveYearHistory||0}/${total}<br>更新：${data.updatedAt||'暫無'}。缺失資料會維持「資料不足」，不會以 0 補值。</span></div>`;
+    const active=data.activeStage||'半導體';
+    section.innerHTML=`<h2>產業財務資料覆蓋率</h2><p class="label">自動隊列：半導體 → 電子其他 → 金融 → 傳產與其他 → 興櫃；候選股優先。</p><div class="strategy"><b>目前補齊：${active}</b><br><span class="hint">本階段 ${data.stageCoverage?.[active]?.reviewed??data.successfulCodes??0}/${data.currentStageCodes??total} 檔已審核・本批成功 ${data.successfulCodes||0} 檔<br>全資料池核心指標已備 ${data.enrichedCodes??0}/${total} 檔・尚待補齊 ${data.remainingCodes??'暫無'} 檔<br>TTM EPS ${metric('eps')}・TTM ROE ${metric('roe')}・負債比 ${metric('debtRatio')}・近五年期間 ${data.fiveYearHistory||0}/${total}<br>更新：${data.updatedAt||'暫無'}。缺失資料會維持「資料不足」，不會以 0 補值。</span></div>`;
     const app=document.querySelector('main.app');if(app)app.insertBefore(section,app.querySelector('.footer'));
   }).catch(()=>{});
   fetch('strategy_data/recommendations.json',{cache:'no-store'}).then(response=>response.ok?response.json():null).then(data=>{
