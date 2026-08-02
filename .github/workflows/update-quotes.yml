@@ -21,18 +21,28 @@ jobs:
       - name: Download official closing prices
         run: |
           python - <<'PY'
-          import json, urllib.request
+          import json, time, urllib.error, urllib.request
           from datetime import datetime, timezone, timedelta
           quotes = {}
           try:
             with open("quotes.json", encoding="utf-8") as existing_file: existing = json.load(existing_file)
           except (FileNotFoundError, json.JSONDecodeError): existing = {}
           history = existing.get("history", {})
+          quotes = {code: dict(values) for code, values in existing.get("quotes", {}).items()}
+          def fetch_json(url, attempts=3):
+            for attempt in range(1, attempts + 1):
+              try:
+                request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
+                with urllib.request.urlopen(request, timeout=30) as response: return json.load(response)
+              except (OSError, TimeoutError, urllib.error.URLError, json.JSONDecodeError) as error:
+                if attempt == attempts:
+                  print(f"warning: {url} unavailable after {attempts} attempts: {error}")
+                  return []
+                time.sleep(attempt * 2)
           # 保留上一期有效財報；每日資料源缺少個股時，不再把舊值清空。
           fundamentals = {code: dict(values) for code, values in existing.get("fundamentals", {}).items()}
           for url, market in [("https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL", "twse"), ("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes", "tpex")]:
-            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
-            with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
+            rows = fetch_json(url)
             for row in rows:
               code = row.get("Code", "") if market == "twse" else row.get("SecuritiesCompanyCode", "")
               name = row.get("Name", "") if market == "twse" else row.get("CompanyName") or row.get("SecuritiesCompanyName", "")
@@ -47,8 +57,7 @@ jobs:
 
           # 興櫃股票不在上櫃主板行情表中，另外由櫃買中心興櫃當日行情表匯入。
           emerging_url = "https://www.tpex.org.tw/openapi/v1/tpex_esb_latest_statistics"
-          request = urllib.request.Request(emerging_url, headers={"User-Agent": "weekly-investment-agent"})
-          with urllib.request.urlopen(request, timeout=30) as response: emerging_rows = json.load(response)
+          emerging_rows = fetch_json(emerging_url)
           for row in emerging_rows:
             code = str(row.get("SecuritiesCompanyCode", "")).strip()
             name = str(row.get("CompanyName", "")).strip()
@@ -66,8 +75,7 @@ jobs:
               fundamentals.setdefault(code, {}).setdefault("market", "emerging")
 
           for url, market in [("https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL", "twse"), ("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_peratio_analysis", "tpex")]:
-            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
-            with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
+            rows = fetch_json(url)
             for row in rows:
               if market == "twse":
                 code = str(row.get("Code", "")).strip()
@@ -86,8 +94,7 @@ jobs:
             return None
 
           for url in ["https://openapi.twse.com.tw/v1/opendata/t187ap05_L", "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap05_O"]:
-            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
-            with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
+            rows = fetch_json(url)
             for row in rows:
               code = str(row.get("公司代號") or row.get("SecuritiesCompanyCode") or "").strip()
               if code and code in fundamentals:
@@ -97,8 +104,7 @@ jobs:
           income_urls = [f"https://openapi.twse.com.tw/v1/opendata/t187ap06_L_{kind}" for kind in ["ci", "basi", "bd", "fh", "ins", "mim"]]
           income_urls += [f"https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap06_O_{kind}" for kind in ["ci", "basi", "bd", "fh", "ins", "mim"]]
           for url in income_urls:
-            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
-            with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
+            rows = fetch_json(url)
             for row in rows:
               code = str(row.get("公司代號") or row.get("SecuritiesCompanyCode") or "").strip()
               if code and code in fundamentals:
@@ -113,8 +119,7 @@ jobs:
           balance_urls = [f"https://openapi.twse.com.tw/v1/opendata/t187ap07_L_{kind}" for kind in ["ci", "basi", "bd", "fh", "ins", "mim"]]
           balance_urls += [f"https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap07_O_{kind}" for kind in ["ci", "basi", "bd", "fh", "ins", "mim"]]
           for url in balance_urls:
-            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
-            with urllib.request.urlopen(request, timeout=30) as response: rows = json.load(response)
+            rows = fetch_json(url)
             for row in rows:
               code = str(row.get("公司代號") or row.get("SecuritiesCompanyCode") or "").strip()
               if code and code in fundamentals:
