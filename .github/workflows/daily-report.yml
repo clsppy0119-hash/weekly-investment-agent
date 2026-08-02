@@ -18,14 +18,16 @@ jobs:
         with:
           python-version: "3.12"
       - name: Build daily report
-        run: python daily_report.py
+        run: REPORT_MODE=comprehensive python daily_report.py
+      - name: Verify candidate-pool corporate actions
+        run: python finmind_actions.py --output backtest_data/candidate_actions.json
       - name: Install AI agent
         run: python -m pip install "openai-agents>=0.6.0" python-dotenv
-      - name: Review top candidate with AI
+      - name: Review comprehensive candidates with AI
         continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python investment_agent/cloud_report.py --mode daily --report daily-report.txt --output ai-daily-report.txt --limit 1
+        run: python investment_agent/cloud_report.py --mode comprehensive --report daily-report.txt --output ai-daily-report.txt --limit 3
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
         with:
@@ -33,6 +35,7 @@ jobs:
           path: |
             daily-report.txt
             ai-daily-report.txt
+            backtest_data/candidate_actions.json
       - name: Push to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

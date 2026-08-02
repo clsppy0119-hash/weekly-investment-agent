@@ -28,6 +28,7 @@ def stock_score(code, style, quotes, fundamentals):
         "value": {"revenue": 15, "eps": 15, "roe": 15, "debt": 15, "pe": 15, "pb": 10, "dividend": 5, "trend20": 10},
         "swing": {"revenue": 10, "eps": 5, "roe": 5, "debt": 5, "pe": 5, "trend20": 25, "trend5": 20, "change": 25},
         "dividend": {"revenue": 10, "eps": 15, "roe": 15, "debt": 15, "pe": 10, "pb": 5, "dividend": 25, "trend20": 5},
+        "comprehensive": {"revenue": 15, "eps": 12, "roe": 12, "debt": 10, "pe": 10, "pb": 6, "dividend": 7, "trend20": 12, "trend5": 7, "change": 9},
     }[style]
 
     revenue = fund.get("revenueYoY")
@@ -50,7 +51,7 @@ def stock_score(code, style, quotes, fundamentals):
 
 def candidates(style, quotes, fundamentals):
     ranked = []
-    minimum_coverage = {"value": 70, "swing": 45, "dividend": 70}[style]
+    minimum_coverage = {"value": 70, "swing": 45, "dividend": 70, "comprehensive": 70}[style]
     for code, fund in fundamentals.items():
         quote = quotes.get(code, {})
         if not (code.isdigit() and len(code) == 4 and number(quote.get("price"))):
@@ -90,9 +91,9 @@ def quote_line(item):
     return f"• {row.get('name', code)}（{code}）｜{row['price']:.2f}｜{row.get('change', 0):+.2f}"
 
 
-report_mode = os.environ.get("REPORT_MODE", "short")
-styles = [("value", "長期價值投資")] if report_mode == "long" else [("swing", "短線／波段操作")]
-report_title = "長線研究報告" if report_mode == "long" else "短線早報"
+report_mode = os.environ.get("REPORT_MODE", "comprehensive")
+styles = [("comprehensive", "綜合投資研究")]
+report_title = "綜合投資研究日報"
 sections = []
 ranked_by_style = {}
 for key, title in styles:
@@ -100,13 +101,6 @@ for key, title in styles:
     ranked_by_style[key] = items
     lines = [candidate_line(item) for item in items] or ["• 暫無資料完整度足夠的候選，請待資料更新後再檢視。"]
     sections.extend(["", f"【{title}｜優先研究候選】", *lines])
-
-auto_long = report_mode == "long" and os.environ.get("LONG_AUTO") == "1"
-long_ready = any(item[0] >= 80 and item[1] >= 70 for item in candidates("value", quotes, fundamentals))
-if auto_long and not long_ready:
-    with open(os.environ.get("REPORT_OUTPUT", "long-research.txt"), "w", encoding="utf-8") as output:
-        output.write("")
-    raise SystemExit(0)
 
 report = "\n".join([
     f"台股{report_title}｜{today}",

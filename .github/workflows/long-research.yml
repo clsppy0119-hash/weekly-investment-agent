@@ -1,49 +1,39 @@
-name: Long-term research Telegram
+name: Manual comprehensive research Telegram
 
 on:
   workflow_dispatch:
-    inputs:
-      force_report:
-        description: "忽略門檻，立即產生研究報告"
-        required: false
-        default: "true"
-  schedule:
-    # 00:15 UTC = 台北時間平日 08:15
-    - cron: "15 0 * * 1-5"
 
 permissions:
   contents: read
 
 jobs:
-  long-research:
+  comprehensive-research:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Build long-term research
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_report }}" = "true" ]; then
-            FORCE_REPORT=1 python long_research_report.py
-          else
-            REPORT_MODE=long LONG_AUTO=1 REPORT_OUTPUT=long-research.txt python daily_report.py
-          fi
-      - name: Check research threshold
-        id: threshold
-        run: |
-          if [ -s long-research.txt ]; then echo "send=true" >> "$GITHUB_OUTPUT"; else echo "send=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Build comprehensive research
+        run: REPORT_MODE=comprehensive REPORT_OUTPUT=comprehensive-research.txt python daily_report.py
+      - name: Verify candidate-pool corporate actions
+        run: python finmind_actions.py --output backtest_data/candidate_actions.json
       - name: Install AI agent
-        if: steps.threshold.outputs.send == 'true'
         run: python -m pip install "openai-agents>=0.6.0" python-dotenv
-      - name: Deep-review long-term candidates with AI
-        if: steps.threshold.outputs.send == 'true'
+      - name: Review comprehensive candidates with AI
         continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python investment_agent/cloud_report.py --mode long --report long-research.txt --output ai-long-research.txt --limit 3
-      - name: Push research to Telegram
-        if: steps.threshold.outputs.send == 'true'
+        run: python investment_agent/cloud_report.py --mode comprehensive --report comprehensive-research.txt --output ai-comprehensive-research.txt --limit 3
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: comprehensive-investment-report
+          path: |
+            comprehensive-research.txt
+            ai-comprehensive-research.txt
+            backtest_data/candidate_actions.json
+      - name: Push to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -51,9 +41,7 @@ jobs:
           python - <<'PY'
           import json, os, urllib.parse, urllib.request
           url = f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage"
-          for path in ("long-research.txt", "ai-long-research.txt"):
-              if not os.path.exists(path):
-                  continue
+          for path in ("comprehensive-research.txt", "ai-comprehensive-research.txt"):
               text = open(path, encoding="utf-8").read().strip()
               for start in range(0, len(text), 3900):
                   body = urllib.parse.urlencode({"chat_id": os.environ["TELEGRAM_CHAT_ID"], "text": text[start:start + 3900]}).encode()
