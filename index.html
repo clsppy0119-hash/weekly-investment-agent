@@ -210,8 +210,7 @@ fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(d
 </script><script>
 // 一句話交易：由使用者輸入方向、股票與數量，其餘欄位自動完成。
 (() => {
-  const tradeHeading = [...document.querySelectorAll('h2')].find(heading => heading.textContent.trim() === '新增交易');
-  const panel = tradeHeading?.closest('.panel');
+  const panel = document.querySelector('.layout .panel');
   const legacyForm = panel?.querySelector('.form');
   if (!panel || !legacyForm) return;
 
