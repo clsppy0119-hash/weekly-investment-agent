@@ -52048,7 +52048,16 @@
       "market": "twse",
       "revenueYoY": 45.70501957576112,
       "cumulativeRevenueYoY": 22.1253743573735,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業",
+      "eps": 0.79,
+      "roe": 7.44,
+      "debtRatio": 33.36,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 公開基本面資料",
+      "financialUpdatedAt": "2026-08-02T15:15:30.164001+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2303": {
       "pe": 18.2,
@@ -52064,11 +52073,11 @@
       "roe": 21.33,
       "debtRatio": 33.34,
       "cashFlow": null,
-      "financialSource": "FinMind 財報與資產負債表",
-      "industry": "半導體",
+      "financialSource": "FinMind 公開基本面資料",
+      "industry": "半導體業",
       "financialHistoryYears": 6,
-      "financialUpdatedAt": "2026-08-02T12:15:00.071638+00:00",
-      "financialNotes": "EPS 為最近四季加總；ROE 為最近四季稅後淨利／平均權益；負債比＝負債／資產。"
+      "financialUpdatedAt": "2026-08-02T15:15:28.890626+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2305": {
       "pe": 111.48,
@@ -52205,12 +52214,16 @@
       "revenueYoY": 3.620312967366914,
       "cumulativeRevenueYoY": 10.655082062962112,
       "revenuePeriod": "11506",
-      "eps": 0.96,
-      "financialPeriod": "115Q2",
-      "roe": 7.834735663718593,
-      "debtRatio": 38.43654479999405,
+      "eps": 2.59,
+      "financialPeriod": "2026-06-30",
+      "roe": 10.73,
+      "debtRatio": 38.44,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "FinMind 公開基本面資料",
+      "industry": "半導體業",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-02T15:15:30.239391+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2330": {
       "pe": 32.6,
@@ -52221,14 +52234,14 @@
       "revenueYoY": 67.86685548491262,
       "cumulativeRevenueYoY": 35.613194655616326,
       "revenuePeriod": "11506",
-      "industry": "半導體",
+      "industry": "半導體業",
       "eps": 74.39,
       "roe": 36.6,
       "financialPeriod": "2026-03-31",
       "financialHistoryYears": 6,
-      "financialSource": "FinMind 財報與資產負債表",
-      "financialUpdatedAt": "2026-08-02T11:37:23.551148+00:00",
-      "financialNotes": "EPS 為最近四季加總；ROE 為最近四季稅後淨利／平均權益；負債比＝負債／資產。",
+      "financialSource": "FinMind 公開基本面資料",
+      "financialUpdatedAt": "2026-08-02T15:15:31.592217+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
       "debtRatio": 31.5
     },
     "2331": {
@@ -52260,12 +52273,16 @@
       "revenueYoY": 216.09461825395996,
       "cumulativeRevenueYoY": 128.75502117306723,
       "revenuePeriod": "11506",
-      "eps": 4.82,
-      "financialPeriod": "115Q2",
-      "roe": 30.72158164859887,
-      "debtRatio": 35.77321276616327,
+      "eps": 4.19,
+      "financialPeriod": "2026-06-30",
+      "roe": 16.01,
+      "debtRatio": 35.77,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "FinMind 公開基本面資料",
+      "industry": "半導體業",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-02T15:15:31.622663+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2338": {
       "pe": null,
@@ -52275,7 +52292,16 @@
       "market": "twse",
       "revenueYoY": 0.08416664208528755,
       "cumulativeRevenueYoY": -5.14144361677994,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業",
+      "eps": -3.27,
+      "roe": -19.78,
+      "debtRatio": 66.11,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 公開基本面資料",
+      "financialUpdatedAt": "2026-08-02T15:15:31.725575+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2340": {
       "pe": null,
@@ -52285,7 +52311,16 @@
       "market": "twse",
       "revenueYoY": 16.342094806930515,
       "cumulativeRevenueYoY": 2.167343922289935,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業",
+      "eps": -2.58,
+      "roe": -17.17,
+      "debtRatio": 53.66,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 公開基本面資料",
+      "financialUpdatedAt": "2026-08-02T15:15:33.136454+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2342": {
       "pe": null,
@@ -52295,7 +52330,16 @@
       "market": "twse",
       "revenueYoY": 4.567934911523317,
       "cumulativeRevenueYoY": -6.431874163543586,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業",
+      "eps": -0.77,
+      "roe": -5.08,
+      "debtRatio": 25.94,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 公開基本面資料",
+      "financialUpdatedAt": "2026-08-02T15:15:33.068865+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2344": {
       "pe": 38.58,
@@ -52305,7 +52349,16 @@
       "market": "twse",
       "revenueYoY": 189.87676071204797,
       "cumulativeRevenueYoY": 139.19764936720955,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業",
+      "eps": 3.37,
+      "roe": 12.93,
+      "debtRatio": 46.52,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 公開基本面資料",
+      "financialUpdatedAt": "2026-08-02T15:15:33.221268+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2345": {
       "pe": 40.19,
@@ -52355,7 +52408,8 @@
       "market": "twse",
       "revenueYoY": 51.71958184529576,
       "cumulativeRevenueYoY": 24.213651821814913,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2352": {
       "pe": 44.11,
@@ -52455,7 +52509,8 @@
       "market": "twse",
       "revenueYoY": 74.79882516895688,
       "cumulativeRevenueYoY": 99.90714739063372,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2364": {
       "pe": 17.98,
@@ -52505,7 +52560,8 @@
       "market": "twse",
       "revenueYoY": 36.51642739564834,
       "cumulativeRevenueYoY": 37.29941838463464,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2371": {
       "pe": null,
@@ -52575,7 +52631,8 @@
       "market": "twse",
       "revenueYoY": 20.600599623892947,
       "cumulativeRevenueYoY": 10.515910995929755,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2380": {
       "pe": 18.14,
@@ -52641,7 +52698,8 @@
       "market": "twse",
       "revenueYoY": 34.01111161221461,
       "cumulativeRevenueYoY": 34.24462498488735,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2390": {
       "pe": null,
@@ -52717,7 +52775,8 @@
       "market": "twse",
       "revenueYoY": 35.245576961695555,
       "cumulativeRevenueYoY": 19.535212529562255,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2402": {
       "pe": 26.56,
@@ -52767,7 +52826,8 @@
       "market": "twse",
       "revenueYoY": 621.3354284927444,
       "cumulativeRevenueYoY": 643.1170392921229,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2409": {
       "pe": 75.63,
@@ -52983,7 +53043,8 @@
       "market": "twse",
       "revenueYoY": 117.37116386797915,
       "cumulativeRevenueYoY": 18.628753653999468,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2436": {
       "pe": 16.29,
@@ -52993,7 +53054,8 @@
       "market": "twse",
       "revenueYoY": 18.283561926860667,
       "cumulativeRevenueYoY": 28.037723613453032,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2438": {
       "pe": null,
@@ -53045,7 +53107,8 @@
       "roe": 12.314638890127833,
       "debtRatio": 18.34314386816842,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "2442": {
       "pe": 3.7,
@@ -53075,7 +53138,8 @@
       "market": "twse",
       "revenueYoY": 28.637381895574038,
       "cumulativeRevenueYoY": 36.078737471426955,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2450": {
       "pe": 17.75,
@@ -53107,11 +53171,11 @@
       "roe": 87.87,
       "debtRatio": 28.68,
       "cashFlow": null,
-      "financialSource": "FinMind 財報與資產負債表",
-      "industry": "半導體",
+      "financialSource": "FinMind 公開基本面資料",
+      "industry": "半導體業",
       "financialHistoryYears": 6,
-      "financialUpdatedAt": "2026-08-02T12:14:59.870288+00:00",
-      "financialNotes": "EPS 為最近四季加總；ROE 為最近四季稅後淨利／平均權益；負債比＝負債／資產。"
+      "financialUpdatedAt": "2026-08-02T15:15:28.738921+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2453": {
       "pe": 16.94,
@@ -53137,7 +53201,8 @@
       "roe": 22.64295697802593,
       "debtRatio": 45.05776945082058,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "2455": {
       "pe": 71.57,
@@ -53173,7 +53238,8 @@
       "market": "twse",
       "revenueYoY": 7.126864539616727,
       "cumulativeRevenueYoY": 4.53651528744666,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2459": {
       "pe": 12.33,
@@ -53349,7 +53415,8 @@
       "market": "twse",
       "revenueYoY": 27.366334018682334,
       "cumulativeRevenueYoY": 13.983259576992966,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "2482": {
       "pe": null,
@@ -54663,11 +54730,11 @@
       "roe": 64.06,
       "debtRatio": 36.84,
       "cashFlow": null,
-      "financialSource": "FinMind 財報與資產負債表",
-      "industry": "半導體",
+      "financialSource": "FinMind 公開基本面資料",
+      "industry": "半導體業",
       "financialHistoryYears": 6,
-      "financialUpdatedAt": "2026-08-02T12:15:00.024175+00:00",
-      "financialNotes": "EPS 為最近四季加總；ROE 為最近四季稅後淨利／平均權益；負債比＝負債／資產。"
+      "financialUpdatedAt": "2026-08-02T15:15:28.843686+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "3008": {
       "pe": 25.19,
@@ -54717,7 +54784,8 @@
       "market": "twse",
       "revenueYoY": -1.1200766724913236,
       "cumulativeRevenueYoY": -2.0885342105140445,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3015": {
       "pe": 26.06,
@@ -54737,7 +54805,8 @@
       "market": "twse",
       "revenueYoY": 41.1677815992038,
       "cumulativeRevenueYoY": 27.865119873583634,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3017": {
       "pe": 38.12,
@@ -54913,7 +54982,8 @@
       "market": "twse",
       "revenueYoY": 18.95885030532578,
       "cumulativeRevenueYoY": -2.7535228697334344,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3035": {
       "pe": 58.86,
@@ -54929,7 +54999,8 @@
       "roe": 4.6925132899337,
       "debtRatio": 28.622667982670258,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "3036": {
       "pe": 13.94,
@@ -54985,7 +55056,8 @@
       "market": "twse",
       "revenueYoY": 167.50830564784053,
       "cumulativeRevenueYoY": 42.89095493442987,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3042": {
       "pe": 28.53,
@@ -55111,7 +55183,8 @@
       "roe": 30.426106976341984,
       "debtRatio": 11.468648764393157,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "3055": {
       "pe": null,
@@ -55211,7 +55284,8 @@
       "market": "twse",
       "revenueYoY": 74.09097390560387,
       "cumulativeRevenueYoY": 12.46399740375644,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3130": {
       "pe": 13.46,
@@ -55231,7 +55305,8 @@
       "market": "twse",
       "revenueYoY": 150.02313750823012,
       "cumulativeRevenueYoY": 256.0946243793828,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3138": {
       "pe": 55.84,
@@ -55261,7 +55336,8 @@
       "market": "twse",
       "revenueYoY": 33.89710732120984,
       "cumulativeRevenueYoY": 0.26280820906540675,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3164": {
       "pe": 31.73,
@@ -55301,7 +55377,8 @@
       "market": "twse",
       "revenueYoY": 32.267517957903046,
       "cumulativeRevenueYoY": 29.794918131687737,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3209": {
       "pe": 15.54,
@@ -55341,7 +55418,8 @@
       "market": "twse",
       "revenueYoY": -42.49941295261353,
       "cumulativeRevenueYoY": -41.02219403931515,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3266": {
       "pe": 21.8,
@@ -55499,7 +55577,8 @@
       "market": "twse",
       "revenueYoY": 39.75269641874535,
       "cumulativeRevenueYoY": 17.698513809699495,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3416": {
       "pe": 22.67,
@@ -55555,7 +55634,8 @@
       "roe": 47.551641442909606,
       "debtRatio": 63.98233920382403,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "3447": {
       "pe": 18.92,
@@ -55575,7 +55655,8 @@
       "market": "twse",
       "revenueYoY": 88.17862702906383,
       "cumulativeRevenueYoY": 9.911626096750897,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3481": {
       "pe": 413.64,
@@ -55661,7 +55742,8 @@
       "market": "twse",
       "revenueYoY": 24.343026486386368,
       "cumulativeRevenueYoY": 41.620146075690606,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3532": {
       "pe": 343.67,
@@ -55671,7 +55753,8 @@
       "market": "twse",
       "revenueYoY": 23.7105244008926,
       "cumulativeRevenueYoY": 15.75719866075163,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3533": {
       "pe": 26.06,
@@ -55711,7 +55794,8 @@
       "market": "twse",
       "revenueYoY": 2.1625922503989665,
       "cumulativeRevenueYoY": -13.493201555301093,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3550": {
       "pe": null,
@@ -55767,7 +55851,8 @@
       "market": "twse",
       "revenueYoY": -2.6702288525774125,
       "cumulativeRevenueYoY": 6.793850018318901,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3588": {
       "pe": 82.83,
@@ -55777,7 +55862,8 @@
       "market": "twse",
       "revenueYoY": 46.382279258137025,
       "cumulativeRevenueYoY": 20.86019504693017,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3591": {
       "pe": null,
@@ -55797,7 +55883,8 @@
       "market": "twse",
       "revenueYoY": 18.58858957849729,
       "cumulativeRevenueYoY": 4.987329276680653,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3593": {
       "pe": null,
@@ -55897,7 +55984,8 @@
       "market": "twse",
       "revenueYoY": 15.393764143989447,
       "cumulativeRevenueYoY": -39.74326450698351,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3665": {
       "pe": 42.38,
@@ -55947,7 +56035,8 @@
       "market": "twse",
       "revenueYoY": 25.617782192971564,
       "cumulativeRevenueYoY": 13.06812455910511,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3694": {
       "pe": 12.58,
@@ -56037,7 +56126,8 @@
       "market": "twse",
       "revenueYoY": 32.861279955266355,
       "cumulativeRevenueYoY": 22.021177497754,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3712": {
       "pe": null,
@@ -56723,7 +56813,8 @@
       "market": "twse",
       "revenueYoY": 1.1580188054463485,
       "cumulativeRevenueYoY": -1.5492680758551929,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4927": {
       "pe": null,
@@ -56813,7 +56904,8 @@
       "market": "twse",
       "revenueYoY": 50.028083252408074,
       "cumulativeRevenueYoY": 19.152670999545,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4956": {
       "pe": null,
@@ -56853,7 +56945,8 @@
       "market": "twse",
       "revenueYoY": 24.761225552287513,
       "cumulativeRevenueYoY": 1.534672595956703,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4967": {
       "pe": 5.98,
@@ -56863,7 +56956,8 @@
       "market": "twse",
       "revenueYoY": 34.996287416578696,
       "cumulativeRevenueYoY": 67.73953534526801,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4968": {
       "pe": 26.32,
@@ -56879,7 +56973,8 @@
       "roe": 6.848362609121711,
       "debtRatio": 25.025113116702425,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "4976": {
       "pe": null,
@@ -56975,7 +57070,8 @@
       "market": "twse",
       "revenueYoY": -4.967310712589941,
       "cumulativeRevenueYoY": -15.176595371522588,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5225": {
       "pe": 7.84,
@@ -57005,7 +57101,8 @@
       "market": "twse",
       "revenueYoY": 12.778482052726718,
       "cumulativeRevenueYoY": 17.774392550706946,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5243": {
       "pe": 15.81,
@@ -57045,7 +57142,8 @@
       "market": "twse",
       "revenueYoY": -22.40798186882456,
       "cumulativeRevenueYoY": 5.396872838137528,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5283": {
       "pe": 9.27,
@@ -57075,7 +57173,8 @@
       "market": "twse",
       "revenueYoY": 14.12282395058262,
       "cumulativeRevenueYoY": 11.043242007330011,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5288": {
       "pe": 15.21,
@@ -57150,7 +57249,8 @@
       "market": "twse",
       "revenueYoY": 47.665111320984074,
       "cumulativeRevenueYoY": 28.639992890741848,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5484": {
       "pe": 101.89,
@@ -57672,7 +57772,8 @@
       "roe": 10.881498576436773,
       "debtRatio": 29.67722484201788,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "6205": {
       "pe": 32.44,
@@ -57802,7 +57903,8 @@
       "market": "twse",
       "revenueYoY": 21.714018933029624,
       "cumulativeRevenueYoY": 32.41357011729345,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6243": {
       "pe": null,
@@ -57812,7 +57914,8 @@
       "market": "twse",
       "revenueYoY": -56.18110034353689,
       "cumulativeRevenueYoY": -52.12006949835496,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6257": {
       "pe": 27.88,
@@ -57822,7 +57925,8 @@
       "market": "twse",
       "revenueYoY": 20.995882409269367,
       "cumulativeRevenueYoY": 18.079219623863757,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6269": {
       "pe": null,
@@ -57848,7 +57952,8 @@
       "roe": 6.713791720701033,
       "debtRatio": 24.15178406232816,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "6272": {
       "pe": 9.92,
@@ -57968,7 +58073,8 @@
       "market": "twse",
       "revenueYoY": 37.771677521318765,
       "cumulativeRevenueYoY": 25.537151211799827,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6416": {
       "pe": 19.14,
@@ -58058,7 +58164,8 @@
       "market": "twse",
       "revenueYoY": 40.55459044749156,
       "cumulativeRevenueYoY": -5.214739162111288,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6456": {
       "pe": null,
@@ -58138,7 +58245,8 @@
       "market": "twse",
       "revenueYoY": 287.8983328197554,
       "cumulativeRevenueYoY": 70.27062547976278,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6525": {
       "pe": 20.26,
@@ -58148,7 +58256,8 @@
       "market": "twse",
       "revenueYoY": 19.843686128900394,
       "cumulativeRevenueYoY": 15.644673036228081,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6526": {
       "pe": 29.85,
@@ -58158,7 +58267,8 @@
       "market": "twse",
       "revenueYoY": 14.401349875766075,
       "cumulativeRevenueYoY": 9.299961432535602,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6531": {
       "pe": 67.78,
@@ -58168,7 +58278,8 @@
       "market": "twse",
       "revenueYoY": 59.477769215041754,
       "cumulativeRevenueYoY": 94.67605835240275,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6533": {
       "pe": null,
@@ -58178,7 +58289,8 @@
       "market": "twse",
       "revenueYoY": 247.04308093994777,
       "cumulativeRevenueYoY": 62.06907821274695,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6534": {
       "pe": 19.77,
@@ -58218,7 +58330,8 @@
       "market": "twse",
       "revenueYoY": -23.476778866638263,
       "cumulativeRevenueYoY": -29.760364074212507,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6558": {
       "pe": null,
@@ -58238,7 +58351,8 @@
       "market": "twse",
       "revenueYoY": 6.5679207920792075,
       "cumulativeRevenueYoY": -16.07652290652794,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6579": {
       "pe": 28.26,
@@ -58508,7 +58622,8 @@
       "market": "twse",
       "revenueYoY": -17.841765120861478,
       "cumulativeRevenueYoY": -11.02719298245614,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6698": {
       "pe": null,
@@ -58548,7 +58663,8 @@
       "market": "twse",
       "revenueYoY": -3.5649222241253136,
       "cumulativeRevenueYoY": -4.779331610635161,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6722": {
       "pe": 13.42,
@@ -58608,7 +58724,8 @@
       "market": "twse",
       "revenueYoY": 50.05919884233375,
       "cumulativeRevenueYoY": 16.36033607999941,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6757": {
       "pe": 9.23,
@@ -58638,7 +58755,8 @@
       "market": "twse",
       "revenueYoY": 68.75001629130628,
       "cumulativeRevenueYoY": 37.81385240017568,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6771": {
       "pe": 12.82,
@@ -58688,7 +58806,8 @@
       "market": "twse",
       "revenueYoY": 15.55439129457698,
       "cumulativeRevenueYoY": 9.037153876706077,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6790": {
       "pe": 12.61,
@@ -58744,7 +58863,8 @@
       "roe": 12.673900270471067,
       "debtRatio": 15.243412763781402,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "6805": {
       "pe": 34.46,
@@ -58830,7 +58950,8 @@
       "market": "twse",
       "revenueYoY": -51.64287624689206,
       "cumulativeRevenueYoY": -43.10864802165227,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6861": {
       "pe": 38.82,
@@ -58960,7 +59081,8 @@
       "market": "twse",
       "revenueYoY": -32.101831729276626,
       "cumulativeRevenueYoY": -6.175888187806082,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6914": {
       "pe": 15.08,
@@ -59010,7 +59132,8 @@
       "market": "twse",
       "revenueYoY": -63.376640593928144,
       "cumulativeRevenueYoY": -60.959117861229586,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6923": {
       "pe": 25.11,
@@ -59090,7 +59213,8 @@
       "market": "twse",
       "revenueYoY": 64.17155209836051,
       "cumulativeRevenueYoY": 33.627529532614275,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6944": {
       "pe": 20.29,
@@ -59183,7 +59307,8 @@
       "market": "twse",
       "revenueYoY": -0.3289827323638412,
       "cumulativeRevenueYoY": -5.698391199855097,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6965": {
       "pe": 49.19,
@@ -59300,7 +59425,8 @@
       "market": "twse",
       "revenueYoY": -38.68703727478923,
       "cumulativeRevenueYoY": -25.28045498638796,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7732": {
       "pe": 20.61,
@@ -59340,7 +59466,8 @@
       "market": "twse",
       "revenueYoY": 64.4845015528896,
       "cumulativeRevenueYoY": 64.11644858145033,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7750": {
       "pe": 50.77,
@@ -59386,7 +59513,8 @@
       "market": "twse",
       "revenueYoY": 11.905891336542021,
       "cumulativeRevenueYoY": 10.873128673453763,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7769": {
       "pe": 77.12,
@@ -59396,7 +59524,8 @@
       "market": "twse",
       "revenueYoY": 106.54371201496026,
       "cumulativeRevenueYoY": 91.59588442186318,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7780": {
       "pe": 40.0,
@@ -59502,7 +59631,8 @@
       "market": "twse",
       "revenueYoY": 50.722189173111246,
       "cumulativeRevenueYoY": 91.41426402004656,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7823": {
       "pe": null,
@@ -59549,7 +59679,8 @@
       "market": "twse",
       "revenueYoY": 26.606882946298615,
       "cumulativeRevenueYoY": 28.95067260179889,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8021": {
       "pe": 92.55,
@@ -59569,7 +59700,8 @@
       "market": "twse",
       "revenueYoY": 33.62262688880279,
       "cumulativeRevenueYoY": 28.399120589722187,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8033": {
       "pe": 246.27,
@@ -59645,7 +59777,8 @@
       "market": "twse",
       "revenueYoY": 7.187399522176132,
       "cumulativeRevenueYoY": -1.2954984832136716,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8101": {
       "pe": null,
@@ -59695,7 +59828,8 @@
       "market": "twse",
       "revenueYoY": 16.255262184489105,
       "cumulativeRevenueYoY": 13.315927649033759,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8112": {
       "pe": 9.67,
@@ -59725,7 +59859,8 @@
       "market": "twse",
       "revenueYoY": 60.867801283132565,
       "cumulativeRevenueYoY": 40.86062114829514,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8150": {
       "pe": 61.53,
@@ -59735,7 +59870,8 @@
       "market": "twse",
       "revenueYoY": 37.229842348004304,
       "cumulativeRevenueYoY": 27.072310765634526,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8162": {
       "pe": 34.93,
@@ -59745,7 +59881,8 @@
       "market": "twse",
       "revenueYoY": -2.1087320288221836,
       "cumulativeRevenueYoY": -3.254880988414857,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8163": {
       "pe": 60.0,
@@ -59837,7 +59974,8 @@
       "roe": 12.818110932968871,
       "debtRatio": 19.47124949837533,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "8271": {
       "pe": 5.55,
@@ -59853,7 +59991,8 @@
       "roe": 96.0548619899866,
       "debtRatio": 55.84458804701582,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "8341": {
       "pe": 16.26,
@@ -60681,7 +60820,16 @@
       "market": "tpex",
       "revenueYoY": 27.897197482174107,
       "cumulativeRevenueYoY": 4.554695173485004,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業",
+      "eps": -2.35,
+      "roe": -4.63,
+      "debtRatio": 30.83,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 公開基本面資料",
+      "financialUpdatedAt": "2026-08-02T15:15:30.112916+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "1599": {
       "pe": null,
@@ -61257,7 +61405,8 @@
       "market": "tpex",
       "revenueYoY": 32.916553411253055,
       "cumulativeRevenueYoY": 199.22220375602458,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3078": {
       "pe": 10.67,
@@ -61353,7 +61502,8 @@
       "market": "tpex",
       "revenueYoY": 29.55254858878341,
       "cumulativeRevenueYoY": 33.8643139305193,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3114": {
       "pe": 11.55,
@@ -61393,7 +61543,8 @@
       "market": "tpex",
       "revenueYoY": -0.9132776520177972,
       "cumulativeRevenueYoY": -2.6135245999952024,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3128": {
       "pe": 20.05,
@@ -61413,7 +61564,8 @@
       "market": "tpex",
       "revenueYoY": 15.21416051997371,
       "cumulativeRevenueYoY": 15.737415428019121,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3141": {
       "pe": 65.15,
@@ -61429,7 +61581,8 @@
       "roe": 10.874728662383555,
       "debtRatio": 30.860002773974465,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "3147": {
       "pe": 24.86,
@@ -61495,7 +61648,8 @@
       "roe": 14.01266539809171,
       "debtRatio": 19.127707170461388,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "3171": {
       "pe": 13.31,
@@ -61525,7 +61679,8 @@
       "market": "tpex",
       "revenueYoY": 36.03095897831205,
       "cumulativeRevenueYoY": 2.5388206449056416,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3188": {
       "pe": 3.82,
@@ -61631,7 +61786,8 @@
       "market": "tpex",
       "revenueYoY": 26.070616002891832,
       "cumulativeRevenueYoY": 38.93041711117547,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3221": {
       "pe": 152.41,
@@ -61671,7 +61827,8 @@
       "market": "tpex",
       "revenueYoY": 21.045548913917585,
       "cumulativeRevenueYoY": 2.568346952602179,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3228": {
       "pe": null,
@@ -61681,7 +61838,8 @@
       "market": "tpex",
       "revenueYoY": 56.80235187697874,
       "cumulativeRevenueYoY": 10.332081972692912,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3230": {
       "pe": null,
@@ -61741,7 +61899,8 @@
       "market": "tpex",
       "revenueYoY": 14.552633434393288,
       "cumulativeRevenueYoY": 0.37126468595206963,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3260": {
       "pe": 7.96,
@@ -61751,7 +61910,8 @@
       "market": "tpex",
       "revenueYoY": 212.0575633036068,
       "cumulativeRevenueYoY": 183.33210046161716,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3264": {
       "pe": 23.11,
@@ -61767,7 +61927,8 @@
       "roe": 21.197281558206182,
       "debtRatio": 52.5152856935518,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "3265": {
       "pe": 25.26,
@@ -61777,7 +61938,8 @@
       "market": "tpex",
       "revenueYoY": 3.577098737283907,
       "cumulativeRevenueYoY": 20.4457063471082,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3268": {
       "pe": null,
@@ -61787,7 +61949,8 @@
       "market": "tpex",
       "revenueYoY": 4.795277679518924,
       "cumulativeRevenueYoY": 6.433541214581948,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3272": {
       "pe": null,
@@ -61947,7 +62110,8 @@
       "market": "tpex",
       "revenueYoY": 16.065083487244873,
       "cumulativeRevenueYoY": 8.020301892759921,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3322": {
       "pe": null,
@@ -62089,7 +62253,8 @@
       "roe": -2.4803704177983867,
       "debtRatio": 19.801716360994703,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "3373": {
       "pe": null,
@@ -62109,7 +62274,8 @@
       "market": "tpex",
       "revenueYoY": 61.00810513493806,
       "cumulativeRevenueYoY": 32.96711960242186,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3379": {
       "pe": 15.92,
@@ -62179,7 +62345,8 @@
       "market": "tpex",
       "revenueYoY": -6.387255914025232,
       "cumulativeRevenueYoY": -17.41158868585769,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3441": {
       "pe": 73.68,
@@ -62239,7 +62406,8 @@
       "market": "tpex",
       "revenueYoY": 23.03112517898862,
       "cumulativeRevenueYoY": 21.542043497858185,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3479": {
       "pe": 19.22,
@@ -62451,7 +62619,8 @@
       "market": "tpex",
       "revenueYoY": 19.606084117285747,
       "cumulativeRevenueYoY": -3.4176035516608207,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3529": {
       "pe": 83.03,
@@ -62467,7 +62636,8 @@
       "roe": 68.14576535590999,
       "debtRatio": 43.118462256246346,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "3531": {
       "pe": 93.75,
@@ -62563,7 +62733,8 @@
       "roe": 66.26368103974112,
       "debtRatio": 14.908336321243892,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "3556": {
       "pe": 19.97,
@@ -62573,7 +62744,8 @@
       "market": "tpex",
       "revenueYoY": 66.86296504019442,
       "cumulativeRevenueYoY": 24.072538123393013,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3558": {
       "pe": 43.57,
@@ -62603,7 +62775,8 @@
       "market": "tpex",
       "revenueYoY": 24.189814814814813,
       "cumulativeRevenueYoY": 1.9831284941836897,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3570": {
       "pe": 11.94,
@@ -62643,7 +62816,8 @@
       "market": "tpex",
       "revenueYoY": 95.43904685387314,
       "cumulativeRevenueYoY": 28.86662406218018,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3587": {
       "pe": 27.76,
@@ -62843,7 +63017,8 @@
       "market": "tpex",
       "revenueYoY": 29.991642290012535,
       "cumulativeRevenueYoY": 17.112146850787262,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3680": {
       "pe": 40.8,
@@ -62853,7 +63028,8 @@
       "market": "tpex",
       "revenueYoY": 37.92616527813181,
       "cumulativeRevenueYoY": 22.279681796561125,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3684": {
       "pe": 13.43,
@@ -62923,7 +63099,8 @@
       "market": "tpex",
       "revenueYoY": 29.859380823363388,
       "cumulativeRevenueYoY": 25.067532444118594,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "3709": {
       "pe": 7.25,
@@ -63959,7 +64136,8 @@
       "market": "tpex",
       "revenueYoY": 24.61101042697689,
       "cumulativeRevenueYoY": 17.348653938846997,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4754": {
       "pe": 13.6,
@@ -64089,7 +64267,8 @@
       "market": "tpex",
       "revenueYoY": 32.51522372253111,
       "cumulativeRevenueYoY": 26.432008550256043,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4924": {
       "pe": 13.89,
@@ -64159,7 +64338,8 @@
       "market": "tpex",
       "revenueYoY": -3.7051232911715855,
       "cumulativeRevenueYoY": 1.7004199648950469,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4953": {
       "pe": 13.01,
@@ -64179,7 +64359,8 @@
       "market": "tpex",
       "revenueYoY": 12.22926183396314,
       "cumulativeRevenueYoY": -0.1666878085641768,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4971": {
       "pe": 68.27,
@@ -64189,7 +64370,8 @@
       "market": "tpex",
       "revenueYoY": -6.262225815706424,
       "cumulativeRevenueYoY": 15.658384677993292,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4972": {
       "pe": null,
@@ -64215,7 +64397,8 @@
       "market": "tpex",
       "revenueYoY": 197.3016513672852,
       "cumulativeRevenueYoY": 112.07588512408356,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4974": {
       "pe": 15.17,
@@ -64245,7 +64428,8 @@
       "market": "tpex",
       "revenueYoY": 55.06382371817728,
       "cumulativeRevenueYoY": 54.158581243063146,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "4995": {
       "pe": 13.35,
@@ -64507,7 +64691,8 @@
       "roe": -14.29582190581782,
       "debtRatio": 16.801508256877025,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "5274": {
       "pe": 123.24,
@@ -64517,7 +64702,8 @@
       "market": "tpex",
       "revenueYoY": 67.47066184525202,
       "cumulativeRevenueYoY": 62.77159751511307,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5276": {
       "pe": 13.87,
@@ -64583,7 +64769,8 @@
       "roe": 14.37453378792084,
       "debtRatio": 19.7384748603028,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "5301": {
       "pe": null,
@@ -64603,7 +64790,8 @@
       "market": "tpex",
       "revenueYoY": -14.053174172544765,
       "cumulativeRevenueYoY": 74.56572465646876,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5309": {
       "pe": 234.52,
@@ -64643,7 +64831,8 @@
       "market": "tpex",
       "revenueYoY": 167.87101013980998,
       "cumulativeRevenueYoY": 162.02376112803694,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5315": {
       "pe": 11.03,
@@ -64709,7 +64898,8 @@
       "roe": 1.3518674251793223,
       "debtRatio": 20.173781460572997,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "5345": {
       "pe": null,
@@ -64729,7 +64919,8 @@
       "market": "tpex",
       "revenueYoY": 33.57197389935392,
       "cumulativeRevenueYoY": 13.226216868513267,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5348": {
       "pe": null,
@@ -64755,7 +64946,8 @@
       "roe": 59.02833557640318,
       "debtRatio": 40.590752128319465,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "5353": {
       "pe": 20.56,
@@ -64881,7 +65073,8 @@
       "market": "tpex",
       "revenueYoY": 9.455285836828871,
       "cumulativeRevenueYoY": 2.7158224223650986,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5426": {
       "pe": 60.9,
@@ -64931,7 +65124,8 @@
       "market": "tpex",
       "revenueYoY": -10.094479686867324,
       "cumulativeRevenueYoY": 1.3190999894583948,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5450": {
       "pe": 75.53,
@@ -65011,7 +65205,8 @@
       "market": "tpex",
       "revenueYoY": 39.68474733426055,
       "cumulativeRevenueYoY": 48.27390556570152,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5474": {
       "pe": 27.92,
@@ -65061,7 +65256,8 @@
       "market": "tpex",
       "revenueYoY": 7.614773597478452,
       "cumulativeRevenueYoY": 2.2642483596709364,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5487": {
       "pe": null,
@@ -65071,7 +65267,8 @@
       "market": "tpex",
       "revenueYoY": 15.349544072948328,
       "cumulativeRevenueYoY": -6.204291845493562,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "5488": {
       "pe": 68.89,
@@ -65473,7 +65670,8 @@
       "market": "tpex",
       "revenueYoY": -34.030110737837504,
       "cumulativeRevenueYoY": -4.468080322007601,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6104": {
       "pe": 20.0,
@@ -65483,7 +65681,8 @@
       "market": "tpex",
       "revenueYoY": 5.661463437673425,
       "cumulativeRevenueYoY": -0.17937122387237037,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6109": {
       "pe": null,
@@ -65613,7 +65812,8 @@
       "market": "tpex",
       "revenueYoY": 36.53870493511045,
       "cumulativeRevenueYoY": 43.20627174123342,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6130": {
       "pe": null,
@@ -65699,7 +65899,8 @@
       "roe": 4.7427409336565844,
       "debtRatio": 13.080565840651667,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "6148": {
       "pe": 21.03,
@@ -65895,7 +66096,8 @@
       "market": "tpex",
       "revenueYoY": 14.108955904198915,
       "cumulativeRevenueYoY": 9.048903023840364,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6185": {
       "pe": 231.67,
@@ -65925,7 +66127,8 @@
       "market": "tpex",
       "revenueYoY": 87.06198415059339,
       "cumulativeRevenueYoY": 35.97030380008246,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6188": {
       "pe": 21.39,
@@ -65975,7 +66178,8 @@
       "market": "tpex",
       "revenueYoY": 0.0,
       "cumulativeRevenueYoY": 14.563106796116505,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6199": {
       "pe": 58.42,
@@ -66025,7 +66229,8 @@
       "market": "tpex",
       "revenueYoY": 22.498510520079527,
       "cumulativeRevenueYoY": 1.2635873387503753,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6210": {
       "pe": null,
@@ -66115,7 +66320,8 @@
       "market": "tpex",
       "revenueYoY": 65.06962875172574,
       "cumulativeRevenueYoY": 49.625237932501335,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6227": {
       "pe": 13.02,
@@ -66145,7 +66351,8 @@
       "market": "tpex",
       "revenueYoY": 44.66838657491099,
       "cumulativeRevenueYoY": 52.25988788426388,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6231": {
       "pe": 31.16,
@@ -66165,7 +66372,8 @@
       "market": "tpex",
       "revenueYoY": 19.708126478525973,
       "cumulativeRevenueYoY": -0.7575564730858717,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6234": {
       "pe": 357.22,
@@ -66195,7 +66403,8 @@
       "market": "tpex",
       "revenueYoY": 7.551178061027423,
       "cumulativeRevenueYoY": 43.11933843870351,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6240": {
       "pe": null,
@@ -66285,7 +66494,8 @@
       "market": "tpex",
       "revenueYoY": 33.71161891839105,
       "cumulativeRevenueYoY": 9.423610904536583,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6263": {
       "pe": 17.49,
@@ -66411,7 +66621,8 @@
       "market": "tpex",
       "revenueYoY": 52.989566234599344,
       "cumulativeRevenueYoY": 42.18339162444387,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6292": {
       "pe": 9.75,
@@ -66447,7 +66658,8 @@
       "market": "tpex",
       "revenueYoY": 9.836360532762495,
       "cumulativeRevenueYoY": 13.342432260441438,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6417": {
       "pe": 21.41,
@@ -66487,7 +66699,8 @@
       "market": "tpex",
       "revenueYoY": 171.65308498253785,
       "cumulativeRevenueYoY": 9.159799433180728,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6425": {
       "pe": null,
@@ -66517,7 +66730,8 @@
       "market": "tpex",
       "revenueYoY": 21.599174347519842,
       "cumulativeRevenueYoY": 10.989313566158847,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6441": {
       "pe": null,
@@ -66553,7 +66767,8 @@
       "market": "tpex",
       "revenueYoY": -23.68455669560642,
       "cumulativeRevenueYoY": 71.75087461478564,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6465": {
       "pe": 18.53,
@@ -66613,7 +66828,8 @@
       "market": "tpex",
       "revenueYoY": -6.62529319781079,
       "cumulativeRevenueYoY": -13.207278366134748,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6486": {
       "pe": 15.46,
@@ -66639,7 +66855,8 @@
       "market": "tpex",
       "revenueYoY": -1.625897664890664,
       "cumulativeRevenueYoY": -7.604867486301924,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6492": {
       "pe": null,
@@ -66659,7 +66876,8 @@
       "market": "tpex",
       "revenueYoY": 45.809128630705395,
       "cumulativeRevenueYoY": 43.531979265694716,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6496": {
       "pe": null,
@@ -66735,7 +66953,8 @@
       "roe": 16.41089343192572,
       "debtRatio": 28.040166764700324,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "6512": {
       "pe": null,
@@ -66805,7 +67024,8 @@
       "market": "tpex",
       "revenueYoY": 18.6488114905444,
       "cumulativeRevenueYoY": 2.0007081157937923,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6535": {
       "pe": null,
@@ -66865,7 +67085,8 @@
       "market": "tpex",
       "revenueYoY": 37.63050839378656,
       "cumulativeRevenueYoY": 24.231301487724295,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6556": {
       "pe": 10.02,
@@ -66911,7 +67132,8 @@
       "market": "tpex",
       "revenueYoY": 11.012409374122345,
       "cumulativeRevenueYoY": 17.677397456052596,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6569": {
       "pe": 26.2,
@@ -67151,7 +67373,8 @@
       "market": "tpex",
       "revenueYoY": 0.33061598202956405,
       "cumulativeRevenueYoY": 41.491976067395036,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6642": {
       "pe": 29.6,
@@ -67171,7 +67394,8 @@
       "market": "tpex",
       "revenueYoY": -23.52155048788376,
       "cumulativeRevenueYoY": -7.5459073169792825,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6649": {
       "pe": 59.68,
@@ -67191,7 +67415,8 @@
       "market": "tpex",
       "revenueYoY": 19.45585335629837,
       "cumulativeRevenueYoY": 7.919485749302785,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6654": {
       "pe": 402.7,
@@ -67251,7 +67476,8 @@
       "market": "tpex",
       "revenueYoY": 9.928816208001871,
       "cumulativeRevenueYoY": 7.094038029242931,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6680": {
       "pe": null,
@@ -67271,7 +67497,8 @@
       "market": "tpex",
       "revenueYoY": 24.548925011980206,
       "cumulativeRevenueYoY": 31.582262093867868,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6684": {
       "pe": null,
@@ -67281,7 +67508,8 @@
       "market": "tpex",
       "revenueYoY": -18.869322639700112,
       "cumulativeRevenueYoY": -1.8969279838845057,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6690": {
       "pe": 14.7,
@@ -67317,7 +67545,8 @@
       "market": "tpex",
       "revenueYoY": 106.97920992410253,
       "cumulativeRevenueYoY": 83.50345430475238,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6697": {
       "pe": 13.35,
@@ -67347,7 +67576,8 @@
       "market": "tpex",
       "revenueYoY": 8.7498756177651,
       "cumulativeRevenueYoY": -9.699824847496528,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6712": {
       "pe": 29.82,
@@ -67367,7 +67597,8 @@
       "market": "tpex",
       "revenueYoY": 60.57521512066967,
       "cumulativeRevenueYoY": 53.76493011907014,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6720": {
       "pe": 49.45,
@@ -67377,7 +67608,8 @@
       "market": "tpex",
       "revenueYoY": -18.613844962954772,
       "cumulativeRevenueYoY": -24.67534497649353,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6721": {
       "pe": 10.9,
@@ -67437,7 +67669,8 @@
       "market": "tpex",
       "revenueYoY": -14.876105396616571,
       "cumulativeRevenueYoY": -14.154068323622425,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6733": {
       "pe": null,
@@ -67563,7 +67796,8 @@
       "market": "tpex",
       "revenueYoY": 6.32444909151887,
       "cumulativeRevenueYoY": 12.169182836806298,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6791": {
       "pe": 20.86,
@@ -67623,7 +67857,8 @@
       "market": "tpex",
       "revenueYoY": 14.871069569138687,
       "cumulativeRevenueYoY": 18.35390507808633,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6829": {
       "pe": 40.93,
@@ -67633,7 +67868,8 @@
       "market": "tpex",
       "revenueYoY": 69.40258279232194,
       "cumulativeRevenueYoY": 43.081949992060295,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6840": {
       "pe": 40.0,
@@ -67813,7 +68049,8 @@
       "market": "tpex",
       "revenueYoY": -43.63989727215937,
       "cumulativeRevenueYoY": -28.375484572852905,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6899": {
       "pe": 13.88,
@@ -67859,7 +68096,8 @@
       "roe": 30.045746718062656,
       "debtRatio": 36.077343216850906,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "6910": {
       "pe": 13.86,
@@ -67929,7 +68167,8 @@
       "market": "tpex",
       "revenueYoY": 27.619903403347188,
       "cumulativeRevenueYoY": 7.195245962006885,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6961": {
       "pe": 18.25,
@@ -68009,7 +68248,8 @@
       "market": "tpex",
       "revenueYoY": 49.96470230466799,
       "cumulativeRevenueYoY": 27.447564281500917,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "6997": {
       "pe": 52.21,
@@ -68049,7 +68289,8 @@
       "market": "tpex",
       "revenueYoY": 8.775664460795657,
       "cumulativeRevenueYoY": 11.750856164383562,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7584": {
       "pe": null,
@@ -68089,7 +68330,8 @@
       "market": "tpex",
       "revenueYoY": 17.80945706698141,
       "cumulativeRevenueYoY": 7.70005047395923,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7708": {
       "pe": 13.15,
@@ -68119,7 +68361,8 @@
       "market": "tpex",
       "revenueYoY": 49.37077106104543,
       "cumulativeRevenueYoY": 10.94230352573299,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7713": {
       "pe": 14.43,
@@ -68209,7 +68452,8 @@
       "market": "tpex",
       "revenueYoY": -6.430351748169291,
       "cumulativeRevenueYoY": 63.0852759377674,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7738": {
       "pe": 11.91,
@@ -68259,7 +68503,8 @@
       "market": "tpex",
       "revenueYoY": 67.24363360454167,
       "cumulativeRevenueYoY": 67.72206405207477,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7753": {
       "pe": 9.04,
@@ -68299,7 +68544,8 @@
       "market": "tpex",
       "revenueYoY": -62.30240408364894,
       "cumulativeRevenueYoY": -47.96099963732362,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7772": {
       "pe": 87.6,
@@ -68309,7 +68555,8 @@
       "market": "tpex",
       "revenueYoY": 6.718503219535901,
       "cumulativeRevenueYoY": -15.07626342705286,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7777": {
       "pe": 57.66,
@@ -68369,7 +68616,8 @@
       "market": "tpex",
       "revenueYoY": 116.45935483870967,
       "cumulativeRevenueYoY": 68.48738818599404,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7811": {
       "pe": 14.31,
@@ -68419,7 +68667,8 @@
       "market": "tpex",
       "revenueYoY": 255.83109919571046,
       "cumulativeRevenueYoY": 210.2765695427715,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "7839": {
       "pe": 17.06,
@@ -68449,7 +68698,8 @@
       "market": "tpex",
       "revenueYoY": 70.62246963562752,
       "cumulativeRevenueYoY": 15.198857393979345,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8027": {
       "pe": null,
@@ -68505,7 +68755,8 @@
       "roe": 2.9353997584404734,
       "debtRatio": 7.304856301951998,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "TWSE/TPEx",
+      "industry": "半導體業"
     },
     "8042": {
       "pe": 31.53,
@@ -68585,7 +68836,8 @@
       "market": "tpex",
       "revenueYoY": -20.60699575977742,
       "cumulativeRevenueYoY": 185.87915757602744,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8059": {
       "pe": null,
@@ -68741,7 +68993,8 @@
       "market": "tpex",
       "revenueYoY": 16.05250649642661,
       "cumulativeRevenueYoY": 44.35837084378472,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8087": {
       "pe": null,
@@ -68761,7 +69014,8 @@
       "market": "tpex",
       "revenueYoY": 1.015439915039621,
       "cumulativeRevenueYoY": 45.05007531990266,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8089": {
       "pe": null,
@@ -68781,7 +69035,8 @@
       "market": "tpex",
       "revenueYoY": 71.69755125469767,
       "cumulativeRevenueYoY": 50.668577399845354,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8092": {
       "pe": 200.0,
@@ -68841,7 +69096,8 @@
       "market": "tpex",
       "revenueYoY": 40.21994602907466,
       "cumulativeRevenueYoY": 2.690009320005117,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8107": {
       "pe": null,
@@ -68951,7 +69207,8 @@
       "market": "tpex",
       "revenueYoY": 88.43935428090913,
       "cumulativeRevenueYoY": 107.88704801115387,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8234": {
       "pe": null,
@@ -69001,7 +69258,8 @@
       "market": "tpex",
       "revenueYoY": -83.65110523171461,
       "cumulativeRevenueYoY": -63.49128247625583,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8279": {
       "pe": 10.53,
@@ -69057,7 +69315,8 @@
       "market": "tpex",
       "revenueYoY": 301.0014716799628,
       "cumulativeRevenueYoY": 243.08190556946727,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8342": {
       "pe": 15.21,
@@ -69107,7 +69366,8 @@
       "market": "tpex",
       "revenueYoY": 200.06744217625493,
       "cumulativeRevenueYoY": 54.93184345782547,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體業"
     },
     "8390": {
       "pe": 10.93,
@@ -69716,7 +69976,8 @@
       "market": "emerging"
     },
     "3644": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "3659": {
       "market": "emerging"
@@ -69797,7 +70058,8 @@
       "market": "emerging"
     },
     "4925": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "4980": {
       "market": "emerging"
@@ -69806,7 +70068,8 @@
       "market": "emerging"
     },
     "5246": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "5248": {
       "market": "emerging"
@@ -69815,7 +70078,8 @@
       "market": "emerging"
     },
     "5262": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "5267": {
       "market": "emerging"
@@ -69824,7 +70088,8 @@
       "market": "emerging"
     },
     "5297": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "5859": {
       "market": "emerging"
@@ -69881,7 +70146,8 @@
       "market": "emerging"
     },
     "6563": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "6564": {
       "market": "emerging"
@@ -70010,7 +70276,8 @@
       "market": "emerging"
     },
     "6786": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "6787": {
       "market": "emerging"
@@ -70049,7 +70316,8 @@
       "market": "emerging"
     },
     "6819": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "6820": {
       "market": "emerging"
@@ -70073,7 +70341,8 @@
       "market": "emerging"
     },
     "6842": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "6847": {
       "market": "emerging"
@@ -70139,13 +70408,15 @@
       "market": "emerging"
     },
     "6920": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "6926": {
       "market": "emerging"
     },
     "6927": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "6932": {
       "market": "emerging"
@@ -70199,7 +70470,8 @@
       "market": "emerging"
     },
     "6992": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "6995": {
       "market": "emerging"
@@ -70208,7 +70480,8 @@
       "market": "emerging"
     },
     "7415": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7418": {
       "market": "emerging"
@@ -70235,7 +70508,8 @@
       "market": "emerging"
     },
     "7530": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7551": {
       "market": "emerging"
@@ -70268,7 +70542,8 @@
       "market": "emerging"
     },
     "7669": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7702": {
       "market": "emerging"
@@ -70277,7 +70552,8 @@
       "market": "emerging"
     },
     "7707": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7710": {
       "market": "emerging"
@@ -70373,7 +70649,8 @@
       "market": "emerging"
     },
     "7796": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7797": {
       "market": "emerging"
@@ -70397,7 +70674,8 @@
       "market": "emerging"
     },
     "7815": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7816": {
       "market": "emerging"
@@ -70439,7 +70717,8 @@
       "market": "emerging"
     },
     "7843": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7846": {
       "market": "emerging"
@@ -70460,7 +70739,8 @@
       "market": "emerging"
     },
     "7853": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7854": {
       "market": "emerging"
@@ -70469,7 +70749,8 @@
       "market": "emerging"
     },
     "7856": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7857": {
       "market": "emerging"
@@ -70493,7 +70774,8 @@
       "market": "emerging"
     },
     "7866": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7867": {
       "market": "emerging"
@@ -70511,10 +70793,12 @@
       "market": "emerging"
     },
     "7872": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7873": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7875": {
       "market": "emerging"
@@ -70532,7 +70816,8 @@
       "market": "emerging"
     },
     "7880": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7881": {
       "market": "emerging"
@@ -70547,10 +70832,12 @@
       "market": "emerging"
     },
     "7886": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7887": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7888": {
       "market": "emerging"
@@ -70571,7 +70858,8 @@
       "market": "emerging"
     },
     "7894": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7895": {
       "market": "emerging"
@@ -70583,10 +70871,12 @@
       "market": "emerging"
     },
     "7898": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7899": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7901": {
       "market": "emerging"
@@ -70601,7 +70891,8 @@
       "market": "emerging"
     },
     "7909": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7911": {
       "market": "emerging"
@@ -70610,7 +70901,8 @@
       "market": "emerging"
     },
     "7913": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7915": {
       "market": "emerging"
@@ -70619,7 +70911,8 @@
       "market": "emerging"
     },
     "7918": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "7919": {
       "market": "emerging"
@@ -70670,7 +70963,8 @@
       "market": "emerging"
     },
     "8098": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     },
     "8119": {
       "market": "emerging"

@@ -1,24 +1,35 @@
 {
-  "scope": "半導體優先候選池；不是全市場資料覆蓋率",
-  "updatedAt": "2026-08-02T12:15:00.570055+00:00",
+  "scope": "半導體全產業分批補齊；每次優先處理候選股，再輪替全產業，非全市場覆蓋率。",
+  "strategy": "semiconductor-first-v2",
+  "updatedAt": "2026-08-02T15:15:33.222194+00:00",
+  "universeCodes": 244,
   "queriedCodes": [
     "2303",
     "2451",
     "3006",
-    "4995",
-    "6292"
+    "1595",
+    "2302",
+    "2329",
+    "2330",
+    "2337",
+    "2338",
+    "2340",
+    "2342",
+    "2344"
   ],
-  "semiconductorCodes": [
+  "priorityCodes": [
     "2303",
     "2451",
     "3006"
   ],
-  "successfulCodes": 3,
+  "successfulCodes": 12,
+  "enrichedCodes": 37,
+  "remainingCodes": 207,
   "failures": {},
   "metrics": {
-    "eps": 3,
-    "roe": 3,
-    "debtRatio": 3
+    "eps": 37,
+    "roe": 37,
+    "debtRatio": 37
   },
-  "fiveYearHistory": 3
+  "fiveYearHistory": 12
 }
