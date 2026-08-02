@@ -153,12 +153,15 @@ def baseline_0050(history: list[dict[str, tuple[float, float]]]) -> float | None
 
 def select_parameters(history: list[dict[str, tuple[float, float]]]) -> tuple[dict, list[dict]]:
     candidates = []
-    for lookback in (10, 20, 40):
+    # A one-year split leaves roughly 48 trading days in each holdout period.
+    # Keep the candidate window short enough that both holdouts contain several
+    # non-overlapping trades; otherwise a zero-trade "result" is meaningless.
+    for lookback in (5, 10, 20):
         for count in (3, 5, 10):
-            for holding in (5, 10):
+            for holding in (5,):
                 result = run_slice(history, lookback, count, holding)
                 # Favour return but penalise unstable drawdowns; no test data is used here.
-                score = result["return"] + 0.35 * result["mdd"]
+                score = result["return"] + 0.35 * result["mdd"] if result["trades"] >= 6 else float("-inf")
                 candidates.append({"lookback": lookback, "count": count, "holding": holding, "score": score, **result})
     return max(candidates, key=lambda row: row["score"]), candidates
 
@@ -177,7 +180,10 @@ def report(path: Path, output: Path) -> None:
     chosen, _ = select_parameters(train)
     validation_result = run_slice(validation, chosen["lookback"], chosen["count"], chosen["holding"])
     test_result = run_slice(test, chosen["lookback"], chosen["count"], chosen["holding"])
+    if not validation_result["trades"] or not test_result["trades"]:
+        raise SystemExit("切分後沒有足夠的驗證或保留測試交易，拒絕產生無效回測結論。")
     benchmark = baseline_0050(test)
+    passed = benchmark is not None and test_result["return"] > benchmark and test_result["trades"] >= 5
     result = {
         "source": "TWSE official daily close data; listed stocks only",
         "data_start": dates[0], "data_end": dates[-1], "trading_days": len(history),
@@ -186,6 +192,7 @@ def report(path: Path, output: Path) -> None:
         "validation": {key: validation_result[key] for key in ("return", "mdd", "trades", "win_rate")},
         "test": {key: test_result[key] for key in ("return", "mdd", "trades", "win_rate")},
         "benchmark_0050_price_return": benchmark,
+        "decision": "candidate" if passed else "rejected",
         "cost_assumptions": {"buy_fee": BUY_FEE, "sell_fee": SELL_FEE, "stock_sell_tax": STOCK_SELL_TAX, "etf_sell_tax": ETF_SELL_TAX},
     }
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -198,6 +205,7 @@ def report(path: Path, output: Path) -> None:
         f"驗證期：報酬 {pct(validation_result['return'])}，最大回撤 {pct(validation_result['mdd'])}，勝率 {pct(validation_result['win_rate'])}，{validation_result['trades']} 次再平衡。",
         f"保留測試期：報酬 {pct(test_result['return'])}，最大回撤 {pct(test_result['mdd'])}，勝率 {pct(test_result['win_rate'])}，{test_result['trades']} 次再平衡。",
         f"0050 價格報酬（同測試期、含 ETF 費稅假設）：{pct(benchmark)}。",
+        "結論：可列入下一輪候選。" if passed else "結論：不採用此參數作正式推薦；保留測試未跑贏 0050，需增加資料期間或改良訊號後再驗證。",
         "成本已計入：買進手續費 0.1425%、賣出手續費 0.1425%、股票賣出證交稅 0.3%。",
         "限制：未計入股利／除權息還原、滑價、融資券與上櫃股票；結果不構成投資建議。",
     ]) + "\n", encoding="utf-8")
