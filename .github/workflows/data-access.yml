@@ -2,6 +2,15 @@ name: Verify licensed data access
 
 on:
   workflow_dispatch:
+    inputs:
+      provider:
+        description: "要驗證的資料來源；FinLab 近期資料恢復後再選 all"
+        required: true
+        default: finmind
+        type: choice
+        options:
+          - finmind
+          - all
 
 permissions:
   contents: read
@@ -29,7 +38,7 @@ jobs:
       - name: Install FinLab provider
         run: python -m pip install --upgrade pip finlab
       - name: Verify FinMind and FinLab credentials
-        run: python data_access.py
+        run: python data_access.py --provider "${{ inputs.provider }}"
       - name: Upload non-sensitive verification status
         uses: actions/upload-artifact@v4
         with:
