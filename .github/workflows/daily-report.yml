@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Fetch attributable market-news headlines
+        run: python market_news.py
       - name: Build daily report
         run: REPORT_MODE=comprehensive python daily_report.py
       - name: Verify candidate-pool corporate actions
@@ -36,6 +38,7 @@ jobs:
             daily-report.txt
             ai-daily-report.txt
             backtest_data/candidate_actions.json
+            market-news.json
       - name: Push to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

@@ -81,7 +81,6 @@ with open("quotes.json", encoding="utf-8") as source:
 quotes = data.get("quotes", {})
 fundamentals = data.get("fundamentals", {})
 valid = [(code, row) for code, row in quotes.items() if number(row.get("price"))]
-gainers = sorted(valid, key=lambda item: item[1].get("change", 0), reverse=True)[:3]
 volume = sorted(valid, key=lambda item: item[1].get("volume", 0), reverse=True)[:3]
 today = datetime.now(TZ_TAIPEI).strftime("%Y-%m-%d")
 
@@ -89,6 +88,22 @@ today = datetime.now(TZ_TAIPEI).strftime("%Y-%m-%d")
 def quote_line(item):
     code, row = item
     return f"• {row.get('name', code)}（{code}）｜{row['price']:.2f}｜{row.get('change', 0):+.2f}"
+
+
+def market_news_lines():
+    path = "market-news.json"
+    try:
+        with open(path, encoding="utf-8") as source:
+            payload = json.load(source)
+    except (OSError, json.JSONDecodeError):
+        return ["• 本次未取得可驗證消息來源；不以消息面產生投資結論。"]
+    rows = payload.get("items", [])
+    if not rows:
+        return ["• 本次未取得可驗證消息來源；不以消息面產生投資結論。"]
+    return [
+        f"• 【{row.get('topic', '市場消息')}】{row.get('title', '無標題')}｜{row.get('publisher', '未知來源')}\n  {row.get('link', '')}"
+        for row in rows[:6]
+    ]
 
 
 report_mode = os.environ.get("REPORT_MODE", "comprehensive")
@@ -106,14 +121,14 @@ report = "\n".join([
     f"台股{report_title}｜{today}",
     f"行情更新：{data.get('updatedAt', '暫無時間')}",
     "",
-    "【今日漲幅前段】",
-    *[quote_line(item) for item in gainers],
-    "",
     "【今日成交量前段】",
     *[quote_line(item) for item in volume],
     *sections,
     "",
-    "以上為規則式研究排序，僅供研究參考，不構成買賣建議或報酬保證。",
+    "【市場消息與風險提示】",
+    *market_news_lines(),
+    "",
+    "消息僅供追蹤與研究，需閱讀原始來源確認脈絡；不構成買賣建議或報酬保證。",
 ])
 
 tracking_state = record_recommendations(today, report_mode, ranked_by_style, data)
