@@ -13,6 +13,7 @@ import math
 import time
 import urllib.parse
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from statistics import mean
@@ -54,7 +55,7 @@ def fetch_day(day: date) -> dict | None:
     request = urllib.request.Request(f"{TWSE_URL}?{query}", headers={"User-Agent": "weekly-investment-agent/1.0"})
     for attempt in range(3):
         try:
-            with urllib.request.urlopen(request, timeout=30) as response:
+            with urllib.request.urlopen(request, timeout=12) as response:
                 payload = json.load(response)
             if payload.get("stat") != "OK":
                 return None
@@ -72,11 +73,11 @@ def fetch_day(day: date) -> dict | None:
                     rows.append([code, close, volume])
             return {"date": day.isoformat(), "rows": rows}
         except Exception:
-            time.sleep(1.5 * (attempt + 1))
+            time.sleep(0.8 * (attempt + 1))
     return None
 
 
-def collect(days: int, output: Path) -> None:
+def collect(days: int, output: Path, workers: int) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     existing: dict[str, dict] = {}
     if output.exists():
@@ -84,15 +85,19 @@ def collect(days: int, output: Path) -> None:
             row = json.loads(line)
             existing[row["date"]] = row
     wanted = weekday_dates(days)
-    for index, day in enumerate(wanted, 1):
-        key = day.isoformat()
-        if key not in existing:
-            payload = fetch_day(day)
+    missing = [day for day in wanted if day.isoformat() not in existing]
+    completed = len(wanted) - len(missing)
+    # Keep parallelism deliberately low: this shortens a first full download
+    # while remaining polite to the public data source.
+    with ThreadPoolExecutor(max_workers=max(1, min(workers, 3))) as pool:
+        futures = {pool.submit(fetch_day, day): day for day in missing}
+        for future in as_completed(futures):
+            payload = future.result()
             if payload:
-                existing[key] = payload
-            time.sleep(0.15)
-        if index % 25 == 0 or index == len(wanted):
-            print(f"資料下載進度：{index}/{len(wanted)}")
+                existing[payload["date"]] = payload
+            completed += 1
+            if completed % 25 == 0 or completed == len(wanted):
+                print(f"資料下載進度：{completed}/{len(wanted)}")
     output.write_text("\n".join(json.dumps(existing[key], ensure_ascii=False) for key in sorted(existing)) + "\n", encoding="utf-8")
     print(f"已保存 {len(existing)} 個交易日到 {output}")
 
@@ -205,12 +210,13 @@ def main() -> None:
     collect_parser = sub.add_parser("collect")
     collect_parser.add_argument("--days", type=int, default=365)
     collect_parser.add_argument("--output", type=Path, default=DEFAULT_DATA)
+    collect_parser.add_argument("--workers", type=int, default=3)
     report_parser = sub.add_parser("report")
     report_parser.add_argument("--input", type=Path, default=DEFAULT_DATA)
     report_parser.add_argument("--output", type=Path, default=DATA_DIR / "one_year_backtest.md")
     args = parser.parse_args()
     if args.command == "collect":
-        collect(args.days, args.output)
+        collect(args.days, args.output, args.workers)
     else:
         report(args.input, args.output)
 
