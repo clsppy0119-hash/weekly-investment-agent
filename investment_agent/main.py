@@ -13,13 +13,15 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from agent import load_market_data, research
+from agent import load_market_data
+from research_team import run_research_team
 
 
 ROOT = Path(__file__).resolve().parent.parent
 AUDIT_LOG = Path(__file__).resolve().parent / "data" / "audit-log.jsonl"
 
-# The ignored local file is read only at runtime; no secret is logged or committed.
+# Ignored local files are read only at runtime; no secret is logged or committed.
+load_dotenv(Path(__file__).resolve().parent / ".env.local")
 load_dotenv(ROOT / ".env.local")
 
 
@@ -82,7 +84,7 @@ def main() -> int:
             print("找不到 OPENAI_API_KEY；不會執行研究。", file=sys.stderr)
             return 2
         try:
-            print(asyncio.run(research(args.research)))
+            print(asyncio.run(run_research_team([args.research])))
             return 0
         except Exception as error:  # Keep local operation safe even when the API account is unavailable.
             if "insufficient_quota" in str(error):
