@@ -207,4 +207,91 @@ fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(d
     if(codes.length)loadForecasts(codes);
   };
 })();
+</script><script>
+// 一句話交易：由使用者輸入方向、股票與數量，其餘欄位自動完成。
+(() => {
+  const panel = document.querySelector('.layout .panel');
+  const legacyForm = panel?.querySelector('.form');
+  if (!panel || !legacyForm) return;
+
+  const style = document.createElement('style');
+  style.textContent = `.agent-trade{margin:12px 0;padding:14px;background:linear-gradient(135deg,#f4f8ff,#eef5ff);border:1px solid #d9e7ff;border-radius:14px}.agent-trade-row{display:grid;grid-template-columns:1fr auto;gap:8px}.agent-trade input{width:100%;min-width:0}.agent-examples{margin-top:8px;font-size:12px;color:#64748b}.advanced-trade{margin-top:10px}.advanced-trade summary{cursor:pointer;color:var(--blue);font-weight:700}@media(max-width:600px){.agent-trade{padding:12px}.agent-trade-row{grid-template-columns:1fr}.agent-trade-row button{width:100%}}`;
+  document.head.appendChild(style);
+
+  const box = document.createElement('div');
+  box.className = 'agent-trade';
+  box.innerHTML = `<b>告訴 Agent 這筆交易</b><p class="label">只要輸入買賣方向、股票及股數，名稱、報價、手續費與稅金會自動處理。</p><div class="agent-trade-row"><input id="agentTradeText" class="input" autocomplete="off" placeholder="例如：買進 2330 100 股"><button id="agentTradeAdd">交給 Agent</button></div><div class="agent-examples">也可以輸入：賣出 2330 50 股／賣出 2330 全部／買進 台積電 1 張</div><div id="agentTradeMessage" class="hint"></div>`;
+  legacyForm.before(box);
+
+  const details = document.createElement('details');
+  details.className = 'advanced-trade';
+  details.innerHTML = '<summary>進階輸入／修改成交價</summary>';
+  legacyForm.before(details);
+  details.appendChild(legacyForm);
+
+  const text = document.querySelector('#agentTradeText');
+  const message = document.querySelector('#agentTradeMessage');
+  const latestPosition = code => positions().find(item => item.code === code);
+
+  function identifyStock(command) {
+    const codeMatch = command.match(/\b\d{4,6}\b/);
+    if (codeMatch && q(codeMatch[0])) return { code: codeMatch[0], quote: q(codeMatch[0]), token: codeMatch[0] };
+    const match = Object.entries(quotes)
+      .filter(([, quote]) => quote?.name && command.includes(quote.name))
+      .sort((a, b) => b[1].name.length - a[1].name.length)[0];
+    return match ? { code: match[0], quote: match[1], token: match[1].name } : null;
+  }
+
+  function parseShares(command, stock, side) {
+    if (side === 'sell' && /全部|全數|清倉/.test(command)) return { all: true };
+    const remainder = command.replace(stock.token, ' ').replace(/買進|買入|買|賣出|賣掉|賣/gu, ' ');
+    const lots = remainder.match(/([\d,.]+)\s*張/);
+    if (lots) return { shares: Math.round(Number(lots[1].replace(/,/g, '')) * 1000) };
+    const shares = remainder.match(/([\d,]+)\s*(?:股)?/);
+    return shares ? { shares: Number(shares[1].replace(/,/g, '')) } : {};
+  }
+
+  function submitCommand() {
+    const command = text.value.trim();
+    const buy = /買進|買入|買/.test(command);
+    const sell = /賣出|賣掉|賣/.test(command);
+    if (!command || buy === sell) {
+      message.textContent = '請清楚輸入「買進」或「賣出」。';
+      return;
+    }
+    const side = buy ? 'buy' : 'sell';
+    const stock = identifyStock(command);
+    if (!stock) {
+      message.textContent = '找不到這支台股，請輸入股票代碼或完整名稱。';
+      return;
+    }
+    const parsed = parseShares(command, stock, side);
+    const available = latestPosition(stock.code)?.shares || 0;
+    const shares = parsed.all ? available : parsed.shares;
+    if (!(shares > 0) || !Number.isInteger(shares)) {
+      message.textContent = side === 'sell' ? '請輸入賣出股數，或輸入「全部」。' : '請輸入買進股數，例如 100 股或 1 張。';
+      return;
+    }
+    if (side === 'sell' && shares > available) {
+      message.textContent = `目前只有 ${available.toLocaleString()} 股，無法賣出 ${shares.toLocaleString()} 股。`;
+      return;
+    }
+    const price = Number(stock.quote.price);
+    if (!(price > 0)) {
+      message.textContent = '目前沒有可用報價，請稍後更新，或展開進階輸入填寫實際成交價。';
+      return;
+    }
+    state.transactions.push({ id: crypto.randomUUID(), side, code: stock.code, name: stock.quote.name, shares, price, fee: null, date: new Date().toLocaleDateString('zh-TW') });
+    save();
+    render();
+    text.value = '';
+    const action = side === 'sell' ? '賣出' : '買進';
+    message.textContent = `已記錄 ${stock.quote.name}（${stock.code}）${action} ${shares.toLocaleString()} 股，成交價暫用最新報價 ${money(price)}；可在進階輸入校正實際成交價。`;
+  }
+
+  document.querySelector('#agentTradeAdd').addEventListener('click', submitCommand);
+  text.addEventListener('keydown', event => {
+    if (event.key === 'Enter') submitCommand();
+  });
+})();
 </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="cloud-config.js"></script><script src="cloud-sync.js"></script><script src="research.js"></script><script src="portfolio-tools.js"></script><script src="risk-tools.js"></script><style>[hidden]{display:none!important}.tabs button.active{background:var(--blue);color:#fff;border-color:var(--blue)}@media(max-width:600px){.tabs button.active{background:var(--blue);color:#fff}}</style></body></html>
