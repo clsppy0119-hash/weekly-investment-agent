@@ -7,7 +7,7 @@ on:
     - cron: "0 0 * * 1-5"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   daily-report:
@@ -20,6 +20,10 @@ jobs:
       - name: Fetch attributable market-news headlines
         run: python market_news.py
       - name: Build daily report
+        run: REPORT_MODE=comprehensive python daily_report.py
+      - name: Enrich semiconductor fundamentals
+        run: python finmind_fundamentals.py
+      - name: Rebuild report with verified fundamentals
         run: REPORT_MODE=comprehensive python daily_report.py
       - name: Verify candidate-pool corporate actions
         run: python finmind_actions.py --output backtest_data/candidate_actions.json
@@ -39,6 +43,15 @@ jobs:
             ai-daily-report.txt
             backtest_data/candidate_actions.json
             market-news.json
+            data/fundamentals-coverage.json
+      - name: Persist verified financial data
+        continue-on-error: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add quotes.json data/fundamentals-coverage.json
+          git diff --cached --quiet || git commit -m "更新半導體財務資料"
+          git push
       - name: Push to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

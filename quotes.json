@@ -52059,12 +52059,16 @@
       "revenueYoY": 22.8543590392003,
       "cumulativeRevenueYoY": 11.279653514892827,
       "revenuePeriod": "11506",
-      "eps": 4.68,
-      "financialPeriod": "115Q2",
-      "roe": 26.284120513339776,
-      "debtRatio": 33.341985637574375,
+      "eps": 6.68,
+      "financialPeriod": "2026-06-30",
+      "roe": 21.33,
+      "debtRatio": 33.34,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "FinMind 財報與資產負債表",
+      "industry": "半導體",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-02T11:37:23.443966+00:00",
+      "financialNotes": "EPS 為最近四季加總；ROE 為最近四季稅後淨利／平均權益；負債比＝負債／資產。"
     },
     "2305": {
       "pe": 111.48,
@@ -52216,7 +52220,16 @@
       "market": "twse",
       "revenueYoY": 67.86685548491262,
       "cumulativeRevenueYoY": 35.613194655616326,
-      "revenuePeriod": "11506"
+      "revenuePeriod": "11506",
+      "industry": "半導體",
+      "eps": 74.39,
+      "roe": 36.6,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 財報與資產負債表",
+      "financialUpdatedAt": "2026-08-02T11:37:23.551148+00:00",
+      "financialNotes": "EPS 為最近四季加總；ROE 為最近四季稅後淨利／平均權益；負債比＝負債／資產。",
+      "debtRatio": 31.5
     },
     "2331": {
       "pe": 36.8,
@@ -53089,12 +53102,16 @@
       "revenueYoY": 381.5468504599107,
       "cumulativeRevenueYoY": 422.1697253819397,
       "revenuePeriod": "11506",
-      "eps": 46.63,
-      "financialPeriod": "115Q2",
-      "roe": 104.0728258328507,
-      "debtRatio": 28.679982924350973,
+      "eps": 57.76,
+      "financialPeriod": "2026-06-30",
+      "roe": 87.87,
+      "debtRatio": 28.68,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "FinMind 財報與資產負債表",
+      "industry": "半導體",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-02T11:37:23.505335+00:00",
+      "financialNotes": "EPS 為最近四季加總；ROE 為最近四季稅後淨利／平均權益；負債比＝負債／資產。"
     },
     "2453": {
       "pe": 16.94,
@@ -54641,12 +54658,16 @@
       "revenueYoY": 328.3542479788894,
       "cumulativeRevenueYoY": 242.62430701861496,
       "revenuePeriod": "11506",
-      "eps": 27.58,
-      "financialPeriod": "115Q2",
-      "roe": 83.89746070041352,
-      "debtRatio": 36.837806031413706,
+      "eps": 31.16,
+      "financialPeriod": "2026-06-30",
+      "roe": 64.06,
+      "debtRatio": 36.84,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx"
+      "financialSource": "FinMind 財報與資產負債表",
+      "industry": "半導體",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-02T11:37:24.301286+00:00",
+      "financialNotes": "EPS 為最近四季加總；ROE 為最近四季稅後淨利／平均權益；負債比＝負債／資產。"
     },
     "3008": {
       "pe": 25.19,
