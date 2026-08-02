@@ -1,29 +1,44 @@
 name: Long-term research Telegram
+
 on:
   workflow_dispatch:
     inputs:
       force_report:
-        description: "手動測試時產生報告"
+        description: "忽略門檻，立即產生研究報告"
         required: false
         default: "true"
   schedule:
-    # 08:15 台北時間；僅在長線研究門檻達標時才會推播。
+    # 00:15 UTC = 台北時間平日 08:15
     - cron: "15 0 * * 1-5"
+
 permissions:
   contents: read
+
 jobs:
   long-research:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Build long-term research
         env:
-          FORCE_REPORT: ${{ inputs.force_report == 'true' && '1' || '0' }}
+          FORCE_REPORT: ${{ github.event_name == 'workflow_dispatch' && inputs.force_report == 'true' && '1' || '0' }}
         run: python long_research_report.py
       - name: Check research threshold
         id: threshold
         run: |
           if [ -s long-research.txt ]; then echo "send=true" >> "$GITHUB_OUTPUT"; else echo "send=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Install AI agent
+        if: steps.threshold.outputs.send == 'true'
+        run: python -m pip install "openai-agents>=0.6.0" python-dotenv
+      - name: Deep-review long-term candidates with AI
+        if: steps.threshold.outputs.send == 'true'
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python investment_agent/cloud_report.py --mode long --report long-research.txt --output ai-long-research.txt --limit 3
       - name: Push research to Telegram
         if: steps.threshold.outputs.send == 'true'
         env:
@@ -32,10 +47,15 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, urllib.parse, urllib.request
-          text = open("long-research.txt", encoding="utf-8").read()
           url = f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage"
-          body = urllib.parse.urlencode({"chat_id": os.environ["TELEGRAM_CHAT_ID"], "text": text}).encode()
-          with urllib.request.urlopen(urllib.request.Request(url, data=body), timeout=30) as response:
-              result = json.load(response)
-          if not result.get("ok"): raise RuntimeError(result)
+          for path in ("long-research.txt", "ai-long-research.txt"):
+              if not os.path.exists(path):
+                  continue
+              text = open(path, encoding="utf-8").read().strip()
+              for start in range(0, len(text), 3900):
+                  body = urllib.parse.urlencode({"chat_id": os.environ["TELEGRAM_CHAT_ID"], "text": text[start:start + 3900]}).encode()
+                  with urllib.request.urlopen(urllib.request.Request(url, data=body), timeout=30) as response:
+                      result = json.load(response)
+                  if not result.get("ok"):
+                      raise RuntimeError(result)
           PY

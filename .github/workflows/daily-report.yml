@@ -1,23 +1,38 @@
 name: Daily report and Telegram
+
 on:
   workflow_dispatch:
   schedule:
-    # GitHub Actions cron 使用 UTC；00:00 UTC = 台北時間 08:00。
+    # 00:00 UTC = 台北時間平日 08:00
     - cron: "0 0 * * 1-5"
+
 permissions:
   contents: read
+
 jobs:
   daily-report:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Build daily report
         run: python daily_report.py
+      - name: Install AI agent
+        run: python -m pip install "openai-agents>=0.6.0" python-dotenv
+      - name: Review top candidate with AI
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python investment_agent/cloud_report.py --mode daily --report daily-report.txt --output ai-daily-report.txt --limit 1
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
         with:
           name: daily-investment-report
-          path: daily-report.txt
+          path: |
+            daily-report.txt
+            ai-daily-report.txt
       - name: Push to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -25,13 +40,16 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, urllib.parse, urllib.request
-          with open("daily-report.txt", encoding="utf-8") as source:
-              text = source.read()
           url = f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage"
-          body = urllib.parse.urlencode({"chat_id": os.environ["TELEGRAM_CHAT_ID"], "text": text}).encode()
-          request = urllib.request.Request(url, data=body)
-          with urllib.request.urlopen(request, timeout=30) as response:
-              result = json.load(response)
-          if not result.get("ok"):
-              raise RuntimeError(result)
+          for path in ("daily-report.txt", "ai-daily-report.txt"):
+              if not os.path.exists(path):
+                  continue
+              text = open(path, encoding="utf-8").read().strip()
+              for start in range(0, len(text), 3900):
+                  body = urllib.parse.urlencode({"chat_id": os.environ["TELEGRAM_CHAT_ID"], "text": text[start:start + 3900]}).encode()
+                  request = urllib.request.Request(url, data=body)
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      result = json.load(response)
+                  if not result.get("ok"):
+                      raise RuntimeError(result)
           PY
