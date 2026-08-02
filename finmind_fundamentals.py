@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -27,6 +28,9 @@ def save(path: Path, data: dict) -> None:
 
 def fetch(dataset: str, code: str = "", start: str = "") -> list[dict]:
     query = {"dataset": dataset}
+    token = os.environ.get("FINMIND_TOKEN", "").strip()
+    if token:
+        query["token"] = token
     if code:
         query["data_id"] = code
     if start:
@@ -97,7 +101,7 @@ def enrich(code: str, start: str, industry: str) -> tuple[str, dict, str | None]
             "debtRatio": round(debt, 2) if debt is not None else None,
             "financialPeriod": max(filter(None, (period, balance_period)), default=None),
             "financialHistoryYears": years,
-            "financialSource": "FinMind 公開基本面資料",
+            "financialSource": "FinMind 授權基本面資料" if os.environ.get("FINMIND_TOKEN", "").strip() else "FinMind 公開基本面資料",
             "financialUpdatedAt": datetime.now(timezone.utc).isoformat(),
             "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
         }, None
@@ -165,6 +169,7 @@ def main() -> None:
     coverage = {
         "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
         "strategy": STRATEGY,
+        "credentialMode": "authenticated" if os.environ.get("FINMIND_TOKEN", "").strip() else "unauthenticated",
         "updatedAt": datetime.now(timezone.utc).isoformat(),
         "activeStage": active_stage,
         "universeCodes": len(total_codes),
