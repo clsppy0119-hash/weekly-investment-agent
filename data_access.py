@@ -13,7 +13,7 @@ import json
 import os
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -93,6 +93,13 @@ def verify_finlab() -> dict[str, Any]:
         raise RuntimeError("缺少 finlab 套件") from error
 
     probes = {dataset: dataframe_summary(data.get(dataset)) for dataset in FINLAB_DATASETS}
+    last_price_date = datetime.fromisoformat(probes["price:收盤價"]["lastDate"]).date()
+    freshness_cutoff = date.today() - timedelta(days=14)
+    if last_price_date < freshness_cutoff:
+        raise RuntimeError(
+            f"FinLab 收盤資料停在 {last_price_date.isoformat()}，早於新鮮度門檻 "
+            f"{freshness_cutoff.isoformat()}，不能用於目前市場研究"
+        )
     return {
         "provider": "FinLab",
         "credential": "FINLAB_API_TOKEN",
