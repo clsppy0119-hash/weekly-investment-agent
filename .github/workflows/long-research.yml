@@ -23,9 +23,12 @@ jobs:
         with:
           python-version: "3.12"
       - name: Build long-term research
-        env:
-          FORCE_REPORT: ${{ github.event_name == 'workflow_dispatch' && inputs.force_report == 'true' && '1' || '0' }}
-        run: python long_research_report.py
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_report }}" = "true" ]; then
+            FORCE_REPORT=1 python long_research_report.py
+          else
+            REPORT_MODE=long LONG_AUTO=1 REPORT_OUTPUT=long-research.txt python daily_report.py
+          fi
       - name: Check research threshold
         id: threshold
         run: |
