@@ -1,9 +1,8 @@
 {
   "scope": "半導體優先候選池；不是全市場資料覆蓋率",
-  "updatedAt": "2026-08-02T11:37:24.301286+00:00",
+  "updatedAt": "2026-08-02T11:38:02.227487+00:00",
   "queriedCodes": [
     "2303",
-    "2330",
     "2451",
     "3006",
     "4995",
@@ -11,16 +10,15 @@
   ],
   "semiconductorCodes": [
     "2303",
-    "2330",
     "2451",
     "3006"
   ],
-  "successfulCodes": 4,
+  "successfulCodes": 3,
   "failures": {},
   "metrics": {
-    "eps": 4,
-    "roe": 4,
-    "debtRatio": 4
+    "eps": 3,
+    "roe": 3,
+    "debtRatio": 3
   },
-  "fiveYearHistory": 4
+  "fiveYearHistory": 3
 }
