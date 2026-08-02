@@ -27,6 +27,49 @@
           "status": "pending",
           "observations": 0
         }
+      },
+      "decisionRecord": {
+        "schemaVersion": 2,
+        "recordedAt": "2026-08-02",
+        "strategyVersion": "2.0",
+        "decision": "暫不決策",
+        "rationale": "資料不足，僅保留觀察紀錄。",
+        "dataCompleteness": {
+          "analysisWeightPct": 55,
+          "requiredMetrics": [
+            "revenueYoY",
+            "eps",
+            "roe",
+            "debtRatio"
+          ],
+          "missingMetrics": [],
+          "fiveYearHistory": true
+        },
+        "sources": {
+          "market": "TWSE／TPEx 公開行情（由既有行情流程整理）",
+          "fundamentals": "FinMind 財報與資產負債表",
+          "quoteUpdatedAt": "2026-08-02 15:33 Taipei time",
+          "financialPeriod": "2026-06-30"
+        },
+        "snapshot": {
+          "price": 293.0,
+          "change": 23.5,
+          "ma5": null,
+          "ma20": null,
+          "revenueYoY": 381.5468504599107,
+          "epsTTM": 57.76,
+          "roeTTM": 87.87,
+          "debtRatio": 28.68,
+          "pe": 5.1,
+          "pb": 3.29,
+          "dividendYield": 4.02
+        },
+        "riskFlags": [
+          "分析權重未達 70%，僅供追蹤",
+          "20 日均線資料不足"
+        ],
+        "reconstructed": true,
+        "reconstructionNote": "此筆為舊紀錄補建；資料快照日期以本次補建日為準。"
       }
     },
     {
@@ -55,6 +98,49 @@
           "status": "pending",
           "observations": 0
         }
+      },
+      "decisionRecord": {
+        "schemaVersion": 2,
+        "recordedAt": "2026-08-02",
+        "strategyVersion": "2.0",
+        "decision": "暫不決策",
+        "rationale": "資料不足，僅保留觀察紀錄。",
+        "dataCompleteness": {
+          "analysisWeightPct": 55,
+          "requiredMetrics": [
+            "revenueYoY",
+            "eps",
+            "roe",
+            "debtRatio"
+          ],
+          "missingMetrics": [],
+          "fiveYearHistory": true
+        },
+        "sources": {
+          "market": "TWSE／TPEx 公開行情（由既有行情流程整理）",
+          "fundamentals": "FinMind 財報與資產負債表",
+          "quoteUpdatedAt": "2026-08-02 15:33 Taipei time",
+          "financialPeriod": "2026-06-30"
+        },
+        "snapshot": {
+          "price": 180.0,
+          "change": 16.0,
+          "ma5": null,
+          "ma20": null,
+          "revenueYoY": 328.3542479788894,
+          "epsTTM": 31.16,
+          "roeTTM": 64.06,
+          "debtRatio": 36.84,
+          "pe": 5.68,
+          "pb": 2.7,
+          "dividendYield": 0.56
+        },
+        "riskFlags": [
+          "分析權重未達 70%，僅供追蹤",
+          "20 日均線資料不足"
+        ],
+        "reconstructed": true,
+        "reconstructionNote": "此筆為舊紀錄補建；資料快照日期以本次補建日為準。"
       }
     },
     {
@@ -70,6 +156,255 @@
       "coverage": 55,
       "strategyVersion": "1.0",
       "quoteUpdatedAt": "2026-08-01 23:44 Taipei time",
+      "outcomes": {
+        "5": {
+          "status": "pending",
+          "observations": 0
+        },
+        "20": {
+          "status": "pending",
+          "observations": 0
+        },
+        "60": {
+          "status": "pending",
+          "observations": 0
+        }
+      },
+      "decisionRecord": {
+        "schemaVersion": 2,
+        "recordedAt": "2026-08-02",
+        "strategyVersion": "2.0",
+        "decision": "暫不決策",
+        "rationale": "資料不足，僅保留觀察紀錄。",
+        "dataCompleteness": {
+          "analysisWeightPct": 55,
+          "requiredMetrics": [
+            "revenueYoY",
+            "eps",
+            "roe",
+            "debtRatio"
+          ],
+          "missingMetrics": [],
+          "fiveYearHistory": true
+        },
+        "sources": {
+          "market": "TWSE／TPEx 公開行情（由既有行情流程整理）",
+          "fundamentals": "FinMind 財報與資產負債表",
+          "quoteUpdatedAt": "2026-08-02 15:33 Taipei time",
+          "financialPeriod": "2026-06-30"
+        },
+        "snapshot": {
+          "price": 121.0,
+          "change": 11.0,
+          "ma5": null,
+          "ma20": null,
+          "revenueYoY": 22.8543590392003,
+          "epsTTM": 6.68,
+          "roeTTM": 21.33,
+          "debtRatio": 33.34,
+          "pe": 18.2,
+          "pb": 3.42,
+          "dividendYield": 2.16
+        },
+        "riskFlags": [
+          "分析權重未達 70%，僅供追蹤",
+          "20 日均線資料不足"
+        ],
+        "reconstructed": true,
+        "reconstructionNote": "此筆為舊紀錄補建；資料快照日期以本次補建日為準。"
+      }
+    },
+    {
+      "id": "2026-08-02:comprehensive:comprehensive:2451",
+      "date": "2026-08-02",
+      "mode": "comprehensive",
+      "style": "comprehensive",
+      "rank": 1,
+      "code": "2451",
+      "name": "創見",
+      "entryPrice": 293.0,
+      "score": 83,
+      "coverage": 81,
+      "strategyVersion": "2.0",
+      "quoteUpdatedAt": "2026-08-02 15:33 Taipei time",
+      "decisionRecord": {
+        "schemaVersion": 2,
+        "recordedAt": "2026-08-02",
+        "strategyVersion": "2.0",
+        "decision": "正式研究候選",
+        "rationale": "核心財務欄位、近五年歷史與分析權重均達門檻，進入後續人工研究；不是買進指令。",
+        "dataCompleteness": {
+          "analysisWeightPct": 81,
+          "requiredMetrics": [
+            "revenueYoY",
+            "eps",
+            "roe",
+            "debtRatio"
+          ],
+          "missingMetrics": [],
+          "fiveYearHistory": true
+        },
+        "sources": {
+          "market": "TWSE／TPEx 公開行情（由既有行情流程整理）",
+          "fundamentals": "FinMind 財報與資產負債表",
+          "quoteUpdatedAt": "2026-08-02 15:33 Taipei time",
+          "financialPeriod": "2026-06-30"
+        },
+        "snapshot": {
+          "price": 293.0,
+          "change": 23.5,
+          "ma5": null,
+          "ma20": null,
+          "revenueYoY": 381.5468504599107,
+          "epsTTM": 57.76,
+          "roeTTM": 87.87,
+          "debtRatio": 28.68,
+          "pe": 5.1,
+          "pb": 3.29,
+          "dividendYield": 4.02
+        },
+        "riskFlags": [
+          "20 日均線資料不足"
+        ]
+      },
+      "outcomes": {
+        "5": {
+          "status": "pending",
+          "observations": 0
+        },
+        "20": {
+          "status": "pending",
+          "observations": 0
+        },
+        "60": {
+          "status": "pending",
+          "observations": 0
+        }
+      }
+    },
+    {
+      "id": "2026-08-02:comprehensive:comprehensive:6292",
+      "date": "2026-08-02",
+      "mode": "comprehensive",
+      "style": "comprehensive",
+      "rank": 2,
+      "code": "6292",
+      "name": "迅德",
+      "entryPrice": 53.7,
+      "score": 81,
+      "coverage": 81,
+      "strategyVersion": "2.0",
+      "quoteUpdatedAt": "2026-08-02 15:33 Taipei time",
+      "decisionRecord": {
+        "schemaVersion": 2,
+        "recordedAt": "2026-08-02",
+        "strategyVersion": "2.0",
+        "decision": "僅追蹤",
+        "rationale": "分析權重達基本門檻，但關鍵財務或歷史資料尚未完整，不產生投資結論。",
+        "dataCompleteness": {
+          "analysisWeightPct": 81,
+          "requiredMetrics": [
+            "revenueYoY",
+            "eps",
+            "roe",
+            "debtRatio"
+          ],
+          "missingMetrics": [],
+          "fiveYearHistory": false
+        },
+        "sources": {
+          "market": "TWSE／TPEx 公開行情（由既有行情流程整理）",
+          "fundamentals": "TWSE/TPEx",
+          "quoteUpdatedAt": "2026-08-02 15:33 Taipei time",
+          "financialPeriod": "115Q2"
+        },
+        "snapshot": {
+          "price": 53.7,
+          "change": 4.8,
+          "ma5": null,
+          "ma20": null,
+          "revenueYoY": 20.236248366172752,
+          "epsTTM": 3.52,
+          "roeTTM": 27.433298647765124,
+          "debtRatio": 39.267338592413175,
+          "pe": 9.75,
+          "pb": 2.1,
+          "dividendYield": 3.35
+        },
+        "riskFlags": [
+          "近五年財務歷史不足",
+          "20 日均線資料不足"
+        ]
+      },
+      "outcomes": {
+        "5": {
+          "status": "pending",
+          "observations": 0
+        },
+        "20": {
+          "status": "pending",
+          "observations": 0
+        },
+        "60": {
+          "status": "pending",
+          "observations": 0
+        }
+      }
+    },
+    {
+      "id": "2026-08-02:comprehensive:comprehensive:4995",
+      "date": "2026-08-02",
+      "mode": "comprehensive",
+      "style": "comprehensive",
+      "rank": 3,
+      "code": "4995",
+      "name": "晶達",
+      "entryPrice": 47.0,
+      "score": 78,
+      "coverage": 81,
+      "strategyVersion": "2.0",
+      "quoteUpdatedAt": "2026-08-02 15:33 Taipei time",
+      "decisionRecord": {
+        "schemaVersion": 2,
+        "recordedAt": "2026-08-02",
+        "strategyVersion": "2.0",
+        "decision": "僅追蹤",
+        "rationale": "分析權重達基本門檻，但關鍵財務或歷史資料尚未完整，不產生投資結論。",
+        "dataCompleteness": {
+          "analysisWeightPct": 81,
+          "requiredMetrics": [
+            "revenueYoY",
+            "eps",
+            "roe",
+            "debtRatio"
+          ],
+          "missingMetrics": [],
+          "fiveYearHistory": false
+        },
+        "sources": {
+          "market": "TWSE／TPEx 公開行情（由既有行情流程整理）",
+          "fundamentals": "TWSE/TPEx",
+          "quoteUpdatedAt": "2026-08-02 15:33 Taipei time",
+          "financialPeriod": "115Q2"
+        },
+        "snapshot": {
+          "price": 47.0,
+          "change": 1.5,
+          "ma5": null,
+          "ma20": null,
+          "revenueYoY": 37.353012811145206,
+          "epsTTM": 1.82,
+          "roeTTM": 16.30989174308828,
+          "debtRatio": 46.39264393832225,
+          "pe": 13.35,
+          "pb": 2.11,
+          "dividendYield": 4.24
+        },
+        "riskFlags": [
+          "近五年財務歷史不足",
+          "20 日均線資料不足"
+        ]
+      },
       "outcomes": {
         "5": {
           "status": "pending",
