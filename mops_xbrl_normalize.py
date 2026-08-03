@@ -22,13 +22,13 @@ ROOT = Path(__file__).resolve().parent
 CONCEPTS = {
     "revenue": ("Revenue", "OperatingRevenue"),
     "grossProfit": ("GrossProfit",),
-    "operatingIncome": ("OperatingIncome", "OperatingIncomeLoss", "IncomeFromOperations"),
+    "operatingIncome": ("OperatingIncome", "OperatingIncomeLoss", "IncomeFromOperations", "ProfitLossFromOperatingActivities"),
     "netIncome": ("ProfitLoss", "NetIncomeLoss", "ProfitLossFromContinuingOperations"),
     "assets": ("Assets",),
     "liabilities": ("Liabilities",),
     "equity": ("Equity",),
     "operatingCashFlow": ("NetCashFlowsFromUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivities", "NetCashFlowsFromOperatingActivities", "CashFlowsFromUsedInOperatingActivities"),
-    "eps": ("BasicEarningsPerShare", "EarningsPerShareBasic", "EarningsPerShare"),
+    "eps": ("BasicEarningsPerShare", "BasicEarningsLossPerShare", "EarningsPerShareBasic", "EarningsPerShare"),
 }
 TAG = re.compile(r"<ix:nonFraction\b(?P<attrs>[^>]*)>(?P<value>.*?)</ix:nonFraction>", re.I | re.S)
 ATTRIBUTE = re.compile(r'(?P<key>[\w:-]+)=["\'](?P<value>.*?)["\']', re.S)
