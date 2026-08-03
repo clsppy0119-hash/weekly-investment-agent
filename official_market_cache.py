@@ -86,6 +86,12 @@ def main() -> None:
         "quotes": quotes,
     }
     save(args.cache_dir / "official-market-v1" / "latest-quotes.json", payload)
+    market_progress_path = args.cache_dir / "finmind-market-v1" / "progress.json"
+    market_progress = json.loads(market_progress_path.read_text(encoding="utf-8")) if market_progress_path.exists() else {}
+    semiconductor_progress = market_progress.get("reviewed", {}).get("半導體", [])
+    semiconductor_unavailable = market_progress.get("unavailable", {}).get("半導體", {})
+    semiconductor_codes = {str(code) for code in semiconductor_progress} | {str(code) for code in semiconductor_unavailable}
+    semiconductor_quotes = semiconductor_codes & set(quotes)
     status = {
         "schemaVersion": 1,
         "provider": "TWSE／TPEx official open data",
@@ -93,6 +99,11 @@ def main() -> None:
         "updatedAt": payload["updatedAt"],
         "sources": sources,
         "quoteCount": len(quotes),
+        "semiconductorCoverage": {
+            "knownCodes": len(semiconductor_codes),
+            "officialQuoteCodes": len(semiconductor_quotes),
+            "missingOfficialQuoteCodes": sorted(semiconductor_codes - semiconductor_quotes),
+        },
         "ready": any(item.get("ready") for item in sources.values()),
     }
     save(args.status, status)
