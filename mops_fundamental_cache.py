@@ -34,7 +34,7 @@ def save(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def request_statement(code: str, endpoint: str, year: int, season: int) -> str:
+def request_statement(code: str, endpoint: str, year: int, season: int, typek: str) -> str:
     fields = {
         "encodeURIComponent": "1",
         "step": "1",
@@ -42,7 +42,7 @@ def request_statement(code: str, endpoint: str, year: int, season: int) -> str:
         "off": "1",
         "queryName": "co_id",
         "inpuType": "co_id",
-        "TYPEK": "all",
+        "TYPEK": typek,
         "isnew": "false",
         "co_id": code,
         "year": str(year),
@@ -75,7 +75,12 @@ def main() -> None:
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
     reviewed = set(progress.get("reviewed", []))
-    unavailable = dict(progress.get("unavailable", {}))
+    # A MOPS response can vary by market category; retry earlier misses after
+    # the category-aware parser changes instead of treating them as permanent.
+    unavailable = {
+        code: reason for code, reason in progress.get("unavailable", {}).items()
+        if "MOPS 未找到完整" not in str(reason)
+    }
     selected = [code for code in codes if code not in reviewed and code not in unavailable][: max(1, args.batch_size)]
     # At the beginning of August 2026, the latest broadly available quarter is
     # 2026 Q1 (ROC 115/1); then walk back in case of different filing timing.
@@ -86,16 +91,23 @@ def main() -> None:
         try:
             result: dict[str, str] = {}
             for kind, endpoint in STATEMENTS.items():
-                for year, season in periods:
-                    html = request_statement(code, endpoint, year, season)
-                    if has_statement(html):
-                        result[kind] = html
-                        result[f"{kind}Period"] = f"{year}Q{season}"
+                for typek in ("sii", "otc", "rotc"):
+                    if kind in result:
                         break
+                    for year, season in periods:
+                        html = request_statement(code, endpoint, year, season, typek)
+                        if has_statement(html):
+                            result[kind] = html
+                            result[f"{kind}Period"] = f"{year}Q{season}"
+                            result[f"{kind}Market"] = typek
+                            break
             if not all(kind in result for kind in STATEMENTS):
                 raise ValueError("MOPS 未找到完整損益表與資產負債表")
             save(cache_dir / "stocks" / f"{code}.json", result)
-            cached[code] = {"incomePeriod": result["incomePeriod"], "balancePeriod": result["balancePeriod"]}
+            cached[code] = {
+                "incomePeriod": result["incomePeriod"], "incomeMarket": result["incomeMarket"],
+                "balancePeriod": result["balancePeriod"], "balanceMarket": result["balanceMarket"],
+            }
             reviewed.add(code)
         except ValueError as error:
             unavailable[code] = f"{type(error).__name__}: {error}"
