@@ -84,11 +84,12 @@ def main() -> None:
     }
     cache_dir = args.cache_dir / "finmind-market-v1"
     progress_path = cache_dir / "progress.json"
-    progress = load(progress_path, {"reviewed": {stage: [] for stage in STAGES}})
+    progress = load(progress_path, {"reviewed": {stage: [] for stage in STAGES}, "unavailable": {stage: {} for stage in STAGES}})
     reviewed = {stage: set(progress.get("reviewed", {}).get(stage, [])) for stage in STAGES}
+    unavailable = {stage: dict(progress.get("unavailable", {}).get(stage, {})) for stage in STAGES}
     by_stage = {stage: sorted(code for code, meta in universe.items() if meta["stage"] == stage) for stage in STAGES}
-    active_stage = next((stage for stage in STAGES if len(reviewed[stage]) < len(by_stage[stage])), STAGES[-1])
-    selected = [code for code in by_stage[active_stage] if code not in reviewed[active_stage]][: max(1, args.batch_size)]
+    active_stage = next((stage for stage in STAGES if len(reviewed[stage]) + len(unavailable[stage]) < len(by_stage[stage])), STAGES[-1])
+    selected = [code for code in by_stage[active_stage] if code not in reviewed[active_stage] and code not in unavailable[active_stage]][: max(1, args.batch_size)]
 
     start = (date.today() - timedelta(days=max(30, args.days))).isoformat()
     outcomes: dict[str, dict[str, Any]] = {}
@@ -107,13 +108,26 @@ def main() -> None:
                 "dividendEvents": len(dividend),
             }
         except Exception as error:
-            failures[code] = f"{type(error).__name__}: {error}"
+            message = f"{type(error).__name__}: {error}"
+            if "沒有近期價格資料" in str(error):
+                unavailable[active_stage][code] = message
+            else:
+                failures[code] = message
         else:
             reviewed[active_stage].add(code)
 
-    save(progress_path, {"reviewed": {stage: sorted(codes) for stage, codes in reviewed.items()}, "updatedAt": datetime.now(timezone.utc).isoformat()})
+    save(progress_path, {
+        "reviewed": {stage: sorted(codes) for stage, codes in reviewed.items()},
+        "unavailable": unavailable,
+        "updatedAt": datetime.now(timezone.utc).isoformat(),
+    })
     stage_coverage = {
-        stage: {"total": len(codes), "cached": len(reviewed[stage]), "remaining": max(0, len(codes) - len(reviewed[stage]))}
+        stage: {
+            "total": len(codes),
+            "cached": len(reviewed[stage]),
+            "unavailable": len(unavailable[stage]),
+            "remaining": max(0, len(codes) - len(reviewed[stage]) - len(unavailable[stage])),
+        }
         for stage, codes in by_stage.items()
     }
     status = {
@@ -123,7 +137,7 @@ def main() -> None:
         "cacheVisibility": "private GitHub Actions cache; raw rows are not committed",
         "universe": {"total": len(universe), "markets": sorted({meta["market"] for meta in universe.values()})},
         "activeStage": active_stage,
-        "batch": {"requested": len(selected), "cached": outcomes, "failures": failures},
+        "batch": {"requested": len(selected), "cached": outcomes, "unavailable": unavailable[active_stage], "failures": failures},
         "stageCoverage": stage_coverage,
     }
     save(args.status, status)
