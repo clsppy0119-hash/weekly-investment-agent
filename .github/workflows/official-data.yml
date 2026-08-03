@@ -36,7 +36,10 @@ jobs:
       - name: Refresh official fundamentals snapshot
         run: python official_fundamentals_cache.py
       - name: Incrementally cache disclosed MOPS statements
-        run: python mops_fundamental_cache.py --batch-size 20
+        # Requests remain capped at two concurrent connections in the script;
+        # a larger batch shortens the number of daily refresh cycles needed to
+        # cover the public semiconductor universe.
+        run: python mops_fundamental_cache.py --batch-size 50
       - name: Normalise cached MOPS XBRL filings
         run: python mops_xbrl_normalize.py
       - name: Record auditable fundamental decision gate
