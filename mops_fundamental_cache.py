@@ -55,7 +55,10 @@ def download_filing(code: str, roc_year: int, quarter: int) -> bytes:
             "Referer": "https://mopsov.twse.com.tw/mops/web/t203sb01",
         },
     )
-    with urllib.request.urlopen(request, timeout=60) as response:
+    # A company without an available filing can otherwise consume three
+    # 60-second requests per daily batch.  Twenty seconds is ample for the
+    # small official XBRL response while keeping the batch predictable.
+    with urllib.request.urlopen(request, timeout=20) as response:
         content = response.read()
     if not is_xbrl_document(content):
         raise ValueError("MOPS 回應不是有效的 XBRL／iXBRL 財報")
