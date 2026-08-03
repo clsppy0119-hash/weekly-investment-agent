@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATA_CACHE_DIR: .private-data-cache
+      FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -31,6 +32,12 @@ jobs:
           path: .private-data-cache/finmind-market-v1
           key: licensed-data-v1-${{ runner.os }}-unavailable
           restore-keys: licensed-data-v1-${{ runner.os }}-
+      - name: Restore licensed historical-data cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .private-data-cache/finmind-fundamentals-v1
+          key: licensed-data-v1-${{ runner.os }}-unavailable
+          restore-keys: licensed-data-v1-${{ runner.os }}-
       - name: Refresh official market snapshot
         run: python official_market_cache.py
       - name: Refresh official fundamentals snapshot
@@ -40,6 +47,8 @@ jobs:
         # a larger batch shortens the number of daily refresh cycles needed to
         # cover the public semiconductor universe.
         run: python mops_fundamental_cache.py --batch-size 50
+      - name: Incrementally cache authorised six-year fundamentals
+        run: python finmind_fundamental_cache.py --batch-size 10
       - name: Normalise cached MOPS XBRL filings
         run: python mops_xbrl_normalize.py
       - name: Record auditable fundamental decision gate
