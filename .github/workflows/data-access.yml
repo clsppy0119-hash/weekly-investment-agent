@@ -32,6 +32,7 @@ on:
         options:
           - market
           - fundamentals
+          - official-market
 
 permissions:
   contents: read
@@ -68,6 +69,9 @@ jobs:
       - name: Cache next FinMind fundamentals batch
         if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'fundamentals' }}
         run: python finmind_fundamental_cache.py --batch-size "${{ inputs.batch_size }}"
+      - name: Cache official TWSE and TPEx market snapshot
+        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'official-market' }}
+        run: python official_market_cache.py
       - name: Upload non-sensitive verification status
         uses: actions/upload-artifact@v4
         with:
