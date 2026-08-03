@@ -1,0 +1,39 @@
+name: Build private market cache
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: "本次快取股票數量（優先半導體）"
+        required: true
+        default: "10"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  cache-finmind-market-data:
+    runs-on: ubuntu-latest
+    env:
+      DATA_CACHE_DIR: .private-market-cache
+      FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Restore private market cache
+        uses: actions/cache@v4
+        with:
+          path: .private-market-cache
+          key: finmind-market-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: finmind-market-v1-${{ runner.os }}-
+      - name: Cache the next FinMind batch
+        run: python finmind_market_cache.py --batch-size "${{ inputs.batch_size }}"
+      - name: Upload non-sensitive cache status
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-cache-status
+          path: data/market-cache-status.json
+          if-no-files-found: error
