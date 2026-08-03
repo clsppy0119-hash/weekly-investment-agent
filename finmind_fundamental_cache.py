@@ -53,7 +53,17 @@ def fetch(dataset: str, code: str, start: str) -> list[dict[str, Any]]:
     return payload.get("data", [])
 
 
-def semiconductors() -> list[str]:
+def semiconductors(cache_dir: Path) -> list[str]:
+    # The market-cache stage has already removed duplicated historical rows
+    # and recorded stocks without a recent tradable price.  Reuse that exact
+    # reviewed universe so fundamentals and prices always have the same scope.
+    market_progress = load(cache_dir / "finmind-market-v1" / "progress.json", {})
+    reviewed = market_progress.get("reviewed", {}).get("半導體", [])
+    unavailable = market_progress.get("unavailable", {}).get("半導體", {})
+    scoped = {str(code) for code in reviewed} | {str(code) for code in unavailable}
+    if scoped:
+        return sorted(scoped)
+
     token = os.environ.get("FINMIND_TOKEN", "").strip()
     if not token:
         raise RuntimeError("缺少 FINMIND_TOKEN")
@@ -80,8 +90,8 @@ def main() -> None:
     parser.add_argument("--years", type=int, default=6)
     args = parser.parse_args()
 
-    codes = semiconductors()
     cache_dir = args.cache_dir / "finmind-fundamentals-v1"
+    codes = semiconductors(args.cache_dir)
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
     reviewed = set(progress.get("reviewed", []))
