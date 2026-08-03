@@ -1,0 +1,43 @@
+name: Refresh official Taiwan market data
+
+on:
+  schedule:
+    # 17:30 Taipei time: after the market close and before the next report run.
+    - cron: "30 9 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh-official-data:
+    runs-on: ubuntu-latest
+    env:
+      DATA_CACHE_DIR: .private-data-cache
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Restore private data cache
+        uses: actions/cache@v4
+        with:
+          path: .private-data-cache
+          key: official-data-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: official-data-v1-${{ runner.os }}-
+      - name: Restore semiconductor universe metadata
+        uses: actions/cache/restore@v4
+        with:
+          path: .private-data-cache/finmind-market-v1
+          key: licensed-data-v1-${{ runner.os }}-unavailable
+          restore-keys: licensed-data-v1-${{ runner.os }}-
+      - name: Refresh official market snapshot
+        run: python official_market_cache.py
+      - name: Refresh official fundamentals snapshot
+        run: python official_fundamentals_cache.py
+      - name: Upload non-sensitive status
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-data-status
+          path: data/official-*-status.json
+          if-no-files-found: error
