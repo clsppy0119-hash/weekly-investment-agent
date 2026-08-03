@@ -91,12 +91,24 @@ def verify_finlab() -> dict[str, Any]:
     except ImportError as error:
         raise RuntimeError("尚未安裝 finlab 套件") from error
 
-    probes = {dataset: dataframe_summary(data.get(dataset, progress="silent")) for dataset in FINLAB_PROBES}
+    probes: dict[str, dict[str, Any]] = {}
+    unavailable: dict[str, str] = {}
+    for dataset in FINLAB_PROBES:
+        try:
+            probes[dataset] = dataframe_summary(data.get(dataset, progress="silent"))
+        except Exception as error:
+            # Dataset entitlements differ by plan.  Record only the error class
+            # so the status remains safe while the official MOPS pipeline
+            # continues to supply the required statement fields.
+            unavailable[dataset] = type(error).__name__
+    if not probes:
+        raise RuntimeError("FinLab 沒有任何可讀取的資料集")
     return {
         "provider": "FinLab",
         "credential": "FINLAB_API_TOKEN",
         "verifiedAt": utc_now(),
         "probes": probes,
+        "unavailableDatasets": unavailable,
     }
 
 
