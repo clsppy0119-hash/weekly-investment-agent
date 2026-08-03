@@ -35,6 +35,8 @@ jobs:
         run: python official_market_cache.py
       - name: Refresh official fundamentals snapshot
         run: python official_fundamentals_cache.py
+      - name: Incrementally cache disclosed MOPS statements
+        run: python mops_fundamental_cache.py --batch-size 10
       - name: Upload non-sensitive status
         uses: actions/upload-artifact@v4
         with:
