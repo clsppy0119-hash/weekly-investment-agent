@@ -49,6 +49,7 @@ jobs:
           key: licensed-data-v1-${{ runner.os }}-${{ github.run_id }}
           restore-keys: licensed-data-v1-${{ runner.os }}-
       - name: Install FinLab provider
+        if: ${{ inputs.provider == 'all' }}
         run: python -m pip install --upgrade pip finlab
       - name: Verify FinMind and FinLab credentials
         run: python data_access.py --provider "${{ inputs.provider }}"
