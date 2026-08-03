@@ -1,0 +1,84 @@
+name: Verify licensed data access
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "要驗證的資料來源；FinLab 近期資料恢復後再選 all"
+        required: true
+        default: finmind
+        type: choice
+        options:
+          - finmind
+          - all
+      mode:
+        description: "執行資料驗證或建立下一批私有市場快取"
+        required: true
+        default: validate
+        type: choice
+        options:
+          - validate
+          - cache
+      batch_size:
+        description: "快取模式每批股票數量（半導體優先）"
+        required: true
+        default: "1"
+        type: string
+      cache_layer:
+        description: "快取層級：market 為行情與股利，fundamentals 為財報、資產負債與月營收"
+        required: true
+        default: market
+        type: choice
+        options:
+          - market
+          - fundamentals
+          - official-market
+          - official-fundamentals
+
+permissions:
+  contents: read
+
+jobs:
+  verify-data-access:
+    runs-on: ubuntu-latest
+    env:
+      # This folder is restored/saved only through Actions cache and is never committed.
+      DATA_CACHE_DIR: .private-data-cache
+      XDG_CACHE_HOME: .private-data-cache
+      FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+      FINLAB_API_TOKEN: ${{ secrets.FINLAB_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Restore private provider cache
+        uses: actions/cache@v4
+        with:
+          path: .private-data-cache
+          key: licensed-data-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: licensed-data-v1-${{ runner.os }}-
+      - name: Install FinLab provider
+        if: ${{ inputs.provider == 'all' }}
+        run: python -m pip install --upgrade pip finlab
+      - name: Verify FinMind and FinLab credentials
+        if: ${{ inputs.mode == 'validate' }}
+        run: python data_access.py --provider "${{ inputs.provider }}"
+      - name: Cache next FinMind market-data batch
+        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'market' }}
+        run: python finmind_market_cache.py --batch-size "${{ inputs.batch_size }}"
+      - name: Cache next FinMind fundamentals batch
+        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'fundamentals' }}
+        run: python finmind_fundamental_cache.py --batch-size "${{ inputs.batch_size }}"
+      - name: Cache official TWSE and TPEx market snapshot
+        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'official-market' }}
+        run: python official_market_cache.py
+      - name: Cache official TWSE, TPEx and MOPS fundamentals snapshot
+        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'official-fundamentals' }}
+        run: python official_fundamentals_cache.py
+      - name: Upload non-sensitive verification status
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-access-status
+          path: data/*-status.json
+          if-no-files-found: error
