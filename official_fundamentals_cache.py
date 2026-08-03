@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -38,12 +39,21 @@ def save(path: Path, payload: Any) -> None:
 
 
 def fetch(url: str) -> list[dict[str, Any]]:
-    request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent/1.0", "Accept": "application/json"})
-    with urllib.request.urlopen(request, timeout=45) as response:
-        payload = json.load(response)
-    if not isinstance(payload, list):
-        raise RuntimeError("官方 API 未回傳清單資料")
-    return [row for row in payload if isinstance(row, dict)]
+    error: Exception | None = None
+    for attempt in range(3):
+        try:
+            request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent/1.0", "Accept": "application/json"})
+            with urllib.request.urlopen(request, timeout=45) as response:
+                payload = json.load(response)
+            if not isinstance(payload, list):
+                raise RuntimeError("官方 API 未回傳清單資料")
+            return [row for row in payload if isinstance(row, dict)]
+        except Exception as caught:
+            error = caught
+            if attempt < 2:
+                time.sleep(2 * (attempt + 1))
+    assert error is not None
+    raise error
 
 
 def codes(rows: list[dict[str, Any]]) -> set[str]:
@@ -95,7 +105,8 @@ def main() -> None:
         coverage[market] = {
             "fullSnapshotCodes": len(intersection),
             "semiconductorCodes": len(semiconductors & intersection),
-            "missingSemiconductorCodes": sorted(semiconductors - intersection) if intersection else sorted(semiconductors),
+            "missingSemiconductorCount": len(semiconductors - intersection) if intersection else len(semiconductors),
+            "missingSemiconductorSample": sorted(semiconductors - intersection)[:20] if intersection else sorted(semiconductors)[:20],
         }
     covered = set().union(*(codes(rows) for rows in snapshots.values())) if snapshots else set()
     status = {
