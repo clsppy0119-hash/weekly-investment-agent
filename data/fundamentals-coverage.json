@@ -1,56 +1,57 @@
 {
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
-  "updatedAt": "2026-08-02T15:52:36.015437+00:00",
+  "credentialMode": "authenticated",
+  "updatedAt": "2026-08-03T12:41:25.563466+00:00",
   "activeStage": "半導體",
   "universeCodes": 2739,
   "currentStageCodes": 164,
   "queriedCodes": [
-    "1595",
-    "2302",
-    "2344",
-    "2434",
-    "2458",
-    "3041",
-    "3105",
-    "3122",
-    "3131",
-    "3141",
-    "3169",
-    "3178",
-    "3227",
-    "3228",
-    "3259",
-    "3260",
-    "3264",
-    "3265",
-    "3268",
-    "3317",
-    "3372",
-    "3374",
-    "3438",
-    "3450",
-    "3467",
-    "3527",
-    "3529",
-    "3545",
-    "3555",
-    "3556"
+    "2342",
+    "2351",
+    "3443",
+    "3530",
+    "3567",
+    "3581",
+    "3592",
+    "3644",
+    "3675",
+    "3680",
+    "3707",
+    "4749",
+    "4923",
+    "4925",
+    "4951",
+    "4952",
+    "4961",
+    "4966",
+    "4967",
+    "4968",
+    "4971",
+    "4973",
+    "4991",
+    "5222",
+    "5236",
+    "5246",
+    "5262",
+    "5272",
+    "5274",
+    "5297"
   ],
   "priorityCodes": [],
   "successfulCodes": 30,
-  "enrichedCodes": 117,
-  "remainingCodes": 2622,
+  "enrichedCodes": 142,
+  "remainingCodes": 2597,
   "stageCoverage": {
     "半導體": {
       "total": 164,
-      "reviewed": 30,
-      "remaining": 134
+      "reviewed": 60,
+      "remaining": 104
     },
     "電子其他": {
-      "total": 919,
+      "total": 918,
       "reviewed": 0,
-      "remaining": 919
+      "remaining": 918
     },
     "金融": {
       "total": 63,
@@ -58,9 +59,9 @@
       "remaining": 63
     },
     "傳產與其他": {
-      "total": 1381,
+      "total": 1382,
       "reviewed": 0,
-      "remaining": 1381
+      "remaining": 1382
     },
     "興櫃": {
       "total": 212,
@@ -70,9 +71,9 @@
   },
   "failures": {},
   "metrics": {
-    "eps": 117,
-    "roe": 117,
-    "debtRatio": 123
+    "eps": 142,
+    "roe": 142,
+    "debtRatio": 149
   },
-  "fiveYearHistory": 39
+  "fiveYearHistory": 67
 }
