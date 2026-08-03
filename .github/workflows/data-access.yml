@@ -24,6 +24,14 @@ on:
         required: true
         default: "1"
         type: string
+      cache_layer:
+        description: "快取層級：market 為行情與股利，fundamentals 為財報、資產負債與月營收"
+        required: true
+        default: market
+        type: choice
+        options:
+          - market
+          - fundamentals
 
 permissions:
   contents: read
@@ -54,13 +62,14 @@ jobs:
       - name: Verify FinMind and FinLab credentials
         run: python data_access.py --provider "${{ inputs.provider }}"
       - name: Cache next FinMind market-data batch
-        if: ${{ inputs.mode == 'cache' }}
+        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'market' }}
         run: python finmind_market_cache.py --batch-size "${{ inputs.batch_size }}"
+      - name: Cache next FinMind fundamentals batch
+        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'fundamentals' }}
+        run: python finmind_fundamental_cache.py --batch-size "${{ inputs.batch_size }}"
       - name: Upload non-sensitive verification status
         uses: actions/upload-artifact@v4
         with:
           name: data-access-status
-          path: |
-            data/data-access-status.json
-            data/market-cache-status.json
+          path: data/*-status.json
           if-no-files-found: error
