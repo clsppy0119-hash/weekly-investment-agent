@@ -33,6 +33,7 @@ on:
           - market
           - fundamentals
           - official-market
+          - official-fundamentals
 
 permissions:
   contents: read
@@ -72,6 +73,9 @@ jobs:
       - name: Cache official TWSE and TPEx market snapshot
         if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'official-market' }}
         run: python official_market_cache.py
+      - name: Cache official TWSE, TPEx and MOPS fundamentals snapshot
+        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'official-fundamentals' }}
+        run: python official_fundamentals_cache.py
       - name: Upload non-sensitive verification status
         uses: actions/upload-artifact@v4
         with:
