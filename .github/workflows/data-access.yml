@@ -34,6 +34,7 @@ on:
           - fundamentals
           - official-market
           - official-fundamentals
+          - mops-fundamentals
 
 permissions:
   contents: read
@@ -76,6 +77,9 @@ jobs:
       - name: Cache official TWSE, TPEx and MOPS fundamentals snapshot
         if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'official-fundamentals' }}
         run: python official_fundamentals_cache.py
+      - name: Cache disclosed MOPS statements by company
+        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'mops-fundamentals' }}
+        run: python mops_fundamental_cache.py --batch-size "${{ inputs.batch_size }}"
       - name: Upload non-sensitive verification status
         uses: actions/upload-artifact@v4
         with:
