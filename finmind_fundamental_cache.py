@@ -59,8 +59,7 @@ def semiconductors(cache_dir: Path) -> list[str]:
     # reviewed universe so fundamentals and prices always have the same scope.
     market_progress = load(cache_dir / "finmind-market-v1" / "progress.json", {})
     reviewed = market_progress.get("reviewed", {}).get("半導體", [])
-    unavailable = market_progress.get("unavailable", {}).get("半導體", {})
-    scoped = {str(code) for code in reviewed} | {str(code) for code in unavailable}
+    scoped = {str(code) for code in reviewed}
     if scoped:
         return sorted(scoped)
 
@@ -94,8 +93,8 @@ def main() -> None:
     codes = semiconductors(args.cache_dir)
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
-    reviewed = set(progress.get("reviewed", []))
-    unavailable = dict(progress.get("unavailable", {}))
+    reviewed = set(progress.get("reviewed", [])) & set(codes)
+    unavailable = {code: reason for code, reason in progress.get("unavailable", {}).items() if code in codes}
     selected = [code for code in codes if code not in reviewed and code not in unavailable][: max(1, args.batch_size)]
     start = f"{date.today().year - max(1, args.years)}-01-01"
 
