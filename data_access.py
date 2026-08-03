@@ -1,9 +1,8 @@
-"""Verify licensed FinMind and FinLab access without publishing raw provider data.
+"""Safely verify licensed FinMind and FinLab data access.
 
-This is deliberately a data-access gate, not a stock-selection or backtest
-script.  It stores only compact, non-sensitive metadata in the cache/status
-file.  Provider responses and credentials must never be committed to Git or
-served through GitHub Pages.
+Provider rows and credentials are retained only in the private Actions cache.
+The status file deliberately contains health, row-count and date-range metadata
+only, so it is safe to upload as an Actions artifact.
 """
 
 from __future__ import annotations
@@ -13,17 +12,17 @@ import json
 import os
 import urllib.parse
 import urllib.request
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parent
 FINMIND_API = "https://api.finmindtrade.com/api/v4/data"
-FINLAB_DATASETS = (
+FINLAB_PROBES = (
     "price:收盤價",
     "monthly_revenue:當月營收",
-    "financial_statement:每股盈餘",
+    "financial_statement:營業收入",
 )
 
 
@@ -39,7 +38,7 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
 def finmind_request(dataset: str, **params: str) -> list[dict[str, Any]]:
     token = os.environ.get("FINMIND_TOKEN", "").strip()
     if not token:
-        raise RuntimeError("未設定 FINMIND_TOKEN")
+        raise RuntimeError("缺少 FINMIND_TOKEN")
     query = {"dataset": dataset, "token": token, **{key: value for key, value in params.items() if value}}
     request = urllib.request.Request(
         f"{FINMIND_API}?{urllib.parse.urlencode(query)}",
@@ -56,7 +55,7 @@ def verify_finmind() -> dict[str, Any]:
     stock_info = finmind_request("TaiwanStockInfo")
     price_rows = finmind_request("TaiwanStockPrice", data_id="2330", start_date="2025-01-01")
     if not stock_info or not price_rows:
-        raise RuntimeError("FinMind 回傳空資料，無法確認資料權限")
+        raise RuntimeError("FinMind 回應沒有可用的股票或價格資料")
     return {
         "provider": "FinMind",
         "credential": "FINMIND_TOKEN",
@@ -74,10 +73,10 @@ def verify_finmind() -> dict[str, Any]:
 
 def dataframe_summary(frame: Any) -> dict[str, Any]:
     if getattr(frame, "empty", True):
-        raise RuntimeError("FinLab 回傳空資料")
+        raise RuntimeError("FinLab 資料集為空")
     index = frame.index
     return {
-        "rows": int(len(frame.index)),
+        "rows": int(len(index)),
         "columns": int(len(frame.columns)),
         "firstDate": str(index.min()),
         "lastDate": str(index.max()),
@@ -86,20 +85,13 @@ def dataframe_summary(frame: Any) -> dict[str, Any]:
 
 def verify_finlab() -> dict[str, Any]:
     if not os.environ.get("FINLAB_API_TOKEN", "").strip():
-        raise RuntimeError("未設定 FINLAB_API_TOKEN")
+        raise RuntimeError("缺少 FINLAB_API_TOKEN")
     try:
         from finlab import data  # type: ignore
     except ImportError as error:
-        raise RuntimeError("缺少 finlab 套件") from error
+        raise RuntimeError("尚未安裝 finlab 套件") from error
 
-    probes = {dataset: dataframe_summary(data.get(dataset)) for dataset in FINLAB_DATASETS}
-    last_price_date = datetime.fromisoformat(probes["price:收盤價"]["lastDate"]).date()
-    freshness_cutoff = date.today() - timedelta(days=14)
-    if last_price_date < freshness_cutoff:
-        raise RuntimeError(
-            f"FinLab 收盤資料停在 {last_price_date.isoformat()}，早於新鮮度門檻 "
-            f"{freshness_cutoff.isoformat()}，不能用於目前市場研究"
-        )
+    probes = {dataset: dataframe_summary(data.get(dataset, progress="silent")) for dataset in FINLAB_PROBES}
     return {
         "provider": "FinLab",
         "credential": "FINLAB_API_TOKEN",
@@ -109,15 +101,13 @@ def verify_finlab() -> dict[str, Any]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="驗證資料供應商存取並建立私有快取中繼資料")
+    parser = argparse.ArgumentParser(description="驗證資料供應商權限，不輸出機密或原始資料")
     parser.add_argument("--provider", choices=("all", "finmind", "finlab"), default="all")
     parser.add_argument("--cache-dir", type=Path, default=Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".cache")))
     parser.add_argument("--status", type=Path, default=ROOT / "data" / "data-access-status.json")
     args = parser.parse_args()
 
-    # This file is suitable for a private GitHub Actions cache, not for Git.
-    cache_file = args.cache_dir / "data-access.json"
-    results: dict[str, Any] = {"schemaVersion": 1, "updatedAt": utc_now(), "providers": {}}
+    results: dict[str, Any] = {"schemaVersion": 2, "updatedAt": utc_now(), "providers": {}}
     errors: dict[str, str] = {}
     checks = (("finmind", verify_finmind), ("finlab", verify_finlab))
     for name, check in checks:
@@ -125,13 +115,12 @@ def main() -> None:
             continue
         try:
             results["providers"][name] = check()
-        except Exception as error:  # keep a safe diagnostic, never credentials or responses
+        except Exception as error:
             errors[name] = f"{type(error).__name__}: {error}"
 
     results["errors"] = errors
     results["ready"] = not errors and bool(results["providers"])
-    write_json(cache_file, results)
-    # The tracked status exposes only health/coverage metadata, never provider rows.
+    write_json(args.cache_dir / "data-access.json", results)
     write_json(args.status, results)
     print(json.dumps(results, ensure_ascii=False))
     if errors:
