@@ -62,14 +62,14 @@ def semiconductors() -> list[str]:
         payload = json.load(response)
     if payload.get("status") != 200:
         raise RuntimeError(str(payload.get("msg", "FinMind API error")))
-    return sorted(
+    return sorted({
         str(row["stock_id"])
         for row in payload.get("data", [])
         if str(row.get("industry_category") or "") == SEMICONDUCTOR
         and str(row.get("type") or "") in {"twse", "tpex", "emerging"}
         and str(row.get("stock_id", "")).isdigit()
         and len(str(row["stock_id"])) == 4
-    )
+    })
 
 
 def main() -> None:
