@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import socket
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -39,6 +40,9 @@ def download_filing(code: str, roc_year: int, quarter: int) -> bytes:
         f"{MOPS_DOWNLOAD}?{query}",
         headers={"User-Agent": "Mozilla/5.0 (compatible; weekly-investment-agent/1.0)", "Referer": "https://mopsov.twse.com.tw/mops/web/t203sb01"},
     )
+    # ``urlopen(timeout=...)`` covers connection setup; the process-wide socket
+    # timeout also bounds a stalled body read from an otherwise connected host.
+    socket.setdefaulttimeout(8)
     with urllib.request.urlopen(request, timeout=8) as response:
         content = response.read()
     if not is_xbrl_document(content):
