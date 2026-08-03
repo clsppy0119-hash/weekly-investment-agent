@@ -2,8 +2,9 @@ name: Cache authorised historical fundamentals
 
 on:
   schedule:
-    # One low-volume batch per hour.  Twenty companies need three FinMind
-    # requests each, which remains well below the documented hourly limit.
+    # One bounded batch per hour.  Fifty companies need three FinMind
+    # requests each, which remains below the documented 300-request hourly
+    # limit while allowing the backfill to finish in a few cycles.
     - cron: "7 * * * *"
   workflow_dispatch:
 
@@ -28,7 +29,7 @@ jobs:
           key: historical-fundamentals-v1-${{ runner.os }}-${{ github.run_id }}
           restore-keys: historical-fundamentals-v1-${{ runner.os }}-
       - name: Cache next six-year semiconductor batch
-        run: python finmind_fundamental_cache.py --batch-size 20
+        run: python finmind_fundamental_cache.py --batch-size 50
       - name: Check five-year history completeness
         run: python historical_data_quality.py
       - name: Upload non-sensitive status
