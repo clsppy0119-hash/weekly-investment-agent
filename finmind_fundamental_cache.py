@@ -66,6 +66,7 @@ def semiconductors() -> list[str]:
         str(row["stock_id"])
         for row in payload.get("data", [])
         if str(row.get("industry_category") or "") == SEMICONDUCTOR
+        and str(row.get("type") or "") in {"twse", "tpex", "emerging"}
         and str(row.get("stock_id", "")).isdigit()
         and len(str(row["stock_id"])) == 4
     )
