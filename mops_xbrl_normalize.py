@@ -22,13 +22,13 @@ ROOT = Path(__file__).resolve().parent
 CONCEPTS = {
     "revenue": ("Revenue", "OperatingRevenue"),
     "grossProfit": ("GrossProfit",),
-    "operatingIncome": ("OperatingIncome",),
-    "netIncome": ("ProfitLoss", "NetIncomeLoss"),
+    "operatingIncome": ("OperatingIncome", "OperatingIncomeLoss", "IncomeFromOperations"),
+    "netIncome": ("ProfitLoss", "NetIncomeLoss", "ProfitLossFromContinuingOperations"),
     "assets": ("Assets",),
     "liabilities": ("Liabilities",),
     "equity": ("Equity",),
-    "operatingCashFlow": ("NetCashFlowsFromUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivities"),
-    "eps": ("BasicEarningsPerShare",),
+    "operatingCashFlow": ("NetCashFlowsFromUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivities", "NetCashFlowsFromOperatingActivities", "CashFlowsFromUsedInOperatingActivities"),
+    "eps": ("BasicEarningsPerShare", "EarningsPerShareBasic", "EarningsPerShare"),
 }
 TAG = re.compile(r"<ix:nonFraction\b(?P<attrs>[^>]*)>(?P<value>.*?)</ix:nonFraction>", re.I | re.S)
 ATTRIBUTE = re.compile(r'(?P<key>[\w:-]+)=["\'](?P<value>.*?)["\']', re.S)
@@ -69,13 +69,16 @@ def number(value: str, attrs: dict[str, str]) -> float | None:
         return None
 
 
-def extract_metrics(document: str) -> tuple[dict[str, float], dict[str, str]]:
+def extract_metrics(document: str) -> tuple[dict[str, float], dict[str, str], list[str]]:
     wanted = {concept: metric for metric, concepts in CONCEPTS.items() for concept in concepts}
     metrics: dict[str, float] = {}
     sources: dict[str, str] = {}
+    candidate_concepts: set[str] = set()
     for match in TAG.finditer(document):
         attrs = {item.group("key").lower(): item.group("value") for item in ATTRIBUTE.finditer(match.group("attrs"))}
         concept = attrs.get("name", "").split(":")[-1]
+        if any(term in concept.lower() for term in ("operating", "earning", "cashflow", "cashflows")):
+            candidate_concepts.add(attrs.get("name", concept))
         metric = wanted.get(concept)
         if not metric or metric in metrics:
             continue
@@ -83,7 +86,7 @@ def extract_metrics(document: str) -> tuple[dict[str, float], dict[str, str]]:
         if parsed is not None:
             metrics[metric] = parsed
             sources[metric] = attrs.get("name", concept)
-    return metrics, sources
+    return metrics, sources, sorted(candidate_concepts)
 
 
 def main() -> None:
@@ -91,6 +94,7 @@ def main() -> None:
     source_dir = cache_root / "mops-fundamentals-v2" / "stocks"
     output_dir = cache_root / "mops-normalized-v1"
     parsed: dict[str, dict[str, Any]] = {}
+    candidate_concepts: set[str] = set()
     failures: dict[str, str] = {}
     for metadata_path in sorted(source_dir.glob("*.json")):
         code = metadata_path.stem
@@ -99,15 +103,16 @@ def main() -> None:
             raw = next((path for path in (source_dir / f"{code}.html", source_dir / f"{code}.zip") if path.exists()), None)
             if raw is None:
                 raise ValueError("找不到私有 XBRL 原始檔")
-            metrics, sources = extract_metrics(read_ixbrl(raw))
+            metrics, sources, candidates = extract_metrics(read_ixbrl(raw))
             if not metrics:
                 raise ValueError("未辨識到可用的核心 XBRL 概念")
             record = {"code": code, "period": metadata.get("period"), "source": metadata.get("source"), "metrics": metrics, "concepts": sources, "normalizedAt": datetime.now(timezone.utc).isoformat()}
             save(output_dir / f"{code}.json", record)
             parsed[code] = {"period": metadata.get("period"), "metricCount": len(metrics), "metrics": sorted(metrics)}
+            candidate_concepts.update(candidates)
         except Exception as error:
             failures[code] = f"{type(error).__name__}: {error}"
-    status = {"schemaVersion": 1, "provider": "MOPS official XBRL normalizer", "cacheVisibility": "private GitHub Actions cache; no financial values are committed", "updatedAt": datetime.now(timezone.utc).isoformat(), "coverage": {"sourceFilings": len(list(source_dir.glob('*.json'))), "normalised": len(parsed), "failed": len(failures)}, "parsed": parsed, "failures": failures}
+    status = {"schemaVersion": 2, "provider": "MOPS official XBRL normalizer", "cacheVisibility": "private GitHub Actions cache; no financial values are committed", "updatedAt": datetime.now(timezone.utc).isoformat(), "coverage": {"sourceFilings": len(list(source_dir.glob('*.json'))), "normalised": len(parsed), "failed": len(failures)}, "parsed": parsed, "conceptCandidates": sorted(candidate_concepts), "failures": failures}
     save(ROOT / "data" / "mops-xbrl-normalization-status.json", status)
     print(json.dumps(status, ensure_ascii=False))
     if failures:
