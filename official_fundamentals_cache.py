@@ -72,7 +72,13 @@ def main() -> None:
         try:
             rows = fetch(url)
             snapshots[name] = rows
-            source_status[name] = {"url": url, "rows": len(rows), "codes": len(codes(rows)), "ready": bool(rows)}
+            source_status[name] = {
+                "url": url,
+                "rows": len(rows),
+                "codes": len(codes(rows)),
+                "sampleFields": sorted(rows[0]) if rows else [],
+                "ready": bool(rows),
+            }
         except Exception as error:
             source_status[name] = {"url": url, "ready": False, "error": f"{type(error).__name__}: {error}"}
 
