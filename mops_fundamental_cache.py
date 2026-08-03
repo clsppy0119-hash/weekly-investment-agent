@@ -86,10 +86,16 @@ def main() -> None:
 
     cache_dir = args.cache_dir / "mops-fundamentals-v2"
     progress_path = cache_dir / "progress.json"
-    progress = load(progress_path, {"reviewed": [], "unavailable": {}})
+    progress = load(progress_path, {"reviewed": [], "unavailable": {}, "retry": {}})
     reviewed = set(progress.get("reviewed", []))
     unavailable = dict(progress.get("unavailable", {}))
-    selected = [code for code in codes if code not in reviewed and code not in unavailable][: max(1, args.batch_size)]
+    retry = dict(progress.get("retry", {}))
+    # Do not let a temporarily slow company repeatedly occupy the next batch.
+    # Process fresh companies first, then give deferred downloads up to three
+    # bounded retries once the fresh queue is exhausted.
+    fresh = [code for code in codes if code not in reviewed and code not in unavailable and code not in retry]
+    deferred = [code for code in codes if code in retry and code not in reviewed and code not in unavailable]
+    selected = (fresh + deferred)[: max(1, args.batch_size)]
     stock_dir = cache_dir / "stocks"
     stock_dir.mkdir(parents=True, exist_ok=True)
     cached: dict[str, dict[str, str]] = {}
@@ -102,7 +108,14 @@ def main() -> None:
         for future in as_completed(futures):
             code, period, filing, error = future.result()
             if error:
-                failures[code] = error
+                previous = retry.get(code, {})
+                attempts = int(previous.get("attempts", 0)) + 1
+                if attempts >= 3:
+                    unavailable[code] = f"MOPS 下載逾時或連線失敗，已重試 {attempts} 次：{error}"
+                    retry.pop(code, None)
+                else:
+                    retry[code] = {"attempts": attempts, "lastError": error}
+                    failures[code] = error
                 continue
             if filing is None:
                 unavailable[code] = "MOPS 尚無可下載的合併 XBRL 財報"
@@ -116,12 +129,12 @@ def main() -> None:
             except Exception as error:
                 failures[code] = f"{type(error).__name__}: {error}"
 
-    save(progress_path, {"reviewed": sorted(reviewed), "unavailable": unavailable, "updatedAt": datetime.now(timezone.utc).isoformat()})
+    save(progress_path, {"reviewed": sorted(reviewed), "unavailable": unavailable, "retry": retry, "updatedAt": datetime.now(timezone.utc).isoformat()})
     status = {"schemaVersion": 3, "provider": "MOPS official XBRL disclosures", "cacheVisibility": "private GitHub Actions cache; raw filings are not committed", "updatedAt": datetime.now(timezone.utc).isoformat(), "batch": {"requested": len(selected), "cached": cached, "unavailable": unavailable, "failures": failures}, "coverage": {"total": len(codes), "cached": len(reviewed), "unavailable": len(unavailable), "remaining": max(0, len(codes) - len(reviewed) - len(unavailable))}}
     save(args.status, status)
     print(json.dumps(status, ensure_ascii=False))
-    if failures:
-        raise SystemExit(1)
+    # Network timeouts are recorded for bounded retry rather than failing the
+    # entire refresh; a following batch can keep expanding coverage.
 
 
 if __name__ == "__main__":
