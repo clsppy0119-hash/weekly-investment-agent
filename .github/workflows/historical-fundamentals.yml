@@ -1,0 +1,37 @@
+name: Cache authorised historical fundamentals
+
+on:
+  schedule:
+    # One low-volume batch per hour.  Twenty companies need three FinMind
+    # requests each, which remains well below the documented hourly limit.
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cache-historical-fundamentals:
+    runs-on: ubuntu-latest
+    env:
+      DATA_CACHE_DIR: .private-data-cache
+      FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Restore private historical cache
+        uses: actions/cache@v4
+        with:
+          path: .private-data-cache
+          key: historical-fundamentals-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: historical-fundamentals-v1-${{ runner.os }}-
+      - name: Cache next six-year semiconductor batch
+        run: python finmind_fundamental_cache.py --batch-size 20
+      - name: Upload non-sensitive status
+        uses: actions/upload-artifact@v4
+        with:
+          name: historical-fundamentals-status
+          path: data/fundamentals-cache-status.json
+          if-no-files-found: error
