@@ -82,8 +82,18 @@ def main() -> None:
     }
     # Official-data.yml must work on the default branch even when GitHub Actions
     # cannot restore a cache created on a non-default branch.  The tracked
-    # progress file contains the already validated semiconductor queue and is
-    # metadata only (no licensed rows), so it is a safe fallback.
+    # market snapshot is public application data and provides the complete
+    # industry queue without relying on a provider-specific cache.
+    if not codes:
+        market_snapshot = load(ROOT / "quotes.json", {})
+        fundamentals = market_snapshot.get("fundamentals", {})
+        codes.update(
+            str(code)
+            for code, details in fundamentals.items()
+            if isinstance(details, dict) and details.get("industry") == "\u534a\u5c0e\u9ad4\u696d"
+        )
+    # Retain the reviewed queue as a final fallback for very old deployments
+    # that predate the public market snapshot.
     if not codes:
         tracked_progress = load(ROOT / "data" / "fundamentals-progress.json", {})
         tracked_by_stage = tracked_progress.get("reviewedCodes", {})
