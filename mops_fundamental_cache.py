@@ -73,10 +73,20 @@ def main() -> None:
     # The market cache uses the Traditional-Chinese stage name.  Retain the
     # English fallback for compatibility with any older cache schema.
     reviewed_by_stage = market_progress.get("reviewed", {})
-    codes = sorted(
+    codes = {
         str(code)
         for code in (reviewed_by_stage.get("半導體") or reviewed_by_stage.get("semiconductors", []))
-    )
+    }
+    # Official-data.yml must work on the default branch even when GitHub Actions
+    # cannot restore a cache created on a non-default branch.  The tracked
+    # progress file contains the already validated semiconductor queue and is
+    # metadata only (no licensed rows), so it is a safe fallback.
+    if not codes:
+        tracked_progress = load(ROOT / "data" / "fundamentals-progress.json", {})
+        tracked_by_stage = tracked_progress.get("reviewedCodes", {})
+        codes.update(str(code) for code in tracked_by_stage.get("半導體", []))
+        codes.update(str(code) for code in tracked_progress.get("lastBatch", []))
+    codes = sorted(codes)
     cache_dir = args.cache_dir / "mops-fundamentals-v2"
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
