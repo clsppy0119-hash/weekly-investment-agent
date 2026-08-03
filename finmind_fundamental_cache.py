@@ -142,10 +142,14 @@ def main() -> None:
             "unavailable": len(unavailable),
             "remaining": max(0, len(codes) - len(reviewed) - len(unavailable)),
         },
+        "quotaLimited": any("HTTP Error 402" in message for message in failures.values()),
     }
     save(args.status, status)
     print(json.dumps(status, ensure_ascii=False))
-    if failures:
+    # A 402 means the provider quota/access needs attention, not that a
+    # company lacks data. Keep the successful rows and emit a clear status so
+    # Actions can save the private cache before the next authorised run.
+    if failures and not all("HTTP Error 402" in message for message in failures.values()):
         raise SystemExit(1)
 
 
