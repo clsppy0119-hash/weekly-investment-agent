@@ -20,7 +20,10 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent
 MOPS_DOWNLOAD = "https://mopsov.twse.com.tw/server-java/FileDownLoad"
-PERIODS = ((115, 1), (114, 4), (114, 3))
+# The daily pipeline prioritises the latest broadly filed period.  Historical
+# backfill belongs in a separate bounded job; probing three periods for every
+# company with no filing can otherwise block the whole daily queue.
+PERIODS = ((115, 1),)
 
 
 def load(path: Path, default: Any) -> Any:
