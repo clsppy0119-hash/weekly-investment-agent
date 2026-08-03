@@ -54,6 +54,12 @@ def fetch(dataset: str, code: str, start: str) -> list[dict[str, Any]]:
 
 
 def semiconductors(cache_dir: Path) -> list[str]:
+    universe_path = cache_dir / "finmind-fundamentals-v1" / "universe.json"
+    cached_universe = load(universe_path, {})
+    cached_codes = {str(code) for code in cached_universe.get("codes", [])}
+    if cached_codes:
+        return sorted(cached_codes)
+
     # The market-cache stage has already removed duplicated historical rows
     # and recorded stocks without a recent tradable price.  Reuse that exact
     # reviewed universe so fundamentals and prices always have the same scope.
@@ -61,7 +67,9 @@ def semiconductors(cache_dir: Path) -> list[str]:
     reviewed = market_progress.get("reviewed", {}).get("半導體", [])
     scoped = {str(code) for code in reviewed}
     if scoped:
-        return sorted(scoped)
+        codes = sorted(scoped)
+        save(universe_path, {"codes": codes, "source": "FinMind market cache"})
+        return codes
 
     token = os.environ.get("FINMIND_TOKEN", "").strip()
     if not token:
@@ -71,7 +79,7 @@ def semiconductors(cache_dir: Path) -> list[str]:
         payload = json.load(response)
     if payload.get("status") != 200:
         raise RuntimeError(str(payload.get("msg", "FinMind API error")))
-    return sorted({
+    codes = sorted({
         str(row["stock_id"])
         for row in payload.get("data", [])
         if str(row.get("industry_category") or "") == SEMICONDUCTOR
@@ -79,6 +87,11 @@ def semiconductors(cache_dir: Path) -> list[str]:
         and str(row.get("stock_id", "")).isdigit()
         and len(str(row["stock_id"])) == 4
     })
+    # TaiwanStockInfo is a comparatively expensive endpoint.  Keep only the
+    # resulting code list in the private cache so later batches consume quota
+    # exclusively on the three history datasets.
+    save(universe_path, {"codes": codes, "source": "FinMind TaiwanStockInfo"})
+    return codes
 
 
 def main() -> None:
