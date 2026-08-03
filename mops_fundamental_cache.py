@@ -70,7 +70,13 @@ def main() -> None:
     args = parser.parse_args()
 
     market_progress = load(args.cache_dir / "finmind-market-v1" / "progress.json", {})
-    codes = sorted(str(code) for code in market_progress.get("reviewed", {}).get("semiconductors", []))
+    # The market cache uses the Traditional-Chinese stage name.  Retain the
+    # English fallback for compatibility with any older cache schema.
+    reviewed_by_stage = market_progress.get("reviewed", {})
+    codes = sorted(
+        str(code)
+        for code in (reviewed_by_stage.get("半導體") or reviewed_by_stage.get("semiconductors", []))
+    )
     cache_dir = args.cache_dir / "mops-fundamentals-v2"
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
