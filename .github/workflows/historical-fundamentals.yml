@@ -22,6 +22,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Restore cached semiconductor universe metadata
+        uses: actions/cache/restore@v4
+        with:
+          path: .private-data-cache/finmind-market-v1
+          key: licensed-data-v1-${{ runner.os }}-unavailable
+          restore-keys: licensed-data-v1-${{ runner.os }}-
       - name: Restore private historical cache
         uses: actions/cache@v4
         with:
