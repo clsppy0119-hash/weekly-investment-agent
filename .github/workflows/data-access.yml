@@ -60,6 +60,7 @@ jobs:
         if: ${{ inputs.provider == 'all' }}
         run: python -m pip install --upgrade pip finlab
       - name: Verify FinMind and FinLab credentials
+        if: ${{ inputs.mode == 'validate' }}
         run: python data_access.py --provider "${{ inputs.provider }}"
       - name: Cache next FinMind market-data batch
         if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'market' }}
