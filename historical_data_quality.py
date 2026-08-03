@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +20,11 @@ REQUIREMENTS = {
     "statementPeriods": 20,  # five years of quarterly statements
     "balancePeriods": 20,
     "revenueMonths": 60,
+}
+MAX_AGE_DAYS = {
+    "latestStatement": 190,
+    "latestBalance": 190,
+    "latestRevenue": 70,
 }
 
 
@@ -46,14 +51,26 @@ def inspect_stock(path: Path) -> dict[str, Any]:
         "balancePeriods": len(balance),
         "revenueMonths": len(revenue),
     }
+    latest = {
+        "latestStatement": max(statement, default=None),
+        "latestBalance": max(balance, default=None),
+        "latestRevenue": max(revenue, default=None),
+    }
     missing = [key for key, minimum in REQUIREMENTS.items() if counts[key] < minimum]
+    today = date.today()
+    for key, maximum_age in MAX_AGE_DAYS.items():
+        value = latest[key]
+        try:
+            stale = value is None or (today - date.fromisoformat(value)).days > maximum_age
+        except ValueError:
+            stale = True
+        if stale:
+            missing.append(f"fresh:{key}")
     return {
         "statementPeriods": counts["statementPeriods"],
         "balancePeriods": counts["balancePeriods"],
         "revenueMonths": counts["revenueMonths"],
-        "latestStatement": max(statement, default=None),
-        "latestBalance": max(balance, default=None),
-        "latestRevenue": max(revenue, default=None),
+        **latest,
         "fiveYearReady": not missing,
         "missingRequirements": missing,
     }
@@ -74,6 +91,7 @@ def main() -> None:
         "cacheVisibility": "private GitHub Actions cache; raw rows are not committed",
         "updatedAt": datetime.now(timezone.utc).isoformat(),
         "requirements": REQUIREMENTS,
+        "maxAgeDays": MAX_AGE_DAYS,
         "coverage": {
             "cachedStocks": len(stocks),
             "fiveYearReady": ready,
