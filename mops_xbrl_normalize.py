@@ -89,6 +89,31 @@ def extract_metrics(document: str) -> tuple[dict[str, float], dict[str, str], li
     return metrics, sources, sorted(candidate_concepts)
 
 
+def derive_quality_metrics(metrics: dict[str, float]) -> dict[str, float]:
+    """Calculate only ratios fully supported by the current disclosed quarter.
+
+    ``annualizedRoe`` is explicitly a current-quarter annualisation, not a
+    five-year ROE trend.  The distinction is retained in the field name so the
+    decision layer cannot present it as a long-term measure.
+    """
+    derived: dict[str, float] = {}
+    revenue = metrics.get("revenue")
+    assets = metrics.get("assets")
+    equity = metrics.get("equity")
+    net_income = metrics.get("netIncome")
+    if revenue not in (None, 0):
+        for source, target in (("grossProfit", "grossMargin"), ("operatingIncome", "operatingMargin"), ("netIncome", "netMargin")):
+            if source in metrics:
+                derived[target] = metrics[source] / revenue
+    if assets not in (None, 0) and "liabilities" in metrics:
+        derived["debtRatio"] = metrics["liabilities"] / assets
+    if net_income not in (None, 0) and "operatingCashFlow" in metrics:
+        derived["cashEarningsRatio"] = metrics["operatingCashFlow"] / net_income
+    if equity not in (None, 0) and net_income is not None:
+        derived["annualizedRoe"] = (net_income * 4) / equity
+    return derived
+
+
 def main() -> None:
     cache_root = Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache"))
     source_dir = cache_root / "mops-fundamentals-v2" / "stocks"
@@ -106,9 +131,10 @@ def main() -> None:
             metrics, sources, candidates = extract_metrics(read_ixbrl(raw))
             if not metrics:
                 raise ValueError("未辨識到可用的核心 XBRL 概念")
-            record = {"code": code, "period": metadata.get("period"), "source": metadata.get("source"), "metrics": metrics, "concepts": sources, "normalizedAt": datetime.now(timezone.utc).isoformat()}
+            derived = derive_quality_metrics(metrics)
+            record = {"code": code, "period": metadata.get("period"), "source": metadata.get("source"), "metrics": metrics, "derived": derived, "concepts": sources, "normalizedAt": datetime.now(timezone.utc).isoformat()}
             save(output_dir / f"{code}.json", record)
-            parsed[code] = {"period": metadata.get("period"), "metricCount": len(metrics), "metrics": sorted(metrics)}
+            parsed[code] = {"period": metadata.get("period"), "metricCount": len(metrics), "metrics": sorted(metrics), "derivedMetrics": sorted(derived)}
             candidate_concepts.update(candidates)
         except Exception as error:
             failures[code] = f"{type(error).__name__}: {error}"
