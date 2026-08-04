@@ -35,9 +35,13 @@ jobs:
           restore-keys: backtest-data-v1-${{ runner.os }}-
       - name: Cache next total-return batch
         run: python backtest_data_cache.py --batch-size 20
+      - name: Inspect private input schema safely
+        run: python backtest_schema_probe.py
       - name: Upload non-sensitive cache status
         uses: actions/upload-artifact@v4
         with:
           name: backtest-data-status
-          path: data/backtest-data-cache-status.json
+          path: |
+            data/backtest-data-cache-status.json
+            data/backtest-schema-status.json
           if-no-files-found: error
