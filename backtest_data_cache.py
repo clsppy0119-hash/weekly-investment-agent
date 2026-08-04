@@ -38,6 +38,12 @@ def save(path: Path, payload: Any) -> None:
 
 
 def eligible_codes(cache_dir: Path) -> list[str]:
+    historical_universe = cache_dir / "historical-universe-v1" / "semiconductor.json"
+    if historical_universe.exists():
+        rows = load(historical_universe, [])
+        codes = {str(row.get("stock_id", "")) for row in rows if str(row.get("stock_id", "")).isdigit()}
+        if codes:
+            return sorted(codes)
     stocks = cache_dir / "finmind-fundamentals-v1" / "stocks"
     return sorted(path.stem for path in stocks.glob("*.json") if inspect_stock(path)["fiveYearReady"])
 
