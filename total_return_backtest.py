@@ -142,11 +142,15 @@ def main() -> None:
         raise SystemExit("benchmark 0050 is not cached")
     universe = {code: total_return_series(code, data) for code, data in payloads.items() if code != "0050"}
     benchmark = total_return_series("0050", payloads["0050"])
-    common_dates = sorted(set.intersection(*(set(item.values) for item in universe.values()), set(benchmark.values)))
-    if len(common_dates) < 500:
-        raise SystemExit("insufficient common history")
-    train_end, validation_end = int(len(common_dates) * 0.6), int(len(common_dates) * 0.8)
-    splits = {"train": common_dates[:train_end], "validation": common_dates[train_end:validation_end], "test": common_dates[validation_end:]}
+    # Do not intersect every constituent's calendar: that would discard the
+    # early history merely because a later IPO did not yet exist.  The benchmark
+    # calendar is the master calendar; run_period admits a stock only when it
+    # has the required lookback, entry and exit observations.
+    calendar = sorted(benchmark.values)
+    if len(calendar) < 500:
+        raise SystemExit("insufficient benchmark history")
+    train_end, validation_end = int(len(calendar) * 0.6), int(len(calendar) * 0.8)
+    splits = {"train": calendar[:train_end], "validation": calendar[train_end:validation_end], "test": calendar[validation_end:]}
     results = {name: run_period(universe, days) for name, days in splits.items()}
     benchmark_results = {name: run_period({"0050": benchmark}, days, is_etf=True) for name, days in splits.items()}
     passed = (
@@ -159,7 +163,7 @@ def main() -> None:
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "status": "candidate" if passed else "rejected",
-        "universe": {"stocks": len(universe), "benchmark": "0050", "commonTradingDays": len(common_dates)},
+        "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar)},
         "strategy": {"name": "60-day total-return momentum", "lookbackDays": LOOKBACK, "holdingDays": HOLDING, "picks": PICKS},
         "costs": {"buyFee": BUY_FEE, "sellFee": SELL_FEE, "stockSellTax": STOCK_SELL_TAX, "etfSellTax": ETF_SELL_TAX, "oneWaySlippageBps": SLIPPAGE_BPS},
         "dividends": {"cash": "reinvested at ex-dividend date close", "stockDividendEvents": sum(item.stock_dividend_events for item in universe.values()), "limitation": "stock dividend share adjustments require licensed adjusted prices before a strategy can be promoted"},
