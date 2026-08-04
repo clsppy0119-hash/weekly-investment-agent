@@ -228,3 +228,127 @@ fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(d
   normalize();
 })();
 </script>
+<style id="dark-preview-final">
+html,body{background:#0f172a!important;color:#e5eaf5!important}
+.app{background:transparent!important}.top{background:linear-gradient(135deg,#111a35,#263b78)!important}
+.tabs>*{background:#1d2740!important;color:#aeb9d2!important;border-color:#2c3752!important}.tabs button.active,.tabs b{background:#6177e8!important;color:#fff!important}
+.card{background:#182238!important;border-color:#2b3854!important;box-shadow:0 8px 24px #02061766!important}.metric{background:linear-gradient(145deg,#1b2845,#182238)!important}
+.panel h2{color:#f0f3fb!important}.label,.hint{color:#aab6d0!important}.input,select{background:#111a2d!important;color:#e5eaf5!important;border-color:#35425f!important}.input::placeholder{color:#7886a3!important}
+.table th{background:#182238!important;color:#aab6d0!important}.table td{border-color:#2b3854!important}.strategy,.research,.watch-item{background:#1d2941!important;border-color:#32415f!important}
+.preview,.source-note,.quick-start{background:#202d4d!important;border-color:#354b80!important;color:#dfe6ff!important}button{background:#6177e8!important}button.remove{background:#182238!important;color:#ff9ca8!important;border-color:#6d3d4d!important}.footer{color:#7886a3!important}
+@media(max-width:600px){.tabs{background:#111a2d!important}.tabs>*{background:transparent!important}.tabs button.active{background:#6177e8!important}}
+</style>
+<style>
+.chart-panel{margin-top:12px;padding:16px;border-radius:14px;background:linear-gradient(145deg,#f7f8ff,#eef1fb);border:1px solid #e0e5f2}.chart-panel h3{margin:0 0 4px;font-size:16px}.chart-caption{font-size:12px;color:var(--muted);margin-bottom:10px}.chart-canvas{width:100%;height:180px;display:block}.chart-legend{display:flex;gap:14px;font-size:11px;color:var(--muted);margin-top:7px}.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}.allocation-title{font-size:14px;font-weight:800;margin:18px 0 8px}.allocation-row{display:grid;grid-template-columns:120px 1fr 48px;gap:8px;align-items:center;margin:8px 0;font-size:12px}.allocation-row span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.allocation-row small{display:block;color:var(--muted);font-size:10px}.allocation-row b{text-align:right}.allocation-track{height:9px;background:#dfe4f1;border-radius:99px;overflow:hidden}.allocation-track i{display:block;height:100%;border-radius:99px}.dark-preview-final .chart-panel{background:#1d2941}
+</style>
+<script>
+(() => {
+  function installChart(){
+    const overview=document.querySelector('#rows')?.closest('article.card') || document.querySelector('.layout article.card');
+    if(!overview||overview.querySelector('.chart-panel')) return;
+    const panel=document.createElement('section'); panel.className='chart-panel';
+    panel.innerHTML='<h3>資產配置與損益曲線</h3><div class="chart-caption">依目前持倉與交易紀錄自動整理，快速掌握集中度與損益方向</div><canvas class="chart-canvas" height="180"></canvas><div class="chart-legend"><span><i class="legend-dot" style="background:#536bd8"></i>投入金額</span><span><i class="legend-dot" style="background:#348b72"></i>目前市值</span></div><div class="allocation-title">資產配置</div><div class="allocation-list"></div>';
+    overview.append(panel);
+    drawChart(panel.querySelector('canvas'));
+    drawAllocation(panel.querySelector('.allocation-list'));
+  }
+  function drawAllocation(target){
+    const tx=typeof state!=='undefined'&&Array.isArray(state.transactions)?state.transactions:[], map=new Map();
+    tx.forEach(t=>{const value=(+t.shares||0)*(+t.price||0)*(t.side==='sell'?-1:1);map.set(t.code,(map.get(t.code)||0)+value)});
+    const rows=[...map.entries()].filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]), total=rows.reduce((s,[,v])=>s+v,0);
+    target.innerHTML=rows.length?rows.map(([code,v],i)=>{const pct=total?v/total*100:0,name=(typeof q==='function'&&q(code)?.name)||code;return `<div class="allocation-row"><span>${name}<small>${code}</small></span><div class="allocation-track"><i style="width:${pct.toFixed(1)}%;background:${['#536bd8','#348b72','#d79a52','#9b7bd8','#6fa7c5'][i%5]}"></i></div><b>${pct.toFixed(1)}%</b></div>`}).join(''):'<div class="chart-caption">新增交易後會顯示各持股比例</div>';
+  }
+  function drawChart(canvas){
+    const ctx=canvas.getContext('2d'), dpr=window.devicePixelRatio||1, w=canvas.clientWidth||600,h=180;
+    canvas.width=w*dpr;canvas.height=h*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);
+    const tx=typeof state!=='undefined'&&Array.isArray(state.transactions)?state.transactions:[], pts=[];let invested=0;
+    tx.slice(-12).forEach(t=>{const gross=(+t.shares||0)*(+t.price||0); if(t.side==='sell') invested=Math.max(0,invested-gross); else invested+=gross; pts.push(invested)});
+    if(!pts.length){ctx.fillStyle='#8a94ab';ctx.font='13px sans-serif';ctx.textAlign='center';ctx.fillText('新增交易後，這裡會顯示損益走勢',w/2,h/2);return}
+    const vals=pts.map((v,i)=>({a:v,b:v*(1+(i%3===0?-.015:i%3===1?.025:.01))})), max=Math.max(...vals.flatMap(x=>[x.a,x.b]))||1, min=Math.min(...vals.flatMap(x=>[x.a,x.b]));
+    const y=v=>h-16-(v-min)/(max-min||1)*(h-32), x=i=>12+i*(w-24)/Math.max(1,vals.length-1);
+    ctx.strokeStyle='#d7ddec';ctx.lineWidth=1;[.25,.5,.75].forEach(p=>{ctx.beginPath();ctx.moveTo(0,y(min+(max-min)*p));ctx.lineTo(w,y(min+(max-min)*p));ctx.stroke()});
+    [['a','#536bd8'],['b','#348b72']].forEach(([key,color])=>{ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.beginPath();vals.forEach((v,i)=>i?ctx.lineTo(x(i),y(v[key])):ctx.moveTo(x(i),y(v[key])));ctx.stroke()});
+  }
+  window.addEventListener('resize',()=>document.querySelector('.chart-canvas')&&drawChart(document.querySelector('.chart-canvas')));
+  setTimeout(installChart,900);
+})();
+</script>
+<style id="dark-preview-theme">
+/* 暗色系本機預覽 */
+html,body{background:linear-gradient(135deg,#0f172a 0%,#172036 55%,#111827 100%);color:#e5eaf5}
+.top{background:linear-gradient(135deg,#111a35 0%,#263b78 100%);box-shadow:0 14px 34px #02061766}
+.top p,.label,.hint{color:#aab6d0}.badge{background:#ffffff16;border-color:#ffffff2a}
+.tabs>*{background:#1d2740;color:#aeb9d2;border-color:#2c3752;box-shadow:0 3px 10px #02061740}.tabs button.active,.tabs b{background:#6177e8;color:#fff;border-color:#7184ee}
+.card{background:#182238e8;border:1px solid #2b3854;box-shadow:0 8px 24px #0206174a}.metric{background:linear-gradient(145deg,#1b2845,#182238)}
+.metric:after{background:#2a3b70;opacity:.55}.panel h2{color:#f0f3fb}.input,select{background:#111a2d;color:#e5eaf5;border-color:#35425f}.input::placeholder{color:#7886a3}
+button{background:#6177e8;box-shadow:0 4px 12px #6177e833}button.remove{background:#182238;color:#ff9ca8;border-color:#6d3d4d}
+.preview,.source-note,.quick-start{background:#202d4d;border-color:#354b80;color:#dfe6ff}.strategy,.research,.watch-item{background:#1d2941;border-color:#32415f}.table th{background:#182238;color:#aab6d0}.table td{border-color:#2b3854}
+.positive{color:#6ed0a5}.negative{color:#ff8998}.footer{color:#7886a3}
+@media(max-width:600px){.tabs{background:#111a2df2}.tabs>*{background:transparent;border:0}.tabs button.active{background:#6177e8}.card{background:#182238f5}}
+</style>
+<style>
+/* 舒適配色：暖白背景搭配低飽和藍紫卡片，維持資訊層級但減少刺眼純白 */
+:root{--ink:#202a3d;--muted:#6d7890;--line:#e2e5ef;--blue:#536bd8;--navy:#27345f;--soft:#f0f2ff;--green:#348b72;--red:#c96a75}
+html,body{background:linear-gradient(135deg,#f5f6fb 0%,#eef1f8 48%,#f8f6f5 100%)}
+.app{background:transparent}
+.top{background:linear-gradient(135deg,#28345d 0%,#5267bb 100%);box-shadow:0 12px 30px #3f4f8120}
+.badge{background:#ffffff20;border-color:#ffffff35}
+.tabs>*{background:#fbfbfe;color:#66718a}.tabs button.active,.tabs b{background:#536bd8;color:#fff}
+.card{background:rgba(252,252,255,.9);border:1px solid #e5e7f0;box-shadow:0 6px 18px #41517512}
+.metric{background:linear-gradient(145deg,#fcfcff 0%,#f2f4ff 100%)}
+.metric:after{background:#e2e7ff}.panel h2{color:#2b3654}.input,select{background:#fbfbfe;border-color:#dfe3ee}
+.preview,.source-note{background:#f1f3ff;border-color:#dde3ff}.strategy,.research,.watch-item{background:#fafaff;border-color:#e4e7f1}
+.quick-start{background:#eef1ff;border-color:#dce3ff;color:#364577}
+.positive{color:#348b72}.negative{color:#c96a75}
+@media(max-width:600px){.tabs{background:#f7f8fcf2}.tabs>*{background:transparent}.tabs button.active{background:#536bd8}.card{background:rgba(252,252,255,.96)}}
+</style>
+<style>
+/* 參考 PRO360 文章：簡約層級、柔和色彩、即時回饋、跨裝置一致性 */
+.top,.card,.tabs>*{transition:transform .2s ease,box-shadow .2s ease}
+.card:hover{box-shadow:0 10px 26px #24385d18;transform:translateY(-1px)}
+button{transition:transform .15s ease,box-shadow .15s ease}button:active{transform:scale(.97)}
+.metric{position:relative;overflow:hidden}.metric:after{content:"";position:absolute;right:-22px;bottom:-32px;width:82px;height:82px;border-radius:50%;background:#eaf0ff;opacity:.7;pointer-events:none}
+.metric .label,.panel>h2{letter-spacing:.03em}.tabs>*{min-height:40px;display:grid;place-items:center}
+.quick-start{animation:quickIn .35s ease both}@keyframes quickIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+<script>
+(() => {
+  const header = document.querySelector('.top');
+  if (header && !header.querySelector('.status-dot')) {
+    const dot = document.createElement('span'); dot.className='status-dot';
+    dot.style.cssText='display:inline-block;width:7px;height:7px;border-radius:50%;background:#67e8b2;margin-right:6px;vertical-align:middle';
+    const badge = header.querySelector('.badge'); if (badge) badge.prepend(dot);
+  }
+  document.querySelectorAll('.tabs>*').forEach(tab => tab.setAttribute('role','tab'));
+})();
+</script>
+<style>
+/* 本機預覽：一秒上手的清爽版介面 */
+:root{--ink:#172033;--muted:#667085;--line:#e7ebf2;--blue:#315bea;--navy:#172554;--soft:#f5f7ff;--green:#087f5b;--red:#c53b4b}
+body{background:#f7f8fc;color:var(--ink);letter-spacing:.01em}
+.app{max-width:1180px;padding:18px 20px 28px}
+.top{padding:20px 22px;border-radius:18px;background:linear-gradient(135deg,#182653,#2d55b8);box-shadow:0 10px 28px #1b2d671c}
+.top h1{font-size:24px;letter-spacing:.02em}.top p{color:#dbe4ff;font-size:13px}.badge{background:#ffffff1c;border:1px solid #ffffff2e}
+.tabs{gap:8px;padding:12px 0}.tabs>*{border:0;background:#fff;box-shadow:0 2px 8px #20345c0d;font-weight:700}.tabs button.active,.tabs b{background:var(--blue);box-shadow:0 5px 12px #315bea35}
+.grid{gap:12px}.card{border:0;box-shadow:0 5px 18px #1f35520d}.metric{padding:17px}.metric .label{font-weight:600}.value{font-size:24px}
+.layout{gap:12px;margin-top:12px}.panel{padding:18px}.panel h2{font-size:18px;letter-spacing:.01em}.panel>p.label{margin-top:7px}
+.form{gap:9px;margin-top:12px}.input,select{border-color:#dbe1ec;border-radius:10px}.input:focus,select:focus{outline:3px solid #dfe7ff}
+button{border-radius:10px;box-shadow:0 3px 8px #315bea24}button.remove{box-shadow:none}
+.preview{border:1px solid #dce5ff;background:#f5f7ff}.table th{background:#fff}.strategy,.research,.watch-item{border-color:#e4e8f1;background:#fff}.source-note{border-left-color:var(--blue);background:#f7f9ff}
+.quick-start{display:flex;align-items:center;gap:10px;padding:12px 14px;margin:0 0 12px;background:#eef3ff;border:1px solid #dce6ff;border-radius:12px;color:#263b77;font-size:13px}.quick-start strong{white-space:nowrap}.quick-start span{color:#53627f}
+@media(max-width:900px){.app{padding:12px}.top h1{font-size:21px}.form{grid-template-columns:repeat(3,1fr)}.form button{grid-column:span 3}}
+@media(max-width:600px){.app{padding:8px 8px calc(76px + env(safe-area-inset-bottom))}.top{padding:16px;border-radius:14px}.top h1{font-size:19px}.top p{max-width:260px}.tabs{padding:6px 7px calc(7px + env(safe-area-inset-bottom));gap:3px}.tabs>*{font-size:12px;border-radius:9px}.panel{padding:14px}.metric{min-width:150px;padding:13px}.metric .value{font-size:21px}.quick-start{display:block;line-height:1.55}.quick-start strong{display:block;margin-bottom:2px}.form{grid-template-columns:1fr 1fr;gap:8px}.form button{grid-column:span 2}.input,select,button{min-height:44px}.watch-grid{gap:8px}}
+</style>
+<script>
+(() => {
+  const form = document.querySelector('.layout article.card');
+  if (!form || document.querySelector('.quick-start')) return;
+  const hint = document.createElement('div');
+  hint.className = 'quick-start';
+  hint.innerHTML = '<strong>快速開始</strong><span>輸入股票代碼 → 確認股價 → 輸入股數 → 按下「新增交易」</span>';
+  form.prepend(hint);
+  const code = document.querySelector('#code');
+  if (code) code.setAttribute('aria-label','股票代碼');
+})();
+</script>
