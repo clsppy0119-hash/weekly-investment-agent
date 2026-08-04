@@ -10,6 +10,7 @@ import csv
 import io
 import json
 import os
+import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -21,14 +22,23 @@ SOURCES = {
     "twse_listed": "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
     "twse_terminated": "https://www.twse.com.tw/company/suspendListingCsvAndHtml?lang=zh&startYear=&type=csv",
     "tpex_listed": "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O",
-    "tpex_emerging": "https://www.tpex.org.tw/openapi/v1/t187ap46_O_1",
+    "tpex_emerging": "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap04_O",
 }
 
 
 def fetch_json(url: str) -> Any:
     request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent/1.0"})
-    with urllib.request.urlopen(request, timeout=45) as response:
-        return json.load(response)
+    last_error: Exception | None = None
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:
+                return json.load(response)
+        except Exception as error:
+            last_error = error
+            if attempt < 2:
+                time.sleep(2 * (attempt + 1))
+    assert last_error is not None
+    raise last_error
 
 
 def fetch_csv(url: str) -> list[dict[str, str]]:
