@@ -3,8 +3,8 @@
 The free FinMind endpoint is queried only for companies currently present in
 TaiwanStockInfo (TWSE, TPEx and emerging).  Every company needs financials,
 prices and corporate actions before it can enter a total-return backtest. At
-48 companies x 6 datasets per hour it uses the first-stage free-data budget,
-leaving a small retry buffer while the later backtest stage is paused.
+35 companies x 6 datasets per hour stays below the observed free-data limit,
+leaving a generous retry buffer while the later backtest stage is paused.
 under the documented 300-request hourly allowance.
 Raw rows never leave the private Actions cache.
 """
@@ -94,7 +94,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Cache current full-market free total-return inputs incrementally")
     parser.add_argument("--cache-dir", type=Path, default=Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache")))
     parser.add_argument("--status", type=Path, default=ROOT / "data" / "full-market-fundamentals-status.json")
-    parser.add_argument("--batch-size", type=int, default=48)
+    parser.add_argument("--batch-size", type=int, default=35)
     parser.add_argument("--years", type=int, default=6)
     args = parser.parse_args()
     universe = current_universe()
@@ -110,7 +110,7 @@ def main() -> None:
         if cache_has_total_return_inputs(cache / "stocks" / f"{code}.json")
     }
     unavailable = {code: reason for code, reason in progress.get("unavailable", {}).items() if code in universe}
-    selected = [code for code in sorted(universe) if code not in reviewed and code not in unavailable][: max(1, min(48, args.batch_size))]
+    selected = [code for code in sorted(universe) if code not in reviewed and code not in unavailable][: max(1, min(35, args.batch_size))]
     start = f"{date.today().year - max(1, args.years)}-01-01"
     failures: dict[str, str] = {}
     cached: dict[str, dict[str, int]] = {}
