@@ -51,11 +51,18 @@ def fetch(dataset: str, code: str = "", start: str = "") -> list[dict[str, Any]]
 
 
 def current_universe() -> dict[str, dict[str, str]]:
-    return {
-        str(row["stock_id"]): {"name": str(row.get("stock_name") or ""), "market": str(row.get("type") or ""), "industry": str(row.get("industry_category") or "")}
-        for row in fetch("TaiwanStockInfo")
-        if str(row.get("stock_id", "")).isdigit() and len(str(row["stock_id"])) == 4 and str(row.get("type") or "") in {"twse", "tpex", "emerging"}
-    }
+    universe: dict[str, dict[str, str]] = {}
+    for row in fetch("TaiwanStockInfo"):
+        code = str(row.get("stock_id", ""))
+        market = str(row.get("type") or "")
+        industry = str(row.get("industry_category") or "").strip()
+        # ETFs and ETNs can share the market type with equities but do not have
+        # the same income-statement concepts.  They belong in a separate ETF
+        # model, not a failed-equity-data queue.
+        if not (code.isdigit() and len(code) == 4 and market in {"twse", "tpex", "emerging"} and industry and industry.upper() not in {"ETF", "ETN"}):
+            continue
+        universe[code] = {"name": str(row.get("stock_name") or ""), "market": market, "industry": industry}
+    return universe
 
 
 def fetch_one(code: str, start: str) -> tuple[str, dict[str, list[dict[str, Any]]] | None, str | None]:
