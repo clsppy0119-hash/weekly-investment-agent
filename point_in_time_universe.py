@@ -16,7 +16,10 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parent
-CODE_FIELDS = ("公司代號", "證券代號", "股票代號", "SecuritiesCompanyCode", "CompanyCode", "stock_id")
+CODE_FIELDS = (
+    "公司代號", "證券代號", "有價證券代號", "股票代號", "股票代號及名稱",
+    "SecuritiesCompanyCode", "CompanyCode", "stock_id",
+)
 ENTRY_FIELDS = ("上市日期", "上櫃日期", "興櫃日期", "掛牌日期", "ListingDate", "list_date")
 EXIT_FIELDS = ("終止上市日期", "終止上櫃日期", "終止興櫃日期", "終止日期", "DelistingDate")
 
@@ -57,8 +60,11 @@ def main() -> None:
     entries: dict[str, str] = {}
     exits: dict[str, str] = {}
     official_current_records = 0
+    source_fields: dict[str, list[str]] = {}
     for source in ("twse_listed", "tpex_listed", "tpex_emerging"):
-        for row in load(official / f"{source}.json", []):
+        rows = load(official / f"{source}.json", [])
+        source_fields[source] = sorted({str(key) for row in rows if isinstance(row, dict) for key in row})
+        for row in rows:
             if not isinstance(row, dict):
                 continue
             stock = code(row)
@@ -66,7 +72,9 @@ def main() -> None:
             if stock and listed:
                 entries[stock] = min(entries.get(stock, listed), listed)
                 official_current_records += 1
-    for row in load(official / "twse_terminated.json", []):
+    terminated_rows = load(official / "twse_terminated.json", [])
+    source_fields["twse_terminated"] = sorted({str(key) for row in terminated_rows if isinstance(row, dict) for key in row})
+    for row in terminated_rows:
         if isinstance(row, dict):
             stock, ended = code(row), iso_date(value(row, EXIT_FIELDS))
             if stock and ended:
@@ -96,6 +104,7 @@ def main() -> None:
             "officiallyExited": len(exited),
             "eligibleAcrossEntireWindow": len(eligible_all_dates),
         },
+        "sourceFieldNames": source_fields,
         "certified": certified,
         "promotionGate": "open" if certified else "closed: official historical membership evidence is incomplete",
         "cacheVisibility": "private GitHub Actions cache; stock-level evidence is not committed",
