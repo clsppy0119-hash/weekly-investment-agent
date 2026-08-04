@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       batch_size:
-        description: "Equities to cache (maximum 48 / 288 API requests; first-stage full-market coverage)"
+        description: "Equities to cache (maximum 35 / 210 API requests; observed safe free-data batch)"
         required: false
-        default: "48"
+        default: "35"
         type: string
 
 permissions:
@@ -32,7 +32,7 @@ jobs:
           key: full-market-fundamentals-v1-${{ runner.os }}-${{ github.run_id }}
           restore-keys: full-market-fundamentals-v1-${{ runner.os }}-
       - name: Cache next current-market total-return input batch
-        run: python full_market_fundamentals_cache.py --batch-size "${{ inputs.batch_size || '48' }}"
+        run: python full_market_fundamentals_cache.py --batch-size "${{ inputs.batch_size || '35' }}"
       - name: Produce current-market research queue
         run: python current_market_screener.py
       - name: Upload non-sensitive status
