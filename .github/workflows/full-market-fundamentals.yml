@@ -1,0 +1,45 @@
+name: Cache current full-market fundamentals
+
+on:
+  schedule:
+    - cron: "47 * * * *"
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: "Companies to cache (maximum 75 / 225 API requests)"
+        required: false
+        default: "75"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  cache-full-market:
+    runs-on: ubuntu-latest
+    env:
+      DATA_CACHE_DIR: .private-data-cache
+      FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Restore private full-market cache
+        uses: actions/cache@v4
+        with:
+          path: .private-data-cache
+          key: full-market-fundamentals-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: full-market-fundamentals-v1-${{ runner.os }}-
+      - name: Cache next current-market fundamentals batch
+        run: python full_market_fundamentals_cache.py --batch-size "${{ inputs.batch_size || '75' }}"
+      - name: Produce current-market research queue
+        run: python current_market_screener.py
+      - name: Upload non-sensitive status
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-market-fundamentals-status
+          path: |
+            data/full-market-fundamentals-status.json
+            data/current-market-screen-status.json
+          if-no-files-found: error

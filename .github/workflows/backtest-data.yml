@@ -6,6 +6,11 @@ on:
     # FinMind hourly request limit: 60 companies x 3 authorised datasets.
     - cron: "27 * * * *"
   workflow_dispatch:
+    inputs:
+      codes:
+        description: "Optional sample or fixed basket codes, comma-separated"
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -16,6 +21,7 @@ jobs:
     env:
       DATA_CACHE_DIR: .private-data-cache
       FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+      FIXED_UNIVERSE_CODES: ${{ inputs.codes || vars.FIXED_UNIVERSE_CODES }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

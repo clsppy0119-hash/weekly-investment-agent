@@ -48,6 +48,12 @@ def eligible_codes(cache_dir: Path) -> list[str]:
     return sorted(path.stem for path in stocks.glob("*.json") if inspect_stock(path)["fiveYearReady"])
 
 
+def fixed_universe_codes() -> list[str]:
+    """Read an explicit user basket without ever treating it as a market universe."""
+    raw = os.environ.get("FIXED_UNIVERSE_CODES", "")
+    return sorted({item.strip() for item in raw.split(",") if item.strip().isdigit()})
+
+
 def fetch(dataset: str, code: str, start: str) -> list[dict[str, Any]]:
     token = os.environ.get("FINMIND_TOKEN", "").strip()
     if not token:
@@ -93,7 +99,8 @@ def main() -> None:
     args = parser.parse_args()
 
     eligible = eligible_codes(args.cache_dir)
-    codes = sorted(set(eligible) | set(BENCHMARK_CODES))
+    fixed_codes = fixed_universe_codes()
+    codes = sorted(set(eligible) | set(fixed_codes) | set(BENCHMARK_CODES))
     cache_dir = args.cache_dir / "finmind-backtest-v2"
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
@@ -134,7 +141,7 @@ def main() -> None:
     status = {
         "schemaVersion": 2,
         "provider": "FinMind authorised API",
-        "scope": "five-year-ready semiconductor stocks only",
+        "scope": "historical semiconductor research plus explicit user fixed basket",
         "cacheVisibility": "private GitHub Actions cache; raw rows are not committed",
         "updatedAt": datetime.now(timezone.utc).isoformat(),
         "batch": {"requested": len(selected), "cached": cached, "unavailable": unavailable, "failures": failures},
@@ -146,7 +153,7 @@ def main() -> None:
             }
         },
         "coverage": {
-            "eligibleStocks": len(eligible), "benchmarkCodes": list(BENCHMARK_CODES),
+            "eligibleStocks": len(eligible), "fixedUniverseCodes": fixed_codes, "benchmarkCodes": list(BENCHMARK_CODES),
             "required": len(codes), "cached": len(reviewed), "unavailable": len(unavailable),
             "remaining": max(0, len(codes) - len(reviewed) - len(unavailable)),
         },
