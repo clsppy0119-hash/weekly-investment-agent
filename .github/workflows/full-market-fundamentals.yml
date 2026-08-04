@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       batch_size:
-        description: "Equities to cache (maximum 48 / 288 API requests; first-stage full-market coverage)"
+        description: "Equities to cache (maximum 50 / 300 API requests; first-stage full-market coverage)"
         required: false
-        default: "48"
+        default: "50"
         type: string
 
 permissions:
@@ -41,7 +41,7 @@ jobs:
           max_attempts=4
           for attempt in $(seq 1 "$max_attempts"); do
             attempt_log="$(mktemp)"
-            if python full_market_fundamentals_cache.py --batch-size "${{ inputs.batch_size || '48' }}" 2>&1 | tee "$attempt_log"; then
+            if python full_market_fundamentals_cache.py --batch-size "${{ inputs.batch_size || '50' }}" 2>&1 | tee "$attempt_log"; then
               echo "Cache attempt ${attempt} succeeded."
               exit 0
             fi
