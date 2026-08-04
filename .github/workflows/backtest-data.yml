@@ -1,10 +1,8 @@
 name: Cache total-return backtest data
 
 on:
-  schedule:
-    # Runs after the historical fundamentals cache and remains below the
-    # FinMind hourly request limit: 60 companies x 3 authorised datasets.
-    - cron: "27 * * * *"
+  # Automatic backtest collection is paused until first-stage full-market
+  # coverage is complete. Keep manual dispatch available for diagnostics.
   workflow_dispatch:
     inputs:
       codes:
