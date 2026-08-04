@@ -171,6 +171,8 @@ def main() -> None:
     args = parser.parse_args()
     stocks = args.cache_dir / "finmind-backtest-v2" / "stocks"
     payloads = {path.stem: load(path) for path in stocks.glob("*.json")}
+    certification_path = args.cache_dir / "official-listing-history-v1" / "universe-certification.json"
+    universe_status = load(certification_path) if certification_path.exists() else {}
     if "0050" not in payloads:
         raise SystemExit("benchmark 0050 is not cached")
     universe = {code: total_return_series(code, data) for code, data in payloads.items() if code != "0050"}
@@ -205,7 +207,9 @@ def main() -> None:
     # completeness gate.  Do not promote it until historical membership is
     # reconstructed at each rebalance date, otherwise performance can contain
     # survivorship bias.
-    point_in_time_universe = False
+    # This is intentionally derived only from the strict official verifier;
+    # price history or today's membership must never open this gate.
+    point_in_time_universe = bool(universe_status.get("certified", False))
     promotion_blocked = not stock_adjustment_validated or not point_in_time_universe
     output = {
         "schemaVersion": 1,

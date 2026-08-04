@@ -37,6 +37,8 @@ jobs:
         run: python historical_semiconductor_universe.py
       - name: Cache official listing history
         run: python official_listing_history.py
+      - name: Verify point-in-time universe evidence
+        run: python point_in_time_universe.py
       - name: Cache next total-return batch
         run: python backtest_data_cache.py --batch-size 60
       - name: Inspect private input schema safely
@@ -50,4 +52,5 @@ jobs:
             data/backtest-schema-status.json
             data/historical-universe-status.json
             data/official-listing-history-status.json
+            data/point-in-time-universe-status.json
           if-no-files-found: error
