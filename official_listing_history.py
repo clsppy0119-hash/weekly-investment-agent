@@ -34,7 +34,14 @@ def fetch_json(url: str) -> Any:
 def fetch_csv(url: str) -> list[dict[str, str]]:
     request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent/1.0"})
     with urllib.request.urlopen(request, timeout=45) as response:
-        text = response.read().decode("utf-8-sig")
+        raw = response.read()
+    # TWSE's historical delisting CSV is presently Big5/CP950 while newer
+    # endpoints use UTF-8.  Keep both paths so the official record remains
+    # usable when the publisher changes encoding.
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = raw.decode("cp950")
     return list(csv.DictReader(io.StringIO(text)))
 
 
