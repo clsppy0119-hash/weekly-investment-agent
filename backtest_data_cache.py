@@ -56,13 +56,16 @@ def fetch(dataset: str, code: str, start: str) -> list[dict[str, Any]]:
     return payload.get("data", [])
 
 
-def fetch_one(code: str, start: str) -> tuple[str, dict[str, list[dict[str, Any]]] | None, dict[str, str], str | None]:
+def fetch_one(code: str, start: str, include_optional: bool) -> tuple[str, dict[str, list[dict[str, Any]]] | None, dict[str, str], str | None]:
     try:
         payload = {dataset: fetch(dataset, code, start) for dataset in CORE_DATASETS}
     except Exception as error:
         return code, None, {}, f"{type(error).__name__}: {error}"
     optional_errors: dict[str, str] = {}
     for dataset in OPTIONAL_DATASETS:
+        payload[dataset] = []
+        if not include_optional:
+            continue
         try:
             payload[dataset] = fetch(dataset, code, start)
         except Exception as error:
@@ -79,6 +82,7 @@ def main() -> None:
     parser.add_argument("--status", type=Path, default=ROOT / "data" / "backtest-data-cache-status.json")
     parser.add_argument("--batch-size", type=int, default=20)
     parser.add_argument("--years", type=int, default=6)
+    parser.add_argument("--include-optional", action="store_true", help="Probe restricted cross-check datasets")
     args = parser.parse_args()
 
     codes = eligible_codes(args.cache_dir)
@@ -94,7 +98,7 @@ def main() -> None:
     failures: dict[str, str] = {}
     optional_errors: dict[str, int] = {dataset: 0 for dataset in OPTIONAL_DATASETS}
     with ThreadPoolExecutor(max_workers=2) as pool:
-        futures = [pool.submit(fetch_one, code, start) for code in selected]
+        futures = [pool.submit(fetch_one, code, start, args.include_optional) for code in selected]
         for future in as_completed(futures):
             code, payload, access_errors, error = future.result()
             if error:

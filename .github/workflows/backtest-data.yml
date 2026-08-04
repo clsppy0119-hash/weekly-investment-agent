@@ -3,8 +3,7 @@ name: Cache total-return backtest data
 on:
   schedule:
     # Runs after the historical fundamentals cache and remains below the
-    # FinMind hourly request limit: 20 companies x 3 required datasets plus
-    # one optional adjusted-price cross-check.
+    # FinMind hourly request limit: 60 companies x 3 authorised datasets.
     - cron: "27 * * * *"
   workflow_dispatch:
 
@@ -35,7 +34,7 @@ jobs:
           key: backtest-data-v2-${{ runner.os }}-${{ github.run_id }}
           restore-keys: backtest-data-v2-${{ runner.os }}-
       - name: Cache next total-return batch
-        run: python backtest_data_cache.py --batch-size 20
+        run: python backtest_data_cache.py --batch-size 60
       - name: Inspect private input schema safely
         run: python backtest_schema_probe.py
       - name: Upload non-sensitive cache status
