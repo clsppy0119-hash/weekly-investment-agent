@@ -30,8 +30,12 @@ jobs:
           restore-keys: backtest-data-v2-${{ runner.os }}-
       - name: Run auditable total-return backtest
         run: python total_return_backtest.py
+      - name: Audit stock-dividend adjustment mapping
+        run: python corporate_action_audit.py
       - name: Upload non-sensitive backtest result
         uses: actions/upload-artifact@v4
         with:
           name: total-return-backtest
-          path: data/total-return-backtest-status.json
+          path: |
+            data/total-return-backtest-status.json
+            data/corporate-action-audit-status.json
