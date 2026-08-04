@@ -1,0 +1,37 @@
+name: Total-return backtest
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  total-return-backtest:
+    runs-on: ubuntu-latest
+    env:
+      DATA_CACHE_DIR: .private-data-cache
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Restore private historical cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .private-data-cache
+          key: historical-fundamentals-v1-${{ runner.os }}-unavailable
+          restore-keys: historical-fundamentals-v1-${{ runner.os }}-
+      - name: Restore private total-return inputs
+        uses: actions/cache/restore@v4
+        with:
+          path: .private-data-cache
+          key: backtest-data-v2-${{ runner.os }}-latest
+          restore-keys: backtest-data-v2-${{ runner.os }}-
+      - name: Run auditable total-return backtest
+        run: python total_return_backtest.py
+      - name: Upload non-sensitive backtest result
+        uses: actions/upload-artifact@v4
+        with:
+          name: total-return-backtest
+          path: data/total-return-backtest-status.json

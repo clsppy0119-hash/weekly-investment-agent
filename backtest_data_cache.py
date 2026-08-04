@@ -25,6 +25,7 @@ CORE_DATASETS = ("TaiwanStockPrice", "TaiwanStockDividend", "TaiwanStockDividend
 # FinMind documents TaiwanStockPriceAdj as Backer/Sponsor-only.  It is never a
 # required input: total return is calculated from the legal core ledger.
 OPTIONAL_DATASETS = ("TaiwanStockPriceAdj",)
+BENCHMARK_CODES = ("0050",)
 
 
 def load(path: Path, default: Any) -> Any:
@@ -85,7 +86,8 @@ def main() -> None:
     parser.add_argument("--include-optional", action="store_true", help="Probe restricted cross-check datasets")
     args = parser.parse_args()
 
-    codes = eligible_codes(args.cache_dir)
+    eligible = eligible_codes(args.cache_dir)
+    codes = sorted(set(eligible) | set(BENCHMARK_CODES))
     cache_dir = args.cache_dir / "finmind-backtest-v2"
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
@@ -138,7 +140,8 @@ def main() -> None:
             }
         },
         "coverage": {
-            "eligible": len(codes), "cached": len(reviewed), "unavailable": len(unavailable),
+            "eligibleStocks": len(eligible), "benchmarkCodes": list(BENCHMARK_CODES),
+            "required": len(codes), "cached": len(reviewed), "unavailable": len(unavailable),
             "remaining": max(0, len(codes) - len(reviewed) - len(unavailable)),
         },
         "quotaLimited": any("402" in value or "Payment Required" in value for value in failures.values()),
