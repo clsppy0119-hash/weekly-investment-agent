@@ -1,8 +1,10 @@
-"""Incrementally build a private current-market fundamentals cache.
+"""Incrementally build private current-market total-return inputs.
 
 The free FinMind endpoint is queried only for companies currently present in
-TaiwanStockInfo (TWSE, TPEx and emerging).  At 35 companies x 3 datasets per
-hour it leaves room for the concurrent 180-request backtest cache and stays
+TaiwanStockInfo (TWSE, TPEx and emerging).  Every company needs financials,
+prices and corporate actions before it can enter a total-return backtest. At
+18 companies x 6 datasets per hour it leaves room for the concurrent
+180-request backtest cache and stays
 under the documented 300-request hourly allowance.
 Raw rows never leave the private Actions cache.
 """
@@ -22,7 +24,11 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent
 API = "https://api.finmindtrade.com/api/v4/data"
-DATASETS = ("TaiwanStockFinancialStatements", "TaiwanStockBalanceSheet", "TaiwanStockMonthRevenue")
+DATASETS = (
+    "TaiwanStockFinancialStatements", "TaiwanStockBalanceSheet", "TaiwanStockMonthRevenue",
+    "TaiwanStockPrice", "TaiwanStockDividend", "TaiwanStockDividendResult",
+)
+REQUIRED = ("TaiwanStockFinancialStatements", "TaiwanStockBalanceSheet", "TaiwanStockPrice")
 
 
 def load(path: Path, default: Any) -> Any:
@@ -69,18 +75,26 @@ def current_universe() -> dict[str, dict[str, str]]:
 def fetch_one(code: str, start: str) -> tuple[str, dict[str, list[dict[str, Any]]] | None, str | None]:
     try:
         data = {dataset: fetch(dataset, code, start) for dataset in DATASETS}
-        if not data["TaiwanStockFinancialStatements"] or not data["TaiwanStockBalanceSheet"]:
-            return code, None, "missing required financial statements"
+        if any(not data[name] for name in REQUIRED):
+            return code, None, "missing required financial statements or price history"
         return code, data, None
     except Exception as error:
         return code, None, f"{type(error).__name__}: {error}"
 
 
+def cache_has_total_return_inputs(path: Path) -> bool:
+    try:
+        payload = load(path, {})
+    except (OSError, json.JSONDecodeError):
+        return False
+    return all(isinstance(payload.get(name), list) and payload[name] for name in REQUIRED) and all(name in payload for name in DATASETS)
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Cache current full-market free fundamentals incrementally")
+    parser = argparse.ArgumentParser(description="Cache current full-market free total-return inputs incrementally")
     parser.add_argument("--cache-dir", type=Path, default=Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache")))
     parser.add_argument("--status", type=Path, default=ROOT / "data" / "full-market-fundamentals-status.json")
-    parser.add_argument("--batch-size", type=int, default=35)
+    parser.add_argument("--batch-size", type=int, default=18)
     parser.add_argument("--years", type=int, default=6)
     args = parser.parse_args()
     universe = current_universe()
@@ -88,9 +102,15 @@ def main() -> None:
     save(cache / "universe.json", {"updatedAt": datetime.now(timezone.utc).isoformat(), "stocks": universe})
     progress_path = cache / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
-    reviewed = set(progress.get("reviewed", [])) & set(universe)
+    # Older cache rows contained only financial statements.  Requeue them once
+    # so no company is incorrectly treated as backtest-ready without price and
+    # corporate-action inputs.
+    reviewed = {
+        code for code in set(progress.get("reviewed", [])) & set(universe)
+        if cache_has_total_return_inputs(cache / "stocks" / f"{code}.json")
+    }
     unavailable = {code: reason for code, reason in progress.get("unavailable", {}).items() if code in universe}
-    selected = [code for code in sorted(universe) if code not in reviewed and code not in unavailable][: max(1, min(35, args.batch_size))]
+    selected = [code for code in sorted(universe) if code not in reviewed and code not in unavailable][: max(1, min(18, args.batch_size))]
     start = f"{date.today().year - max(1, args.years)}-01-01"
     failures: dict[str, str] = {}
     cached: dict[str, dict[str, int]] = {}
@@ -99,7 +119,7 @@ def main() -> None:
         for future in as_completed(futures):
             code, data, error = future.result()
             if error:
-                if error == "missing required financial statements":
+                if error.startswith("missing required"):
                     unavailable[code] = error
                 else:
                     failures[code] = error
@@ -111,7 +131,7 @@ def main() -> None:
     save(progress_path, {"reviewed": sorted(reviewed), "unavailable": unavailable, "updatedAt": datetime.now(timezone.utc).isoformat()})
     status = {
         "schemaVersion": 1, "provider": "FinMind authenticated free individual endpoints", "cacheVisibility": "private GitHub Actions cache; raw rows are not committed", "updatedAt": datetime.now(timezone.utc).isoformat(),
-        "scope": "current TWSE, TPEx and emerging stocks only", "requestBudget": {"perCompany": len(DATASETS), "batchSize": len(selected), "maximumRequestsPerRun": len(selected) * len(DATASETS), "designedHourlyLimit": 300},
+        "scope": "current TWSE, TPEx and emerging equities; six-year financials, prices, dividends and ex-right results", "requestBudget": {"perCompany": len(DATASETS), "batchSize": len(selected), "maximumRequestsPerRun": len(selected) * len(DATASETS), "designedHourlyLimit": 300},
         "coverage": {"universe": len(universe), "cached": len(reviewed), "unavailable": len(unavailable), "remaining": max(0, len(universe) - len(reviewed) - len(unavailable)), "complete": len(reviewed) + len(unavailable) >= len(universe)},
         "batch": {"requested": selected, "cached": cached, "failures": failures},
         "quotaLimited": any("402" in reason or "Payment Required" in reason for reason in failures.values()),
