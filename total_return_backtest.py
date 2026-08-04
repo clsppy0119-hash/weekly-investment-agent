@@ -153,22 +153,28 @@ def main() -> None:
     splits = {"train": calendar[:train_end], "validation": calendar[train_end:validation_end], "test": calendar[validation_end:]}
     results = {name: run_period(universe, days) for name, days in splits.items()}
     benchmark_results = {name: run_period({"0050": benchmark}, days, is_etf=True) for name, days in splits.items()}
-    passed = (
+    performance_passed = (
         results["validation"]["periods"] >= 5
         and results["test"]["periods"] >= 5
         and results["validation"]["totalReturn"] > benchmark_results["validation"]["totalReturn"]
         and results["test"]["totalReturn"] > benchmark_results["test"]["totalReturn"]
     )
+    stock_events = sum(item.stock_dividend_events for item in universe.values())
+    # Never promote a result that has not modelled the share-count adjustment
+    # for stock dividends.  Cash dividends are already reinvested, but using
+    # this result as a buy signal would otherwise overstate confidence.
+    promotion_blocked = stock_events > 0
     output = {
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
-        "status": "candidate" if passed else "rejected",
+        "status": "research_only" if performance_passed and promotion_blocked else ("candidate" if performance_passed else "rejected"),
         "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar)},
         "strategy": {"name": "60-day total-return momentum", "lookbackDays": LOOKBACK, "holdingDays": HOLDING, "picks": PICKS},
         "costs": {"buyFee": BUY_FEE, "sellFee": SELL_FEE, "stockSellTax": STOCK_SELL_TAX, "etfSellTax": ETF_SELL_TAX, "oneWaySlippageBps": SLIPPAGE_BPS},
-        "dividends": {"cash": "reinvested at ex-dividend date close", "stockDividendEvents": sum(item.stock_dividend_events for item in universe.values()), "limitation": "stock dividend share adjustments require licensed adjusted prices before a strategy can be promoted"},
+        "dividends": {"cash": "reinvested at ex-dividend date close", "stockDividendEvents": stock_events, "limitation": "stock dividend share adjustments require licensed adjusted prices before a strategy can be promoted"},
         "splits": {name: {"strategy": results[name], "benchmark0050": benchmark_results[name]} for name in splits},
         "promotionRule": "Both validation and untouched test must beat 0050 after costs, with at least 5 holding periods each.",
+        "promotionBlocked": promotion_blocked,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
