@@ -200,18 +200,30 @@ def main() -> None:
     # Never promote a result that has not modelled the share-count adjustment
     # for stock dividends.  Cash dividends are already reinvested, but using
     # this result as a buy signal would otherwise overstate confidence.
-    promotion_blocked = stock_events > 0 and not (stock_matches >= 20 and stock_error is not None and stock_error <= 0.03)
+    stock_adjustment_validated = stock_matches >= 20 and stock_error is not None and stock_error <= 0.03
+    # The current cache universe is assembled from companies that pass today's
+    # completeness gate.  Do not promote it until historical membership is
+    # reconstructed at each rebalance date, otherwise performance can contain
+    # survivorship bias.
+    point_in_time_universe = False
+    promotion_blocked = not stock_adjustment_validated or not point_in_time_universe
     output = {
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "status": "research_only" if performance_passed and promotion_blocked else ("candidate" if performance_passed else "rejected"),
-        "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar)},
+        "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar), "pointInTimeMembership": point_in_time_universe},
         "strategy": {"name": "60-day total-return momentum", "lookbackDays": LOOKBACK, "holdingDays": HOLDING, "picks": PICKS},
         "costs": {"buyFee": BUY_FEE, "sellFee": SELL_FEE, "stockSellTax": STOCK_SELL_TAX, "etfSellTax": ETF_SELL_TAX, "oneWaySlippageBps": SLIPPAGE_BPS},
         "dividends": {"cash": "reinvested at ex-dividend date close", "stockDividendEvents": stock_events, "stockDividendMatchedEvents": stock_matches, "stockDividendReferencePriceError": stock_error, "stock": "share count adjusted using validated ex-right reference-price mapping"},
         "splits": {name: {"strategy": results[name], "benchmark0050": benchmark_results[name]} for name in splits},
         "promotionRule": "Both validation and untouched test must beat 0050 after costs, with at least 5 holding periods each.",
         "promotionBlocked": promotion_blocked,
+        "promotionBlockers": [
+            blocker for blocker, active in {
+                "stock_dividend_adjustment": not stock_adjustment_validated,
+                "survivorship_bias": not point_in_time_universe,
+            }.items() if active
+        ],
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
