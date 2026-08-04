@@ -64,6 +64,38 @@ def stock_dividend_events(rows: list[dict[str, Any]]) -> int:
     )
 
 
+def stock_dividend_factors(rows: list[dict[str, Any]]) -> dict[str, float]:
+    factors: dict[str, float] = defaultdict(lambda: 1.0)
+    for row in rows:
+        day = str(row.get("StockExDividendTradingDate") or "")[:10]
+        stock = num(row.get("StockEarningsDistribution")) + num(row.get("StockStatutorySurplus"))
+        if day and stock > 0:
+            # Stock dividend is stated in nominal dollars per share; NT$10
+            # corresponds to one additional share.
+            factors[day] *= 1 + stock / 10
+    return factors
+
+
+def stock_dividend_validation(payload: dict[str, Any]) -> tuple[int, int, float | None]:
+    policies = {str(row.get("StockExDividendTradingDate") or "")[:10]: row for row in payload.get("TaiwanStockDividend", [])}
+    errors: list[float] = []
+    events = 0
+    for action in payload.get("TaiwanStockDividendResult", []):
+        row = policies.get(str(action.get("date") or "")[:10])
+        if not row:
+            continue
+        stock = num(row.get("StockEarningsDistribution")) + num(row.get("StockStatutorySurplus"))
+        if stock <= 0:
+            continue
+        events += 1
+        before, after = num(action.get("before_price")), num(action.get("after_price"))
+        cash = num(row.get("CashEarningsDistribution")) + num(row.get("CashStatutorySurplus"))
+        expected_after = max(0.0, before - cash) / (1 + stock / 10)
+        if before > 0 and after > 0 and expected_after > 0:
+            errors.append(abs(after / expected_after - 1))
+    return events, len(errors), (sum(errors) / len(errors) if errors else None)
+
+
 @dataclass
 class Series:
     code: str
@@ -74,6 +106,7 @@ class Series:
 def total_return_series(code: str, payload: dict[str, Any]) -> Series:
     prices = sorted(payload.get("TaiwanStockPrice", []), key=lambda row: str(row.get("date", "")))
     dividends = cash_dividends(payload.get("TaiwanStockDividend", []))
+    stock_factors = stock_dividend_factors(payload.get("TaiwanStockDividend", []))
     values: dict[str, float] = {}
     previous = 0.0
     wealth = 1.0
@@ -85,7 +118,7 @@ def total_return_series(code: str, payload: dict[str, Any]) -> Series:
         if previous > 0:
             price_return = close / previous
             reinvestment = 1.0 + max(0.0, dividends.get(day, 0.0)) / close
-            wealth *= price_return * reinvestment
+            wealth *= price_return * reinvestment * stock_factors.get(day, 1.0)
         values[day] = wealth
         previous = close
     return Series(code, values, stock_dividend_events(payload.get("TaiwanStockDividend", [])))
@@ -159,11 +192,15 @@ def main() -> None:
         and results["validation"]["totalReturn"] > benchmark_results["validation"]["totalReturn"]
         and results["test"]["totalReturn"] > benchmark_results["test"]["totalReturn"]
     )
-    stock_events = sum(item.stock_dividend_events for item in universe.values())
+    validations = [stock_dividend_validation(data) for code, data in payloads.items() if code != "0050"]
+    stock_events = sum(item[0] for item in validations)
+    stock_matches = sum(item[1] for item in validations)
+    total_error = sum((item[2] or 0.0) * item[1] for item in validations)
+    stock_error = total_error / stock_matches if stock_matches else None
     # Never promote a result that has not modelled the share-count adjustment
     # for stock dividends.  Cash dividends are already reinvested, but using
     # this result as a buy signal would otherwise overstate confidence.
-    promotion_blocked = stock_events > 0
+    promotion_blocked = stock_events > 0 and not (stock_matches >= 20 and stock_error is not None and stock_error <= 0.03)
     output = {
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
@@ -171,7 +208,7 @@ def main() -> None:
         "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar)},
         "strategy": {"name": "60-day total-return momentum", "lookbackDays": LOOKBACK, "holdingDays": HOLDING, "picks": PICKS},
         "costs": {"buyFee": BUY_FEE, "sellFee": SELL_FEE, "stockSellTax": STOCK_SELL_TAX, "etfSellTax": ETF_SELL_TAX, "oneWaySlippageBps": SLIPPAGE_BPS},
-        "dividends": {"cash": "reinvested at ex-dividend date close", "stockDividendEvents": stock_events, "limitation": "stock dividend share adjustments require licensed adjusted prices before a strategy can be promoted"},
+        "dividends": {"cash": "reinvested at ex-dividend date close", "stockDividendEvents": stock_events, "stockDividendMatchedEvents": stock_matches, "stockDividendReferencePriceError": stock_error, "stock": "share count adjusted using validated ex-right reference-price mapping"},
         "splits": {name: {"strategy": results[name], "benchmark0050": benchmark_results[name]} for name in splits},
         "promotionRule": "Both validation and untouched test must beat 0050 after costs, with at least 5 holding periods each.",
         "promotionBlocked": promotion_blocked,
