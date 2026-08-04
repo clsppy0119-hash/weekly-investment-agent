@@ -3,7 +3,8 @@ name: Cache total-return backtest data
 on:
   schedule:
     # Runs after the historical fundamentals cache and remains below the
-    # FinMind hourly request limit: 20 companies x 4 datasets.
+    # FinMind hourly request limit: 20 companies x 3 required datasets plus
+    # one optional adjusted-price cross-check.
     - cron: "27 * * * *"
   workflow_dispatch:
 

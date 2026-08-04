@@ -1,8 +1,7 @@
-"""Incrementally cache five-year price and corporate-action data for backtests.
+"""Incrementally cache eligible companies' total-return backtest inputs.
 
-Only companies that pass the historical completeness gate are eligible.  Raw
-FinMind responses are retained in the private Actions cache; the public status
-contains counts, date ranges and error classes only.
+Raw provider responses remain in the private Actions cache.  The committed
+status contains only coverage, date ranges and access-capability metadata.
 """
 
 from __future__ import annotations
@@ -22,12 +21,10 @@ from historical_data_quality import inspect_stock
 
 ROOT = Path(__file__).resolve().parent
 API = "https://api.finmindtrade.com/api/v4/data"
-DATASETS = (
-    "TaiwanStockPrice",
-    "TaiwanStockPriceAdj",
-    "TaiwanStockDividend",
-    "TaiwanStockDividendResult",
-)
+CORE_DATASETS = ("TaiwanStockPrice", "TaiwanStockDividend", "TaiwanStockDividendResult")
+# FinMind documents TaiwanStockPriceAdj as Backer/Sponsor-only.  It is never a
+# required input: total return is calculated from the legal core ledger.
+OPTIONAL_DATASETS = ("TaiwanStockPriceAdj",)
 
 
 def load(path: Path, default: Any) -> Any:
@@ -47,11 +44,10 @@ def eligible_codes(cache_dir: Path) -> list[str]:
 def fetch(dataset: str, code: str, start: str) -> list[dict[str, Any]]:
     token = os.environ.get("FINMIND_TOKEN", "").strip()
     if not token:
-        raise RuntimeError("缺少 FINMIND_TOKEN")
+        raise RuntimeError("missing FINMIND_TOKEN")
     query = {"dataset": dataset, "data_id": code, "start_date": start, "token": token}
     request = urllib.request.Request(
-        f"{API}?{urllib.parse.urlencode(query)}",
-        headers={"User-Agent": "weekly-investment-agent/1.0"},
+        f"{API}?{urllib.parse.urlencode(query)}", headers={"User-Agent": "weekly-investment-agent/1.0"}
     )
     with urllib.request.urlopen(request, timeout=30) as response:
         payload = json.load(response)
@@ -60,18 +56,25 @@ def fetch(dataset: str, code: str, start: str) -> list[dict[str, Any]]:
     return payload.get("data", [])
 
 
-def fetch_one(code: str, start: str) -> tuple[str, dict[str, list[dict[str, Any]]] | None, str | None]:
+def fetch_one(code: str, start: str) -> tuple[str, dict[str, list[dict[str, Any]]] | None, dict[str, str], str | None]:
     try:
-        payload = {dataset: fetch(dataset, code, start) for dataset in DATASETS}
+        payload = {dataset: fetch(dataset, code, start) for dataset in CORE_DATASETS}
     except Exception as error:
-        return code, None, f"{type(error).__name__}: {error}"
+        return code, None, {}, f"{type(error).__name__}: {error}"
+    optional_errors: dict[str, str] = {}
+    for dataset in OPTIONAL_DATASETS:
+        try:
+            payload[dataset] = fetch(dataset, code, start)
+        except Exception as error:
+            payload[dataset] = []
+            optional_errors[dataset] = f"{type(error).__name__}: {error}"
     if not payload["TaiwanStockPrice"]:
-        return code, None, "缺少歷史價格資料"
-    return code, payload, None
+        return code, None, optional_errors, "no price data"
+    return code, payload, optional_errors, None
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="快取五年回測所需的價格與公司行動資料")
+    parser = argparse.ArgumentParser(description="Cache total-return inputs incrementally")
     parser.add_argument("--cache-dir", type=Path, default=Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache")))
     parser.add_argument("--status", type=Path, default=ROOT / "data" / "backtest-data-cache-status.json")
     parser.add_argument("--batch-size", type=int, default=20)
@@ -79,8 +82,6 @@ def main() -> None:
     args = parser.parse_args()
 
     codes = eligible_codes(args.cache_dir)
-    # v2 adds adjusted prices and the dividend ledger.  Keep it separate from
-    # the earlier price-only cache so no backtest silently mixes data scopes.
     cache_dir = args.cache_dir / "finmind-backtest-v2"
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
@@ -91,48 +92,49 @@ def main() -> None:
 
     cached: dict[str, dict[str, Any]] = {}
     failures: dict[str, str] = {}
+    optional_errors: dict[str, int] = {dataset: 0 for dataset in OPTIONAL_DATASETS}
     with ThreadPoolExecutor(max_workers=2) as pool:
         futures = [pool.submit(fetch_one, code, start) for code in selected]
         for future in as_completed(futures):
-            code, payload, error = future.result()
+            code, payload, access_errors, error = future.result()
             if error:
-                if "缺少歷史價格" in error:
+                if error == "no price data":
                     unavailable[code] = error
                 else:
                     failures[code] = error
                 continue
             assert payload is not None
+            for dataset in access_errors:
+                optional_errors[dataset] = optional_errors.get(dataset, 0) + 1
             save(cache_dir / "stocks" / f"{code}.json", payload)
             prices = payload["TaiwanStockPrice"]
-            adjusted = payload["TaiwanStockPriceAdj"]
-            dividends = payload["TaiwanStockDividend"]
-            actions = payload["TaiwanStockDividendResult"]
             cached[code] = {
                 "priceRows": len(prices),
                 "firstPriceDate": min(str(row.get("date", "")) for row in prices),
                 "lastPriceDate": max(str(row.get("date", "")) for row in prices),
-                "adjustedPriceRows": len(adjusted),
-                "dividendRows": len(dividends),
-                "corporateActionRows": len(actions),
+                "adjustedPriceRows": len(payload["TaiwanStockPriceAdj"]),
+                "dividendRows": len(payload["TaiwanStockDividend"]),
+                "corporateActionRows": len(payload["TaiwanStockDividendResult"]),
             }
             reviewed.add(code)
 
-    save(progress_path, {
-        "reviewed": sorted(reviewed),
-        "unavailable": unavailable,
-        "updatedAt": datetime.now(timezone.utc).isoformat(),
-    })
+    save(progress_path, {"reviewed": sorted(reviewed), "unavailable": unavailable, "updatedAt": datetime.now(timezone.utc).isoformat()})
     status = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "provider": "FinMind authorised API",
         "scope": "five-year-ready semiconductor stocks only",
         "cacheVisibility": "private GitHub Actions cache; raw rows are not committed",
         "updatedAt": datetime.now(timezone.utc).isoformat(),
         "batch": {"requested": len(selected), "cached": cached, "unavailable": unavailable, "failures": failures},
+        "optionalDatasets": {
+            "TaiwanStockPriceAdj": {
+                "purpose": "cross-check only; total return uses raw price, dividends and ex-right results",
+                "availableThisBatch": len(selected) - optional_errors.get("TaiwanStockPriceAdj", 0),
+                "unavailableThisBatch": optional_errors.get("TaiwanStockPriceAdj", 0),
+            }
+        },
         "coverage": {
-            "eligible": len(codes),
-            "cached": len(reviewed),
-            "unavailable": len(unavailable),
+            "eligible": len(codes), "cached": len(reviewed), "unavailable": len(unavailable),
             "remaining": max(0, len(codes) - len(reviewed) - len(unavailable)),
         },
         "quotaLimited": any("402" in value or "Payment Required" in value for value in failures.values()),
