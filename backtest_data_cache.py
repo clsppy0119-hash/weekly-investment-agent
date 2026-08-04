@@ -22,7 +22,12 @@ from historical_data_quality import inspect_stock
 
 ROOT = Path(__file__).resolve().parent
 API = "https://api.finmindtrade.com/api/v4/data"
-DATASETS = ("TaiwanStockPrice", "TaiwanStockDividendResult")
+DATASETS = (
+    "TaiwanStockPrice",
+    "TaiwanStockPriceAdj",
+    "TaiwanStockDividend",
+    "TaiwanStockDividendResult",
+)
 
 
 def load(path: Path, default: Any) -> Any:
@@ -74,7 +79,9 @@ def main() -> None:
     args = parser.parse_args()
 
     codes = eligible_codes(args.cache_dir)
-    cache_dir = args.cache_dir / "finmind-backtest-v1"
+    # v2 adds adjusted prices and the dividend ledger.  Keep it separate from
+    # the earlier price-only cache so no backtest silently mixes data scopes.
+    cache_dir = args.cache_dir / "finmind-backtest-v2"
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
     reviewed = set(progress.get("reviewed", [])) & set(codes)
@@ -97,11 +104,15 @@ def main() -> None:
             assert payload is not None
             save(cache_dir / "stocks" / f"{code}.json", payload)
             prices = payload["TaiwanStockPrice"]
+            adjusted = payload["TaiwanStockPriceAdj"]
+            dividends = payload["TaiwanStockDividend"]
             actions = payload["TaiwanStockDividendResult"]
             cached[code] = {
                 "priceRows": len(prices),
                 "firstPriceDate": min(str(row.get("date", "")) for row in prices),
                 "lastPriceDate": max(str(row.get("date", "")) for row in prices),
+                "adjustedPriceRows": len(adjusted),
+                "dividendRows": len(dividends),
                 "corporateActionRows": len(actions),
             }
             reviewed.add(code)
