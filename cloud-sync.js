@@ -38,6 +38,12 @@
   const get = selector => document.querySelector(selector);
   const status = get('#cloudStatus'), message = get('#authMessage');
   const localPortfolio = () => JSON.parse(localStorage.getItem('tw-stock-dashboard-v3') || '{"transactions":[],"watchlist":[],"investStyle":"value"}');
+  const syncMarkerKey = () => user ? `tw-stock-dashboard-cloud-sync:${user.id}` : '';
+  const portfolioFingerprint = portfolio => JSON.stringify({
+    transactions: portfolio?.transactions || [],
+    watchlist: portfolio?.watchlist || [],
+    investStyle: portfolio?.investStyle || 'value'
+  });
   const originalSetItem = localStorage.setItem.bind(localStorage);
 
   function showMessage(text, isError = false) { message.textContent = text; message.style.color = isError ? '#b42318' : ''; }
@@ -68,13 +74,29 @@
     if (key === 'tw-stock-dashboard-v3') { clearTimeout(syncTimer); syncTimer = setTimeout(pushPortfolio, 800); }
   };
   async function loadPortfolio() {
-    const { data } = await db.from('user_portfolios').select('portfolio').eq('user_id', user.id).maybeSingle();
-    if (data?.portfolio && (data.portfolio.transactions?.length || data.portfolio.watchlist?.length)) {
-      if (confirm('載入此帳號的雲端資料並取代本機資料嗎？')) {
-        skipSync = true; originalSetItem('tw-stock-dashboard-v3', JSON.stringify(data.portfolio)); location.reload(); return;
-      }
+    const { data, error } = await db.from('user_portfolios').select('portfolio,updated_at').eq('user_id', user.id).maybeSingle();
+    if (error) { status.textContent = '雲端資料讀取失敗，保留本機資料'; return; }
+    if (!data?.portfolio) { await pushPortfolio(); return; }
+
+    const remoteFingerprint = portfolioFingerprint(data.portfolio);
+    const localFingerprint = portfolioFingerprint(localPortfolio());
+    const marker = localStorage.getItem(syncMarkerKey());
+    if (remoteFingerprint === localFingerprint || marker === remoteFingerprint) {
+      if (remoteFingerprint === localFingerprint) originalSetItem(syncMarkerKey(), remoteFingerprint);
+      status.textContent = '雲端資料已同步';
+      return;
     }
-    await pushPortfolio();
+
+    if (confirm('偵測到較新的雲端資料，要載入並取代本機資料嗎？')) {
+      skipSync = true;
+      originalSetItem('tw-stock-dashboard-v3', JSON.stringify(data.portfolio));
+      originalSetItem(syncMarkerKey(), remoteFingerprint);
+      location.reload();
+      return;
+    }
+
+    originalSetItem(syncMarkerKey(), remoteFingerprint);
+    status.textContent = '已保留本機資料；未覆蓋雲端';
   }
   async function setUser(nextUser) {
     const changed = user?.id !== nextUser?.id;
