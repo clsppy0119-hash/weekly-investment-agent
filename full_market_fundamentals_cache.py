@@ -1,8 +1,9 @@
 """Incrementally build a private current-market fundamentals cache.
 
 The free FinMind endpoint is queried only for companies currently present in
-TaiwanStockInfo (TWSE, TPEx and emerging).  At 75 companies x 3 datasets per
-hour the workflow stays under the documented 300-request hourly allowance.
+TaiwanStockInfo (TWSE, TPEx and emerging).  At 35 companies x 3 datasets per
+hour it leaves room for the concurrent 180-request backtest cache and stays
+under the documented 300-request hourly allowance.
 Raw rows never leave the private Actions cache.
 """
 
@@ -79,7 +80,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Cache current full-market free fundamentals incrementally")
     parser.add_argument("--cache-dir", type=Path, default=Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache")))
     parser.add_argument("--status", type=Path, default=ROOT / "data" / "full-market-fundamentals-status.json")
-    parser.add_argument("--batch-size", type=int, default=75)
+    parser.add_argument("--batch-size", type=int, default=35)
     parser.add_argument("--years", type=int, default=6)
     args = parser.parse_args()
     universe = current_universe()
@@ -89,7 +90,7 @@ def main() -> None:
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
     reviewed = set(progress.get("reviewed", [])) & set(universe)
     unavailable = {code: reason for code, reason in progress.get("unavailable", {}).items() if code in universe}
-    selected = [code for code in sorted(universe) if code not in reviewed and code not in unavailable][: max(1, min(75, args.batch_size))]
+    selected = [code for code in sorted(universe) if code not in reviewed and code not in unavailable][: max(1, min(35, args.batch_size))]
     start = f"{date.today().year - max(1, args.years)}-01-01"
     failures: dict[str, str] = {}
     cached: dict[str, dict[str, int]] = {}
