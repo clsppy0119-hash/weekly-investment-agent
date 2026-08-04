@@ -31,8 +31,27 @@ jobs:
           path: .private-data-cache
           key: full-market-fundamentals-v1-${{ runner.os }}-${{ github.run_id }}
           restore-keys: full-market-fundamentals-v1-${{ runner.os }}-
-      - name: Cache next current-market total-return input batch
-        run: python full_market_fundamentals_cache.py --batch-size "${{ inputs.batch_size || '48' }}"
+      - name: Cache next current-market total-return input batch (retry after transient failures)
+        shell: bash
+        run: |
+          # The scheduled run starts at :47.  If a transient provider/network
+          # failure occurs, retry at roughly :50, :53 and :56.  A successful
+          # attempt exits immediately, so it never fetches the same batch twice.
+          max_attempts=4
+          for attempt in $(seq 1 "$max_attempts"); do
+            if python full_market_fundamentals_cache.py --batch-size "${{ inputs.batch_size || '48' }}"; then
+              echo "Cache attempt ${attempt} succeeded."
+              exit 0
+            fi
+
+            if [ "$attempt" -lt "$max_attempts" ]; then
+              echo "Cache attempt ${attempt} failed; retrying in 3 minutes."
+              sleep 180
+            fi
+          done
+
+          echo "All ${max_attempts} cache attempts failed."
+          exit 1
       - name: Produce current-market research queue
         run: python current_market_screener.py
       - name: Upload non-sensitive status
