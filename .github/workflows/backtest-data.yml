@@ -33,6 +33,8 @@ jobs:
           path: .private-data-cache
           key: backtest-data-v2-${{ runner.os }}-${{ github.run_id }}
           restore-keys: backtest-data-v2-${{ runner.os }}-
+      - name: Cache historical semiconductor membership
+        run: python historical_semiconductor_universe.py
       - name: Cache next total-return batch
         run: python backtest_data_cache.py --batch-size 60
       - name: Inspect private input schema safely
@@ -44,4 +46,5 @@ jobs:
           path: |
             data/backtest-data-cache-status.json
             data/backtest-schema-status.json
+            data/historical-universe-status.json
           if-no-files-found: error
