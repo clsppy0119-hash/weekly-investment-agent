@@ -208,3 +208,23 @@ fetch('quotes.json',{cache:'no-store'}).then(response => response.json()).then(d
   };
 })();
 </script><script>document.querySelector('#tradeFee')?.setAttribute('hidden','');const feeHint=document.querySelector('#message');if(feeHint)feeHint.textContent='手續費由 Agent 以成交金額 0.1425%、最低 NT$ 20 自動估算；賣出另計證交稅。';</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="cloud-config.js"></script><script src="cloud-sync.js"></script><script src="research.js"></script><script src="portfolio-tools.js"></script><script src="risk-tools.js"></script><script src="agent-automation.js?v=industry-queue-v3"></script><script src="decision-trace.js?v=trace-panel-20260802"></script><style>[hidden]{display:none!important}.tabs button.active{background:var(--blue);color:#fff;border-color:var(--blue)}@media(max-width:600px){.tabs button.active{background:var(--blue);color:#fff}}</style></body></html>
+<script>
+(() => {
+  const normalize = () => {
+    const picker = document.querySelector('.strategy-picker');
+    if (picker) picker.remove();
+    if (typeof state !== 'undefined') state.investStyle = 'value';
+    const panel = document.querySelector('#strategy')?.closest('aside.card');
+    const heading = panel?.querySelector('h2');
+    if (heading) heading.textContent = '綜合建議';
+    const description = panel?.querySelector('p.label');
+    if (description) description.textContent = '綜合評估基本面、估值、趨勢、股利、風險與消息面。';
+    document.querySelectorAll('.strategy-tag').forEach(tag => {
+      if (/長期價值|短線|波段|股息成長/.test(tag.textContent)) tag.textContent = '綜合建議';
+    });
+  };
+  const previous = window.renderStrategy;
+  if (typeof previous === 'function') window.renderStrategy = items => { previous(items); normalize(); };
+  normalize();
+})();
+</script>
