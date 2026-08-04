@@ -1,0 +1,43 @@
+name: Cache total-return backtest data
+
+on:
+  schedule:
+    # Runs after the historical fundamentals cache and remains below the
+    # FinMind hourly request limit: 20 companies x 2 datasets.
+    - cron: "27 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cache-backtest-data:
+    runs-on: ubuntu-latest
+    env:
+      DATA_CACHE_DIR: .private-data-cache
+      FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Restore private historical cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .private-data-cache
+          key: historical-fundamentals-v1-${{ runner.os }}-unavailable
+          restore-keys: historical-fundamentals-v1-${{ runner.os }}-
+      - name: Restore private backtest cache
+        uses: actions/cache@v4
+        with:
+          path: .private-data-cache
+          key: backtest-data-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: backtest-data-v1-${{ runner.os }}-
+      - name: Cache next total-return batch
+        run: python backtest_data_cache.py --batch-size 20
+      - name: Upload non-sensitive cache status
+        uses: actions/upload-artifact@v4
+        with:
+          name: backtest-data-status
+          path: data/backtest-data-cache-status.json
+          if-no-files-found: error
