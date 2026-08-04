@@ -69,39 +69,49 @@ def main() -> None:
     parser.add_argument("--cache-dir", type=Path, default=Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache")))
     parser.add_argument("--output", type=Path, default=ROOT / "data" / "current-market-screen-status.json")
     args = parser.parse_args()
-    quotes = load(args.cache_dir / "official-market-v1" / "latest-quotes.json", {}).get("quotes", {})
-    snapshots = load(args.cache_dir / "official-fundamentals-v1" / "latest-snapshots.json", {})
-    source_names = {
-        "twse": ("twse_revenue", "twse_income", "twse_balance"),
-        "tpex": ("tpex_revenue", "tpex_income", "tpex_balance"),
-        "emerging": ("emerging_revenue", "emerging_income", "emerging_balance"),
-    }
+    cache = args.cache_dir / "full-market-fundamentals-v1"
+    universe = load(cache / "universe.json", {}).get("stocks", {})
+    progress = load(cache / "progress.json", {"reviewed": [], "unavailable": {}})
+    reviewed = {str(code) for code in progress.get("reviewed", [])}
+    unavailable = {str(code) for code in progress.get("unavailable", {})}
     candidates: list[dict[str, Any]] = []
     coverage: dict[str, Any] = {}
-    for market, names in source_names.items():
-        revenue, income, balance = (by_code(snapshots.get(name, [])) for name in names)
-        available = set(revenue) & set(income) & set(balance) & {key for key, item in quotes.items() if item.get("market") == market}
-        coverage[market] = {"quotes": sum(1 for item in quotes.values() if item.get("market") == market), "completeSnapshotRecords": len(available)}
+    for market in ("twse", "tpex", "emerging"):
+        codes = {code for code, item in universe.items() if item.get("market") == market}
+        available = codes & reviewed
+        coverage[market] = {"universe": len(codes), "completeFinancialRecords": len(available), "remaining": len(codes - reviewed - unavailable)}
         for stock_code in available:
-            revenue_value = number(pick(revenue[stock_code], REVENUE_KEYS))
-            revenue_yoy = number(pick(revenue[stock_code], REVENUE_YOY_KEYS))
-            operating_income = number(pick(income[stock_code], OPERATING_INCOME_KEYS))
-            assets = number(pick(balance[stock_code], ASSET_KEYS))
-            liabilities = number(pick(balance[stock_code], LIABILITY_KEYS))
+            raw = load(cache / "stocks" / f"{stock_code}.json", {})
+            statements, balance_rows, revenue_rows = raw.get("TaiwanStockFinancialStatements", []), raw.get("TaiwanStockBalanceSheet", []), raw.get("TaiwanStockMonthRevenue", [])
+            def latest_value(rows: list[dict[str, Any]], kind: str) -> float | None:
+                matches = [row for row in rows if row.get("type") == kind and isinstance(row.get("value"), (int, float))]
+                return float(max(matches, key=lambda row: str(row.get("date", "")))["value"]) if matches else None
+            revenue_yoy = None
+            revenue_by_month = {str(row.get("date", ""))[:7]: number(row.get("revenue")) for row in revenue_rows}
+            if revenue_by_month:
+                latest_month = max(revenue_by_month)
+                revenue_value = revenue_by_month.get(latest_month)
+                prior = f"{int(latest_month[:4]) - 1:04d}{latest_month[4:]}"
+                if revenue_by_month.get(latest_month) and revenue_by_month.get(prior):
+                    revenue_yoy = (revenue_by_month[latest_month] / revenue_by_month[prior] - 1) * 100
+            else:
+                revenue_value = None
+            operating_income = latest_value(statements, "OperatingIncome")
+            assets = latest_value(balance_rows, "TotalAssets")
+            liabilities = latest_value(balance_rows, "Liabilities")
             debt_ratio = liabilities / assets if assets and assets > 0 and liabilities is not None else None
             # These are transparent research-queue gates, not a buy signal.
             checks = {"positiveRevenue": revenue_value is not None and revenue_value > 0, "positiveRevenueYoy": revenue_yoy is not None and revenue_yoy > 0, "positiveOperatingIncome": operating_income is not None and operating_income > 0, "debtBelow50pct": debt_ratio is not None and debt_ratio < 0.5}
             score = sum(checks.values())
             if score >= 3:
-                quote = quotes[stock_code]
-                candidates.append({"code": stock_code, "name": quote.get("name", ""), "market": market, "close": quote.get("close", ""), "screenScore": score, "checks": checks, "revenueYoyPct": revenue_yoy, "debtRatio": debt_ratio, "classification": "priority_research_only"})
+                candidates.append({"code": stock_code, "name": universe[stock_code].get("name", ""), "industry": universe[stock_code].get("industry", ""), "market": market, "screenScore": score, "checks": checks, "revenueYoyPct": revenue_yoy, "debtRatio": debt_ratio, "classification": "priority_research_only"})
     candidates.sort(key=lambda row: (-row["screenScore"], -(row["revenueYoyPct"] or -10_000), row["code"]))
     output = {
-        "schemaVersion": 1, "generatedAt": datetime.now(timezone.utc).isoformat(), "status": "complete" if quotes and snapshots else "waiting_for_official_cache",
-        "scope": "Current TWSE/TPEx market only; no historical performance or investment recommendation is implied.",
-        "sources": "TWSE and TPEx official open-data snapshots", "coverage": coverage,
+        "schemaVersion": 1, "generatedAt": datetime.now(timezone.utc).isoformat(), "status": "complete" if universe and not (set(universe) - reviewed - unavailable) else "coverage_incomplete",
+        "scope": "Current TWSE/TPEx/emerging market only; no historical performance or investment recommendation is implied.",
+        "sources": "FinMind individual public financial datasets; cached privately", "coverage": coverage,
         "screen": {"rules": ["positive reported revenue", "positive latest disclosed revenue YoY", "positive operating income", "debt ratio below 50%"], "minimumScore": 3, "resultCount": len(candidates), "candidates": candidates[:50]},
-        "nextGate": "A candidate requires the 12-part research record and the separately validated historical backtest before any automated recommendation or Telegram push.",
+        "nextGate": "No candidates may be pushed until all current-market records are processed, then the 12-part research record and separately validated historical backtest must pass.",
     }
     save(args.output, output)
     print(json.dumps(output, ensure_ascii=False))
