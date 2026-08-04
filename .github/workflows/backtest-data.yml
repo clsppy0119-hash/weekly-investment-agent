@@ -35,6 +35,8 @@ jobs:
           restore-keys: backtest-data-v2-${{ runner.os }}-
       - name: Cache historical semiconductor membership
         run: python historical_semiconductor_universe.py
+      - name: Cache official listing history
+        run: python official_listing_history.py
       - name: Cache next total-return batch
         run: python backtest_data_cache.py --batch-size 60
       - name: Inspect private input schema safely
@@ -47,4 +49,5 @@ jobs:
             data/backtest-data-cache-status.json
             data/backtest-schema-status.json
             data/historical-universe-status.json
+            data/official-listing-history-status.json
           if-no-files-found: error
