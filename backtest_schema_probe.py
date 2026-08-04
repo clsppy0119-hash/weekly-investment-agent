@@ -32,13 +32,17 @@ def main() -> None:
     parser.add_argument("--status", type=Path, default=ROOT / "data" / "backtest-schema-status.json")
     args = parser.parse_args()
 
-    stock_dir = args.cache_dir / "finmind-backtest-v1" / "stocks"
+    stock_dir = args.cache_dir / "finmind-backtest-v2" / "stocks"
     samples = sorted(stock_dir.glob("*.json"))[:5]
     price_fields: set[str] = set()
+    adjusted_price_fields: set[str] = set()
+    dividend_fields: set[str] = set()
     action_fields: set[str] = set()
     for path in samples:
         payload = load(path)
         price_fields.update(fields(payload.get("TaiwanStockPrice", [])))
+        adjusted_price_fields.update(fields(payload.get("TaiwanStockPriceAdj", [])))
+        dividend_fields.update(fields(payload.get("TaiwanStockDividend", [])))
         action_fields.update(fields(payload.get("TaiwanStockDividendResult", [])))
     status = {
         "schemaVersion": 1,
@@ -46,6 +50,8 @@ def main() -> None:
         "updatedAt": datetime.now(timezone.utc).isoformat(),
         "sampledStocks": len(samples),
         "priceFields": sorted(price_fields),
+        "adjustedPriceFields": sorted(adjusted_price_fields),
+        "dividendFields": sorted(dividend_fields),
         "corporateActionFields": sorted(action_fields),
     }
     save(args.status, status)
