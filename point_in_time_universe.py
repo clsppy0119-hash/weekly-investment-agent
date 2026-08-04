@@ -17,11 +17,11 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent
 CODE_FIELDS = (
-    "公司代號", "證券代號", "有價證券代號", "股票代號", "股票代號及名稱",
+    "公司代號", "證券代號", "有價證券代號", "股票代號", "股票代號及名稱", "終止上市公司",
     "SecuritiesCompanyCode", "CompanyCode", "stock_id",
 )
 ENTRY_FIELDS = ("上市日期", "上櫃日期", "興櫃日期", "掛牌日期", "ListingDate", "DateOfListing", "list_date")
-EXIT_FIELDS = ("終止上市日期", "終止上櫃日期", "終止興櫃日期", "終止日期", "DelistingDate")
+EXIT_FIELDS = ("終止上市日期", "終止上櫃日期", "終止興櫃日期", "終止日期", "DelistingDate", "null")
 
 
 def load(path: Path, default: Any) -> Any:
