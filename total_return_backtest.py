@@ -171,11 +171,26 @@ def main() -> None:
     args = parser.parse_args()
     stocks = args.cache_dir / "finmind-backtest-v2" / "stocks"
     payloads = {path.stem: load(path) for path in stocks.glob("*.json")}
-    certification_path = args.cache_dir / "official-listing-history-v1" / "universe-certification.json"
+    official_dir = args.cache_dir / "official-listing-history-v1"
+    certification_path = official_dir / "universe-certification.json"
     universe_status = load(certification_path) if certification_path.exists() else {}
+    evidence_path = official_dir / "semiconductor-membership-evidence.json"
+    evidence = load(evidence_path) if evidence_path.exists() else {}
     if "0050" not in payloads:
         raise SystemExit("benchmark 0050 is not cached")
-    universe = {code: total_return_series(code, data) for code, data in payloads.items() if code != "0050"}
+    # The research run itself follows the same strict inclusion rule as the
+    # promotion gate: no official entry-date evidence, no stock in the run.
+    verified_codes = {
+        code for code, item in evidence.items()
+        if isinstance(item, dict) and item.get("entryDate") and not item.get("exitDate")
+    }
+    universe = {
+        code: total_return_series(code, data)
+        for code, data in payloads.items()
+        if code != "0050" and code in verified_codes
+    }
+    if not universe:
+        raise SystemExit("no officially verifiable stocks available for strict research backtest")
     benchmark = total_return_series("0050", payloads["0050"])
     # Do not intersect every constituent's calendar: that would discard the
     # early history merely because a later IPO did not yet exist.  The benchmark
@@ -215,7 +230,7 @@ def main() -> None:
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "status": "research_only" if performance_passed and promotion_blocked else ("candidate" if performance_passed else "rejected"),
-        "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar), "pointInTimeMembership": point_in_time_universe},
+        "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar), "pointInTimeMembership": point_in_time_universe, "inclusionRule": "official entry-date evidence only"},
         "strategy": {"name": "60-day total-return momentum", "lookbackDays": LOOKBACK, "holdingDays": HOLDING, "picks": PICKS},
         "costs": {"buyFee": BUY_FEE, "sellFee": SELL_FEE, "stockSellTax": STOCK_SELL_TAX, "etfSellTax": ETF_SELL_TAX, "oneWaySlippageBps": SLIPPAGE_BPS},
         "dividends": {"cash": "reinvested at ex-dividend date close", "stockDividendEvents": stock_events, "stockDividendMatchedEvents": stock_matches, "stockDividendReferencePriceError": stock_error, "stock": "share count adjusted using validated ex-right reference-price mapping"},
