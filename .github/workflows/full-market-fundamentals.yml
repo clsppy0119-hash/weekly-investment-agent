@@ -37,11 +37,21 @@ jobs:
           # The scheduled run starts at :47.  If a transient provider/network
           # failure occurs, retry at roughly :50, :53 and :56.  A successful
           # attempt exits immediately, so it never fetches the same batch twice.
+          set -o pipefail
           max_attempts=4
           for attempt in $(seq 1 "$max_attempts"); do
-            if python full_market_fundamentals_cache.py --batch-size "${{ inputs.batch_size || '48' }}"; then
+            attempt_log="$(mktemp)"
+            if python full_market_fundamentals_cache.py --batch-size "${{ inputs.batch_size || '48' }}" 2>&1 | tee "$attempt_log"; then
               echo "Cache attempt ${attempt} succeeded."
               exit 0
+            fi
+
+            # A provider quota/payment response cannot recover within nine
+            # minutes. Stop here rather than spending more requests; the next
+            # hourly schedule will resume automatically after quota recovery.
+            if grep -Eqi "HTTP[[:space:]]*402|Payment Required" "$attempt_log"; then
+              echo "Provider quota/payment limit detected; skipping retries for this hour."
+              exit 1
             fi
 
             if [ "$attempt" -lt "$max_attempts" ]; then
