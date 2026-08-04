@@ -28,6 +28,8 @@ jobs:
           path: .private-data-cache
           key: backtest-data-v2-${{ runner.os }}-latest
           restore-keys: backtest-data-v2-${{ runner.os }}-
+      - name: Verify strict point-in-time universe evidence
+        run: python point_in_time_universe.py
       - name: Run auditable total-return backtest
         run: python total_return_backtest.py
       - name: Audit stock-dividend adjustment mapping
@@ -39,3 +41,4 @@ jobs:
           path: |
             data/total-return-backtest-status.json
             data/corporate-action-audit-status.json
+            data/point-in-time-universe-status.json
