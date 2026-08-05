@@ -17,15 +17,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       },
       "decisionRecord": {
@@ -88,15 +88,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       },
       "decisionRecord": {
@@ -159,15 +159,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       },
       "decisionRecord": {
@@ -270,15 +270,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       }
     },
@@ -339,15 +339,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       }
     },
@@ -408,15 +408,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       }
     },
@@ -476,15 +476,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       }
     },
@@ -544,15 +544,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       }
     },
@@ -613,15 +613,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       }
     },
@@ -681,15 +681,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       }
     },
@@ -750,15 +750,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "20": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         },
         "60": {
           "status": "pending",
-          "observations": 1
+          "observations": 2
         }
       }
     },
@@ -818,15 +818,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         },
         "20": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         },
         "60": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         }
       }
     },
@@ -887,15 +887,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         },
         "20": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         },
         "60": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         }
       }
     },
@@ -956,15 +956,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         },
         "20": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         },
         "60": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         }
       }
     },
@@ -1024,15 +1024,15 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         },
         "20": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         },
         "60": {
           "status": "pending",
-          "observations": 0
+          "observations": 1
         }
       }
     }
