@@ -102,9 +102,12 @@ class Series:
     code: str
     values: dict[str, float]
     stock_dividend_events: int
+    entry_date: str | None = None
+    exit_date: str | None = None
 
 
-def total_return_series(code: str, payload: dict[str, Any]) -> Series:
+def total_return_series(code: str, payload: dict[str, Any], entry_date: str | None = None,
+                        exit_date: str | None = None) -> Series:
     prices = sorted(payload.get("TaiwanStockPrice", []), key=lambda row: str(row.get("date", "")))
     dividends = cash_dividends(payload.get("TaiwanStockDividend", []))
     stock_factors = stock_dividend_factors(payload.get("TaiwanStockDividend", []))
@@ -122,7 +125,7 @@ def total_return_series(code: str, payload: dict[str, Any]) -> Series:
             wealth *= price_return * reinvestment * stock_factors.get(day, 1.0)
         values[day] = wealth
         previous = close
-    return Series(code, values, stock_dividend_events(payload.get("TaiwanStockDividend", [])))
+    return Series(code, values, stock_dividend_events(payload.get("TaiwanStockDividend", [])), entry_date, exit_date)
 
 
 def official_benchmark_series(path: Path) -> Series:
@@ -170,6 +173,10 @@ def run_period(series: dict[str, Series], dates: list[str], is_etf: bool = False
         signal, entry, exit_ = dates[index], dates[index + 1], dates[index + holding]
         ranked = []
         for code, item in series.items():
+            if item.entry_date and signal < item.entry_date:
+                continue
+            if item.exit_date and exit_ >= item.exit_date:
+                continue
             if signal in item.values and dates[index - lookback] in item.values and entry in item.values and exit_ in item.values:
                 momentum = item.values[signal] / item.values[dates[index - lookback]] - 1
                 if ranking_mode == "risk_adjusted":
@@ -217,10 +224,15 @@ def main() -> None:
     }
     verified_codes = {
         code for code, item in evidence.items()
-        if isinstance(item, dict) and item.get("entryDate") and not item.get("exitDate")
+        if isinstance(item, dict) and item.get("entryDate")
     }
     universe = {
-        code: total_return_series(code, data)
+        code: total_return_series(
+            code,
+            data,
+            evidence.get(code, {}).get("entryDate"),
+            evidence.get(code, {}).get("exitDate"),
+        )
         for code, data in payloads.items()
         if code != "0050" and (code in verified_codes or code in fixed_codes)
     }
