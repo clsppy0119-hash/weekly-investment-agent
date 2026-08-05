@@ -153,7 +153,7 @@ def main() -> None:
         str(row.get("stock_id", "")) for row in delisted_rows
         if str(row.get("stock_id", "")).isdigit()
     }
-    priority_path = args.cache_dir / "point-in-time-snapshots-v1" / "missing-price-codes.json"
+    priority_path = args.cache_dir / "point-in-time-snapshots-v2" / "missing-price-codes.json"
     priority_codes = set(load(priority_path, [])) if priority_path.exists() else set()
     pending = [code for code in codes if code not in reviewed and code not in unavailable]
     # First fill codes proven to exist in an official rebalance-date snapshot;

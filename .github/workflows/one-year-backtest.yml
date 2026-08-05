@@ -44,10 +44,10 @@ jobs:
       - name: Restore and save official point-in-time snapshots
         uses: actions/cache@v4
         with:
-          path: .private-data-cache/point-in-time-snapshots-v1
-          key: market-membership-v1-${{ runner.os }}-${{ github.run_id }}
+          path: .private-data-cache/point-in-time-snapshots-v2
+          key: market-membership-v2-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            market-membership-v1-${{ runner.os }}-
+            market-membership-v2-${{ runner.os }}-
       - name: Restore durable total-return rows when cache is empty
         if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
         shell: bash

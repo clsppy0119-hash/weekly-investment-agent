@@ -51,9 +51,9 @@ jobs:
       - name: Restore official point-in-time snapshots
         uses: actions/cache/restore@v4
         with:
-          path: .private-data-cache/point-in-time-snapshots-v1
-          key: market-membership-v1-${{ runner.os }}-latest
-          restore-keys: market-membership-v1-${{ runner.os }}-
+          path: .private-data-cache/point-in-time-snapshots-v2
+          key: market-membership-v2-${{ runner.os }}-latest
+          restore-keys: market-membership-v2-${{ runner.os }}-
       - name: Restore durable Supabase rows when cache is empty or explicitly requested
         if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
         shell: bash

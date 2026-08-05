@@ -23,7 +23,8 @@ from backtest import fetch_day, number
 
 ROOT = Path(__file__).resolve().parent
 TPEx_URL = "https://www.tpex.org.tw/www/zh-tw/afterTrading/otc"
-SNAPSHOT_VERSION = 1
+SNAPSHOT_VERSION = 2
+SNAPSHOT_DIR_NAME = "point-in-time-snapshots-v2"
 
 
 def ordinary_stock(code: object) -> str:
@@ -93,7 +94,7 @@ def collect_one(day: str, output: Path) -> dict[str, Any]:
     if output.exists():
         try:
             cached = json.loads(output.read_text(encoding="utf-8-sig"))
-            if cached.get("twse") is not None and cached.get("tpex") is not None:
+            if cached.get("schemaVersion") == SNAPSHOT_VERSION and cached.get("twse") is not None and cached.get("tpex") is not None:
                 return cached
         except (OSError, json.JSONDecodeError):
             pass
@@ -162,7 +163,7 @@ def main() -> None:
     args = parser.parse_args()
     calendar = benchmark_calendar(args.cache_dir)
     required = signal_dates(calendar)
-    snapshot_dir = args.cache_dir / "point-in-time-snapshots-v1"
+    snapshot_dir = args.cache_dir / SNAPSHOT_DIR_NAME
     snapshot_dir.mkdir(parents=True, exist_ok=True)
     missing = [day for day in required if not (snapshot_dir / f"{day}.json").exists()]
     with ThreadPoolExecutor(max_workers=max(1, min(args.workers, 2))) as pool:

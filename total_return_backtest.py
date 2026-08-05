@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from market_membership_snapshots import load_membership
+from market_membership_snapshots import SNAPSHOT_DIR_NAME, load_membership
 
 
 ROOT = Path(__file__).resolve().parent
@@ -229,7 +229,7 @@ def main() -> None:
     official_dir = args.cache_dir / "official-listing-history-v1"
     certification_path = official_dir / "universe-certification.json"
     universe_status = load(certification_path) if certification_path.exists() else {}
-    snapshot_dir = args.cache_dir / "point-in-time-snapshots-v1"
+    snapshot_dir = args.cache_dir / SNAPSHOT_DIR_NAME
     snapshot_status_path = ROOT / "data" / "market-membership-snapshot-status.json"
     snapshot_status = load(snapshot_status_path) if snapshot_status_path.exists() else {}
     membership_by_date = load_membership(snapshot_dir)
