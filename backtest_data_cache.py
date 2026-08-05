@@ -134,6 +134,7 @@ def main() -> None:
                 skipped = dict(previous)
                 skipped["updatedAt"] = datetime.now(timezone.utc).isoformat()
                 skipped["skippedDueToQuota"] = True
+                skipped["batch"] = {"requested": 0, "cached": {}, "unavailable": {}, "failures": {}}
                 save(args.status, skipped)
                 print(json.dumps(skipped, ensure_ascii=False))
                 return

@@ -60,11 +60,23 @@ def collect(cache_dir: Path, paths: list[Path] | None = None) -> tuple[list[dict
     return daily, actions
 
 
+def paths_from_batch_status(stock_dir: Path, status_path: Path) -> list[Path] | None:
+    """Return files created by the current batch, or None for legacy fallback."""
+    if not status_path.exists():
+        return None
+    status = load(status_path)
+    cached = status.get("batch", {}).get("cached")
+    if not isinstance(cached, dict):
+        return None
+    return [stock_dir / f"{code}.json" for code in sorted(cached) if (stock_dir / f"{code}.json").exists()]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cache-dir", type=Path, default=Path(os.environ.get("DATA_CACHE_DIR", ".private-data-cache")))
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--batch-size", type=int, default=500)
+    parser.add_argument("--status", type=Path, default=Path("data/backtest-data-cache-status.json"))
     args = parser.parse_args()
     stock_dir = args.cache_dir / "finmind-backtest-v2" / "stocks"
     manifest_path = args.cache_dir / "supabase-sync-v1" / "manifest.json"
@@ -72,11 +84,14 @@ def main() -> None:
     paths = sorted(stock_dir.glob("*.json"))
     changed: list[Path] = []
     next_manifest: dict[str, str] = {}
+    batch_paths = paths_from_batch_status(stock_dir, args.status)
     for path in paths:
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         next_manifest[path.name] = digest
-        if manifest.get(path.name) != digest:
+        if batch_paths is None and manifest.get(path.name) != digest:
             changed.append(path)
+    if batch_paths is not None:
+        changed = batch_paths
     daily, actions = collect(args.cache_dir, changed)
     summary = {"stockFiles": len(paths), "changedFiles": len(changed), "dailyRows": len(daily), "actionRows": len(actions), "dryRun": args.dry_run}
     if args.dry_run:

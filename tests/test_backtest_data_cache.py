@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 import backtest_data_cache
+import supabase_data_sync
 
 
 class BacktestCacheTests(unittest.TestCase):
@@ -18,6 +19,17 @@ class BacktestCacheTests(unittest.TestCase):
             (stock_dir / "2330.json").write_text("{}", encoding="utf-8")
             (stock_dir / "note.txt").write_text("ignore", encoding="utf-8")
             self.assertEqual(backtest_data_cache.existing_cached_codes(stock_dir), {"2330"})
+
+    def test_supabase_sync_uses_only_current_batch_files(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            stocks = root / "stocks"
+            stocks.mkdir()
+            (stocks / "2330.json").write_text("{}", encoding="utf-8")
+            (stocks / "2454.json").write_text("{}", encoding="utf-8")
+            status = root / "status.json"
+            status.write_text(json.dumps({"batch": {"cached": {"2454": {}}}}), encoding="utf-8")
+            self.assertEqual(supabase_data_sync.paths_from_batch_status(stocks, status), [stocks / "2454.json"])
 
     def test_all_market_universe_has_priority(self):
         with tempfile.TemporaryDirectory() as folder:
