@@ -8,6 +8,7 @@ so reruns are idempotent and do not depend on Actions cache retention.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import urllib.parse
@@ -37,10 +38,10 @@ def post(url: str, key: str, table: str, rows: list[dict]) -> None:
             raise RuntimeError(f"Supabase {table} returned HTTP {response.status}")
 
 
-def collect(cache_dir: Path) -> tuple[list[dict], list[dict]]:
+def collect(cache_dir: Path, paths: list[Path] | None = None) -> tuple[list[dict], list[dict]]:
     daily: list[dict] = []
     actions: list[dict] = []
-    for path in sorted((cache_dir / "finmind-backtest-v2" / "stocks").glob("*.json")):
+    for path in sorted(paths or (cache_dir / "finmind-backtest-v2" / "stocks").glob("*.json")):
         payload = load(path)
         code = path.stem
         for row in payload.get("TaiwanStockPrice", []):
@@ -65,8 +66,19 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--batch-size", type=int, default=500)
     args = parser.parse_args()
-    daily, actions = collect(args.cache_dir)
-    summary = {"dailyRows": len(daily), "actionRows": len(actions), "dryRun": args.dry_run}
+    stock_dir = args.cache_dir / "finmind-backtest-v2" / "stocks"
+    manifest_path = args.cache_dir / "supabase-sync-v1" / "manifest.json"
+    manifest = load(manifest_path) if manifest_path.exists() else {}
+    paths = sorted(stock_dir.glob("*.json"))
+    changed: list[Path] = []
+    next_manifest: dict[str, str] = {}
+    for path in paths:
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        next_manifest[path.name] = digest
+        if manifest.get(path.name) != digest:
+            changed.append(path)
+    daily, actions = collect(args.cache_dir, changed)
+    summary = {"stockFiles": len(paths), "changedFiles": len(changed), "dailyRows": len(daily), "actionRows": len(actions), "dryRun": args.dry_run}
     if args.dry_run:
         print(json.dumps(summary, ensure_ascii=False))
         return
@@ -77,6 +89,8 @@ def main() -> None:
     for table, rows in (("investment_market_daily", daily), ("investment_corporate_actions", actions)):
         for start in range(0, len(rows), max(1, args.batch_size)):
             post(url, key, table, rows[start:start + args.batch_size])
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(next_manifest, ensure_ascii=False, sort_keys=True), encoding="utf-8")
     print(json.dumps(summary | {"persisted": True, "finishedAt": datetime.now(timezone.utc).isoformat()}, ensure_ascii=False))
 
 
