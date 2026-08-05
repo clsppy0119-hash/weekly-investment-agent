@@ -1,4 +1,4 @@
-"""Download official TWSE daily data and run a leakage-resistant 1-year backtest.
+"""Download official TWSE daily data and run a leakage-resistant rolling backtest.
 
 The first version intentionally covers listed stocks only.  It uses the public
 TWSE daily closing file, does not use today's stock universe for past dates,
@@ -325,16 +325,16 @@ def report(path: Path, output: Path, benchmark_path: Path = DEFAULT_BENCHMARK) -
     output.parent.mkdir(parents=True, exist_ok=True)
     output.with_suffix(".json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     output.write_text("\n".join([
-        "【近一年上市股票樣本外回測】",
+        "【官方上市股票滾動樣本外回測】",
         f"資料區間：{dates[0]} 至 {dates[-1]}，共 {len(history)} 個交易日（僅上市股票）。",
         f"訓練／驗證／測試：{len(train)}／{len(validation)}／{len(test)} 個交易日。",
         f"訓練選出的參數：動能 {chosen['lookback']} 日、持有前 {chosen['count']} 檔、持有 {chosen['holding']} 日。",
         f"驗證期：報酬 {pct(validation_result['return'])}，最大回撤 {pct(validation_result['mdd'])}，勝率 {pct(validation_result['win_rate'])}，{validation_result['trades']} 次再平衡。",
         f"保留測試期：報酬 {pct(test_result['return'])}，最大回撤 {pct(test_result['mdd'])}，勝率 {pct(test_result['win_rate'])}，{test_result['trades']} 次再平衡。",
-        f"0050 價格報酬（同測試期、含 ETF 費稅假設）：{pct(benchmark)}。",
+        f"0050 官方總報酬指數（同測試期、含 ETF 費稅假設）：{pct(benchmark)}。",
         "結論：可列入下一輪候選。" if passed else "結論：不採用此參數作正式推薦；保留測試未跑贏 0050，需增加資料期間或改良訊號後再驗證。",
-        "成本已計入：買進手續費 0.1425%、賣出手續費 0.1425%、股票賣出證交稅 0.3%。",
-        "限制：未計入股利／除權息還原、滑價、融資券與上櫃股票；結果不構成投資建議。",
+        "成本已計入：買進手續費 0.1425%、賣出手續費 0.1425%、股票賣出證交稅 0.3%、單邊滑價 10 bps。",
+        "限制：此官方日行情分支未自行還原股利／除權息，會由同輪總報酬回測交叉驗證；尚未涵蓋上櫃股票，結果不構成投資建議。",
     ]) + "\n", encoding="utf-8")
     print(output.read_text(encoding="utf-8"))
 
