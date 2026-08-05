@@ -25,7 +25,11 @@ jobs:
       - name: Download one year of official TWSE data
         run: python backtest.py collect --days 365
       - name: Run train validation test backtest
-        run: python backtest.py report
+        run: python backtest.py report --benchmark backtest_data/tai50_total_return.json
+      - name: Run rolling out-of-sample validation
+        run: python walk_forward.py --history backtest_data/twse_daily.jsonl --benchmark backtest_data/tai50_total_return.json --output backtest_data/walk-forward-status.json
+      - name: Evaluate investment-advice gate
+        run: python investment_advice_gate.py --one-year backtest_data/one_year_backtest.json --rolling backtest_data/walk-forward-status.json --output backtest_data/investment-advice-gate.json
       - name: Upload backtest result
         uses: actions/upload-artifact@v4
         with:

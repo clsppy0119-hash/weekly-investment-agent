@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T08:41:19.740714+00:00",
+  "status": "rejected",
+  "universe": {
+    "stocks": 20,
+    "benchmark": "0050",
+    "benchmarkTradingDays": 243,
+    "pointInTimeMembership": false,
+    "inclusionRule": "explicit fixed basket"
+  },
+  "strategy": {
+    "name": "60-day total-return momentum",
+    "lookbackDays": 60,
+    "holdingDays": 20,
+    "picks": 5
+  },
+  "costs": {
+    "buyFee": 0.001425,
+    "sellFee": 0.001425,
+    "stockSellTax": 0.003,
+    "etfSellTax": 0.001,
+    "oneWaySlippageBps": 10
+  },
+  "dividends": {
+    "cash": "reinvested at ex-dividend date close",
+    "stockDividendEvents": 2,
+    "stockDividendMatchedEvents": 2,
+    "stockDividendReferencePriceError": 1.4121617500306716e-05,
+    "stock": "share count adjusted using validated ex-right reference-price mapping"
+  },
+  "splits": {
+    "train": {
+      "strategy": {
+        "totalReturn": 0.10263704383082106,
+        "annualizedReturn": 0.18507243254989625,
+        "mdd": -0.023175029642920952,
+        "periods": 4,
+        "trades": 20
+      },
+      "benchmark0050": {
+        "totalReturn": 0.1827310155326105,
+        "annualizedReturn": 0.33866163373200053,
+        "mdd": 0.0,
+        "periods": 4,
+        "trades": 4
+      }
+    },
+    "validation": {
+      "strategy": {
+        "totalReturn": 0.0,
+        "annualizedReturn": 0.0,
+        "mdd": 0.0,
+        "periods": 0,
+        "trades": 0
+      },
+      "benchmark0050": {
+        "totalReturn": 0.0,
+        "annualizedReturn": 0.0,
+        "mdd": 0.0,
+        "periods": 0,
+        "trades": 0
+      }
+    },
+    "test": {
+      "strategy": {
+        "totalReturn": 0.0,
+        "annualizedReturn": 0.0,
+        "mdd": 0.0,
+        "periods": 0,
+        "trades": 0
+      },
+      "benchmark0050": {
+        "totalReturn": 0.0,
+        "annualizedReturn": 0.0,
+        "mdd": 0.0,
+        "periods": 0,
+        "trades": 0
+      }
+    }
+  },
+  "promotionRule": "Both validation and untouched test must beat 0050 after costs, with at least 5 holding periods each.",
+  "promotionBlocked": true,
+  "promotionBlockers": [
+    "stock_dividend_adjustment",
+    "survivorship_bias",
+    "fixed_universe_only",
+    "short_history"
+  ]
+}

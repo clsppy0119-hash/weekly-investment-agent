@@ -1,8 +1,8 @@
 name: Cache total-return backtest data
 
 on:
-  # Automatic backtest collection is paused until first-stage full-market
-  # coverage is complete. Keep manual dispatch available for diagnostics.
+  schedule:
+    - cron: "*/30 * * * *"
   workflow_dispatch:
     inputs:
       codes:
@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: backtest-data-cache
+  cancel-in-progress: false
+
 jobs:
   cache-backtest-data:
     runs-on: ubuntu-latest
@@ -20,6 +24,8 @@ jobs:
       DATA_CACHE_DIR: .private-data-cache
       FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
       FIXED_UNIVERSE_CODES: ${{ inputs.codes || vars.FIXED_UNIVERSE_CODES }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -31,7 +37,7 @@ jobs:
           path: .private-data-cache
           key: historical-fundamentals-v1-${{ runner.os }}-unavailable
           restore-keys: historical-fundamentals-v1-${{ runner.os }}-
-      - name: Restore private backtest cache
+      - name: Restore and save private backtest cache
         uses: actions/cache@v4
         with:
           path: .private-data-cache
@@ -39,14 +45,19 @@ jobs:
           restore-keys: backtest-data-v2-${{ runner.os }}-
       - name: Cache historical semiconductor membership
         run: python historical_semiconductor_universe.py
+      - name: Refresh all-market universe queue
+        run: python all_market_universe.py
       - name: Cache official listing history
         run: python official_listing_history.py
       - name: Verify point-in-time universe evidence
         run: python point_in_time_universe.py
       - name: Cache next total-return batch
-        run: python backtest_data_cache.py --batch-size 60
+        run: python backtest_data_cache.py --batch-size 35
       - name: Inspect private input schema safely
         run: python backtest_schema_probe.py
+      - name: Persist historical rows to Supabase
+        if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
+        run: python supabase_data_sync.py --cache-dir .private-data-cache
       - name: Upload non-sensitive cache status
         uses: actions/upload-artifact@v4
         with:

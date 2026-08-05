@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T08:48:38.005646+00:00",
+  "status": "research_only",
+  "adviceEnabled": false,
+  "verdict": "禁止產生買賣建議",
+  "blockers": [
+    "one_year_out_of_sample_failed",
+    "stock_dividend_adjustment",
+    "survivorship_bias",
+    "fixed_universe_only",
+    "total_return_not_candidate",
+    "one_or_more_rolling_windows_failed"
+  ],
+  "rule": "只有公平0050總報酬基準、未觸碰測試集通過，且總報酬研究閘門開啟時才可建議"
+}

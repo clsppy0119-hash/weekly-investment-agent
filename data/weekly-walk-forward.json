@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T08:45:54.912667+00:00",
+  "status": "research_only",
+  "promotionPassed": false,
+  "universe": {
+    "stocks": 20,
+    "fixedBasket": true,
+    "survivorshipBiasRisk": true
+  },
+  "windows": [
+    {
+      "from": "2023-01-03",
+      "to": "2025-02-06",
+      "parameters": {
+        "lookback": 40,
+        "holding": 20,
+        "picks": 3
+      },
+      "validation": {
+        "strategy": -0.1317349180115337,
+        "benchmark": 0.12544135828229086,
+        "periods": 2
+      },
+      "test": {
+        "strategy": -0.1828427388392483,
+        "benchmark": 0.1513809441344809,
+        "periods": 2
+      },
+      "passed": false
+    },
+    {
+      "from": "2023-06-12",
+      "to": "2025-07-10",
+      "parameters": {
+        "lookback": 40,
+        "holding": 20,
+        "picks": 3
+      },
+      "validation": {
+        "strategy": -0.1828427388392483,
+        "benchmark": 0.1513809441344809,
+        "periods": 2
+      },
+      "test": {
+        "strategy": 0.22376053987512412,
+        "benchmark": -0.010398148961345943,
+        "periods": 2
+      },
+      "passed": false
+    },
+    {
+      "from": "2023-11-07",
+      "to": "2025-12-03",
+      "parameters": {
+        "lookback": 60,
+        "holding": 20,
+        "picks": 5
+      },
+      "validation": {
+        "strategy": 0.13992706332059135,
+        "benchmark": -0.010398148961345943,
+        "periods": 1
+      },
+      "test": {
+        "strategy": 0.25315472750960555,
+        "benchmark": 0.25703581430931166,
+        "periods": 1
+      },
+      "passed": false
+    },
+    {
+      "from": "2024-04-10",
+      "to": "2026-05-11",
+      "parameters": {
+        "lookback": 40,
+        "holding": 10,
+        "picks": 5
+      },
+      "validation": {
+        "strategy": 0.14943271127209834,
+        "benchmark": 0.25703581430931166,
+        "periods": 5
+      },
+      "test": {
+        "strategy": 0.12627565585313372,
+        "benchmark": 0.5703478800832396,
+        "periods": 5
+      },
+      "passed": false
+    }
+  ],
+  "blockers": [
+    "one_or_more_rolling_windows_failed",
+    "fixed_universe_only",
+    "benchmark_reconstructed_from_etf"
+  ],
+  "rule": "每個滾動窗口的驗證期與未觸碰測試期都必須扣除成本後跑贏 0050；至少三個窗口且不得有失敗窗口。"
+}

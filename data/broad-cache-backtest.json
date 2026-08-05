@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T08:51:19.287913+00:00",
+  "status": "research_only",
+  "universe": {
+    "stocks": 80,
+    "benchmark": "0050",
+    "benchmarkTradingDays": 864,
+    "pointInTimeMembership": false,
+    "inclusionRule": "explicit fixed basket"
+  },
+  "strategy": {
+    "name": "60-day total-return momentum",
+    "lookbackDays": 60,
+    "holdingDays": 20,
+    "picks": 5
+  },
+  "costs": {
+    "buyFee": 0.001425,
+    "sellFee": 0.001425,
+    "stockSellTax": 0.003,
+    "etfSellTax": 0.001,
+    "oneWaySlippageBps": 10
+  },
+  "dividends": {
+    "cash": "reinvested at ex-dividend date close",
+    "stockDividendEvents": 25,
+    "stockDividendMatchedEvents": 25,
+    "stockDividendReferencePriceError": 0.00011531256300756354,
+    "stock": "share count adjusted using validated ex-right reference-price mapping"
+  },
+  "splits": {
+    "train": {
+      "strategy": {
+        "totalReturn": 0.6634516083017545,
+        "annualizedReturn": 0.28090954437098836,
+        "mdd": -0.15018649187050814,
+        "periods": 22,
+        "trades": 110
+      },
+      "benchmark0050": {
+        "totalReturn": 0.39178132885505956,
+        "annualizedReturn": 0.17447926609518305,
+        "mdd": -0.1479948762515435,
+        "periods": 22,
+        "trades": 22
+      }
+    },
+    "validation": {
+      "strategy": {
+        "totalReturn": 0.7236339940162653,
+        "annualizedReturn": 1.2101261757446493,
+        "mdd": -0.0009396887542825194,
+        "periods": 5,
+        "trades": 25
+      },
+      "benchmark0050": {
+        "totalReturn": 0.37521139148355,
+        "annualizedReturn": 0.5905799939194962,
+        "mdd": 0.0,
+        "periods": 5,
+        "trades": 5
+      }
+    },
+    "test": {
+      "strategy": {
+        "totalReturn": 0.30883226240635464,
+        "annualizedReturn": 0.47998993707918935,
+        "mdd": -0.10875685735249463,
+        "periods": 5,
+        "trades": 25
+      },
+      "benchmark0050": {
+        "totalReturn": 0.2120741309146792,
+        "annualizedReturn": 0.32334343148266664,
+        "mdd": -0.08364385318185596,
+        "periods": 5,
+        "trades": 5
+      }
+    }
+  },
+  "promotionRule": "Both validation and untouched test must beat 0050 after costs, with at least 5 holding periods each.",
+  "promotionBlocked": true,
+  "promotionBlockers": [
+    "survivorship_bias",
+    "fixed_universe_only"
+  ]
+}

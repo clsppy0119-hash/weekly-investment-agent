@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-05T08:57:32.909155+00:00",
+  "status": "research_only",
+  "promotionPassed": false,
+  "universe": {
+    "stocks": 73,
+    "fixedBasket": true,
+    "survivorshipBiasRisk": true
+  },
+  "benchmark": {
+    "source": "TWSE official Taiwan 50 total-return index",
+    "tradingDays": 864
+  },
+  "windows": [
+    {
+      "from": "2023-01-03",
+      "to": "2025-04-22",
+      "parameters": {
+        "lookback": 20,
+        "holding": 20,
+        "picks": 3,
+        "ranking": "momentum"
+      },
+      "validation": {
+        "strategy": 0.39423914150979833,
+        "benchmark": 0.4265353595528285,
+        "periods": 6
+      },
+      "test": {
+        "strategy": -0.3480028381963295,
+        "benchmark": -0.1277212114798928,
+        "periods": 6
+      },
+      "passed": false
+    },
+    {
+      "from": "2023-08-24",
+      "to": "2025-11-26",
+      "parameters": {
+        "lookback": 60,
+        "holding": 10,
+        "picks": 3,
+        "ranking": "risk_adjusted"
+      },
+      "validation": {
+        "strategy": -0.1872742467851909,
+        "benchmark": -0.1277212114798928,
+        "periods": 8
+      },
+      "test": {
+        "strategy": 0.8067822195586318,
+        "benchmark": 0.5096122882407248,
+        "periods": 8
+      },
+      "passed": false
+    },
+    {
+      "from": "2024-04-10",
+      "to": "2026-07-15",
+      "parameters": {
+        "lookback": 20,
+        "holding": 20,
+        "picks": 3,
+        "ranking": "risk_adjusted"
+      },
+      "validation": {
+        "strategy": 0.3498826635908834,
+        "benchmark": 0.5096122882407248,
+        "periods": 6
+      },
+      "test": {
+        "strategy": 0.7497037198244607,
+        "benchmark": 0.7303169893032693,
+        "periods": 6
+      },
+      "passed": false
+    }
+  ],
+  "blockers": [
+    "one_or_more_rolling_windows_failed",
+    "fixed_universe_only"
+  ],
+  "rule": "每個滾動窗口的驗證期與未觸碰測試期都必須扣除成本後跑贏 0050；至少三個窗口且不得有失敗窗口。"
+}

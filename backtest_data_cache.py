@@ -29,7 +29,7 @@ BENCHMARK_CODES = ("0050",)
 
 
 def load(path: Path, default: Any) -> Any:
-    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
+    return json.loads(path.read_text(encoding="utf-8-sig")) if path.exists() else default
 
 
 def save(path: Path, payload: Any) -> None:
@@ -38,6 +38,17 @@ def save(path: Path, payload: Any) -> None:
 
 
 def eligible_codes(cache_dir: Path) -> list[str]:
+    all_market = cache_dir / "historical-universe-v1" / "all-market.json"
+    if all_market.exists():
+        rows = load(all_market, [])
+        codes = {
+            str(row.get("stock_id", "")) for row in rows
+            if str(row.get("stock_id", "")).isdigit()
+            and len(str(row.get("stock_id", ""))) == 4
+            and not str(row.get("stock_id", "")).startswith("00")
+        }
+        if codes:
+            return sorted(codes)
     historical_universe = cache_dir / "historical-universe-v1" / "semiconductor.json"
     if historical_universe.exists():
         rows = load(historical_universe, [])
@@ -56,9 +67,9 @@ def fixed_universe_codes() -> list[str]:
 
 def fetch(dataset: str, code: str, start: str) -> list[dict[str, Any]]:
     token = os.environ.get("FINMIND_TOKEN", "").strip()
-    if not token:
-        raise RuntimeError("missing FINMIND_TOKEN")
-    query = {"dataset": dataset, "data_id": code, "start_date": start, "token": token}
+    query = {"dataset": dataset, "data_id": code, "start_date": start}
+    if token:
+        query["token"] = token
     request = urllib.request.Request(
         f"{API}?{urllib.parse.urlencode(query)}", headers={"User-Agent": "weekly-investment-agent/1.0"}
     )
@@ -97,6 +108,23 @@ def main() -> None:
     parser.add_argument("--years", type=int, default=6)
     parser.add_argument("--include-optional", action="store_true", help="Probe restricted cross-check datasets")
     args = parser.parse_args()
+
+    # A 402 is a rolling quota response.  Avoid hammering the provider on
+    # every 30-minute schedule tick; resume automatically after one hour.
+    previous = load(args.status, {})
+    quota_at = previous.get("quotaLimitedAt") or previous.get("updatedAt")
+    if previous.get("quotaLimited") and quota_at:
+        try:
+            age = datetime.now(timezone.utc) - datetime.fromisoformat(str(quota_at))
+            if age.total_seconds() < 3600:
+                skipped = dict(previous)
+                skipped["updatedAt"] = datetime.now(timezone.utc).isoformat()
+                skipped["skippedDueToQuota"] = True
+                save(args.status, skipped)
+                print(json.dumps(skipped, ensure_ascii=False))
+                return
+        except (TypeError, ValueError):
+            pass
 
     eligible = eligible_codes(args.cache_dir)
     fixed_codes = fixed_universe_codes()
@@ -141,7 +169,7 @@ def main() -> None:
     status = {
         "schemaVersion": 2,
         "provider": "FinMind authorised API",
-        "scope": "historical semiconductor research plus explicit user fixed basket",
+        "scope": "resumable historical market research plus explicit user fixed basket",
         "cacheVisibility": "private GitHub Actions cache; raw rows are not committed",
         "updatedAt": datetime.now(timezone.utc).isoformat(),
         "batch": {"requested": len(selected), "cached": cached, "unavailable": unavailable, "failures": failures},
@@ -159,6 +187,10 @@ def main() -> None:
         },
         "quotaLimited": any("402" in value or "Payment Required" in value for value in failures.values()),
     }
+    if status["quotaLimited"]:
+        status["quotaLimitedAt"] = datetime.now(timezone.utc).isoformat()
+    else:
+        status.pop("quotaLimitedAt", None)
     save(args.status, status)
     print(json.dumps(status, ensure_ascii=False))
     if failures and not status["quotaLimited"]:
