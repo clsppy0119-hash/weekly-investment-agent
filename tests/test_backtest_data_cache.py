@@ -7,6 +7,11 @@ import backtest_data_cache
 
 
 class BacktestCacheTests(unittest.TestCase):
+    def test_official_snapshot_gap_has_first_priority(self):
+        pending = ["1101", "2330", "2454", "3008"]
+        ordered = backtest_data_cache.prioritize_pending(pending, {"2454", "3008"}, {"1101", "3008"})
+        self.assertEqual(ordered, ["3008", "2454", "1101", "2330"])
+
     def test_all_market_universe_has_priority(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

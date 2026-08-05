@@ -131,6 +131,8 @@ def evaluate_coverage(required: list[str], snapshot_dir: Path, cached_codes: set
 def load_membership(snapshot_dir: Path) -> dict[str, set[str]]:
     result: dict[str, set[str]] = {}
     for path in snapshot_dir.glob("*.json"):
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}\.json", path.name):
+            continue
         payload = json.loads(path.read_text(encoding="utf-8-sig"))
         day = str(payload.get("date", ""))
         codes = {ordinary_stock(item) for item in [*payload.get("twse", []), *payload.get("tpex", [])]}
@@ -158,6 +160,11 @@ def main() -> None:
     stocks = args.cache_dir / "finmind-backtest-v2" / "stocks"
     cached_codes = {path.stem for path in stocks.glob("*.json") if ordinary_stock(path.stem)}
     status = evaluate_coverage(required, snapshot_dir, cached_codes)
+    memberships = load_membership(snapshot_dir)
+    observed_codes = set().union(*(memberships.get(day, set()) for day in required)) if required else set()
+    (snapshot_dir / "missing-price-codes.json").write_text(
+        json.dumps(sorted(observed_codes - cached_codes), ensure_ascii=False), encoding="utf-8"
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(status, ensure_ascii=False))
