@@ -17,6 +17,8 @@ jobs:
     env:
       DATA_CACHE_DIR: .private-data-cache
       FIXED_UNIVERSE_CODES: ${{ inputs.codes || vars.FIXED_UNIVERSE_CODES }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,6 +36,13 @@ jobs:
           path: .private-data-cache
           key: backtest-data-v2-${{ runner.os }}-latest
           restore-keys: backtest-data-v2-${{ runner.os }}-
+      - name: Restore durable cache from Supabase when Actions cache is empty
+        if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
+        shell: bash
+        run: |
+          if ! find .private-data-cache/finmind-backtest-v2/stocks -type f -name '*.json' -print -quit 2>/dev/null | grep -q .; then
+            python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
+          fi
       - name: Verify strict point-in-time universe evidence
         run: python point_in_time_universe.py
       - name: Run auditable total-return backtest

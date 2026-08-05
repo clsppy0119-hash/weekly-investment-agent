@@ -5,3 +5,4 @@ __pycache__/
 .env.*
 .private-data-cache/
 data/audit-log.jsonl
+data/remote-total-return-*/
