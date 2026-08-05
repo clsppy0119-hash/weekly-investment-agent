@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 2,
+  "provider": "FinMind authorised API",
+  "scope": "historical semiconductor research plus explicit user fixed basket",
+  "cacheVisibility": "private GitHub Actions cache; raw rows are not committed",
+  "updatedAt": "2026-08-05T08:35:56.979135+00:00",
+  "batch": {
+    "requested": 21,
+    "cached": {
+      "2303": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 4
+      },
+      "0050": {
+        "priceRows": 860,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 8,
+        "corporateActionRows": 8
+      },
+      "2308": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 4
+      },
+      "2327": {
+        "priceRows": 858,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 5,
+        "corporateActionRows": 5
+      },
+      "2330": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 14,
+        "corporateActionRows": 14
+      },
+      "2344": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 4
+      },
+      "2363": {
+        "priceRows": 861,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 3
+      },
+      "2379": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 3,
+        "corporateActionRows": 3
+      },
+      "2449": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 4
+      },
+      "2454": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 7,
+        "corporateActionRows": 7
+      },
+      "2408": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 2,
+        "corporateActionRows": 2
+      },
+      "3034": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 4
+      },
+      "3532": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 4
+      },
+      "3105": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 3,
+        "corporateActionRows": 3
+      },
+      "3661": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 3,
+        "corporateActionRows": 3
+      },
+      "3711": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 4
+      },
+      "4966": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 6,
+        "corporateActionRows": 7
+      },
+      "6104": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 4
+      },
+      "6239": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 4,
+        "corporateActionRows": 4
+      },
+      "6770": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 1,
+        "corporateActionRows": 1
+      },
+      "6488": {
+        "priceRows": 865,
+        "firstPriceDate": "2023-01-03",
+        "lastPriceDate": "2026-08-05",
+        "adjustedPriceRows": 0,
+        "dividendRows": 8,
+        "corporateActionRows": 8
+      }
+    },
+    "unavailable": {},
+    "failures": {}
+  },
+  "optionalDatasets": {
+    "TaiwanStockPriceAdj": {
+      "purpose": "cross-check only; total return uses raw price, dividends and ex-right results",
+      "availableThisBatch": 21,
+      "unavailableThisBatch": 0
+    }
+  },
+  "coverage": {
+    "eligibleStocks": 0,
+    "fixedUniverseCodes": [
+      "2303",
+      "2308",
+      "2327",
+      "2330",
+      "2344",
+      "2363",
+      "2379",
+      "2408",
+      "2449",
+      "2454",
+      "3034",
+      "3105",
+      "3532",
+      "3661",
+      "3711",
+      "4966",
+      "6104",
+      "6239",
+      "6488",
+      "6770"
+    ],
+    "benchmarkCodes": [
+      "0050"
+    ],
+    "required": 21,
+    "cached": 21,
+    "unavailable": 0,
+    "remaining": 0
+  },
+  "quotaLimited": false
+}

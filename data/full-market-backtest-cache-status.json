@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 2,
+  "provider": "FinMind authorised API",
+  "scope": "resumable historical market research plus explicit user fixed basket",
+  "cacheVisibility": "private GitHub Actions cache; raw rows are not committed",
+  "updatedAt": "2026-08-05T09:02:37.862211+00:00",
+  "batch": {
+    "requested": 10,
+    "cached": {},
+    "unavailable": {
+      "1107": "no price data",
+      "1230": "no price data",
+      "1262": "no price data",
+      "1311": "no price data"
+    },
+    "failures": {
+      "1419": "HTTPError: HTTP Error 402: Payment Required",
+      "1423": "HTTPError: HTTP Error 402: Payment Required",
+      "1434": "HTTPError: HTTP Error 402: Payment Required",
+      "1432": "HTTPError: HTTP Error 402: Payment Required",
+      "1435": "HTTPError: HTTP Error 402: Payment Required",
+      "1436": "HTTPError: HTTP Error 402: Payment Required",
+      "1437": "HTTPError: HTTP Error 402: Payment Required",
+      "1438": "HTTPError: HTTP Error 402: Payment Required",
+      "1440": "HTTPError: HTTP Error 402: Payment Required",
+      "1439": "HTTPError: HTTP Error 402: Payment Required"
+    }
+  },
+  "optionalDatasets": {
+    "TaiwanStockPriceAdj": {
+      "purpose": "cross-check only; total return uses raw price, dividends and ex-right results",
+      "availableThisBatch": 10,
+      "unavailableThisBatch": 0
+    }
+  },
+  "coverage": {
+    "eligibleStocks": 2527,
+    "fixedUniverseCodes": [],
+    "benchmarkCodes": [
+      "0050"
+    ],
+    "required": 2528,
+    "cached": 94,
+    "unavailable": 4,
+    "remaining": 2430
+  },
+  "quotaLimited": true,
+  "skippedDueToQuota": true,
+  "quotaLimitedAt": "2026-08-05T09:00:57.406710+00:00"
+}

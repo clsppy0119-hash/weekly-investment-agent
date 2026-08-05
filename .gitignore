@@ -1,0 +1,7 @@
+__pycache__/
+**/__pycache__/
+.venv/
+.env
+.env.*
+.private-data-cache/
+data/audit-log.jsonl

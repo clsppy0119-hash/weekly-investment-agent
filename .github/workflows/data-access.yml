@@ -22,7 +22,7 @@ on:
       batch_size:
         description: "快取模式每批股票數量（半導體優先）"
         required: true
-        default: "1"
+        default: "50"
         type: string
       cache_layer:
         description: "快取層級：market 為行情與股利，fundamentals 為財報、資產負債與月營收"
@@ -36,6 +36,12 @@ on:
           - official-fundamentals
           - mops-fundamentals
           - full-market-fundamentals
+  schedule:
+    - cron: "*/30 * * * *"
+
+concurrency:
+  group: data-access-market-cache
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -67,8 +73,8 @@ jobs:
         if: ${{ inputs.mode == 'validate' }}
         run: python data_access.py --provider "${{ inputs.provider }}"
       - name: Cache next FinMind market-data batch
-        if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'market' }}
-        run: python finmind_market_cache.py --batch-size "${{ inputs.batch_size }}"
+        if: ${{ github.event_name == 'schedule' || (inputs.mode == 'cache' && inputs.cache_layer == 'market') }}
+        run: python finmind_market_cache.py --batch-size "${{ inputs.batch_size || '50' }}"
       - name: Cache next FinMind fundamentals batch
         if: ${{ inputs.mode == 'cache' && inputs.cache_layer == 'fundamentals' }}
         run: python finmind_fundamental_cache.py --batch-size "${{ inputs.batch_size }}"

@@ -1,11 +1,22 @@
 import json
 import os
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from strategy_tracker import record_recommendations, review_summary
 
 
 TZ_TAIPEI = timezone(timedelta(hours=8))
+ADVICE_GATE_PATH = Path(os.environ.get("ADVICE_GATE_PATH", "data/investment-advice-gate.json"))
+
+
+def advice_enabled():
+    """Only a verified backtest may turn research candidates into advice."""
+    try:
+        gate = json.loads(ADVICE_GATE_PATH.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return gate.get("status") == "advice_candidate" and gate.get("adviceEnabled") is True
 
 
 def number(value):
@@ -107,6 +118,7 @@ def market_news_lines():
 
 
 report_mode = os.environ.get("REPORT_MODE", "comprehensive")
+strategy_advice_enabled = advice_enabled()
 styles = [("comprehensive", "綜合投資研究")]
 report_title = "綜合投資研究日報"
 sections = []
@@ -114,8 +126,15 @@ ranked_by_style = {}
 for key, title in styles:
     items = candidates(key, quotes, fundamentals)
     ranked_by_style[key] = items
+    if not strategy_advice_enabled:
+        items = []
+        ranked_by_style[key] = []
+        lines = ["\u7b56\u7565\u5c1a\u672a\u901a\u904e\u6a23\u672c\u5916\u9a57\u8b49\uff1b\u76ee\u524d\u50c5\u63d0\u4f9b\u7814\u7a76\u8cc7\u6599\uff0c\u4e0d\u63d0\u4f9b\u8cb7\u9032\u3001\u8ce3\u51fa\u6216\u52a0\u78bc\u5efa\u8b70\u3002"]
     lines = [candidate_line(item) for item in items] or ["• 暫無資料完整度足夠的候選，請待資料更新後再檢視。"]
     sections.extend(["", f"【{title}｜優先研究候選】", *lines])
+
+if not strategy_advice_enabled:
+    sections.extend(["", "\u7b56\u7565\u5c1a\u672a\u901a\u904e\u6a23\u672c\u5916\u9a57\u8b49\uff1b\u76ee\u524d\u50c5\u63d0\u4f9b\u7814\u7a76\u8cc7\u6599\uff0c\u4e0d\u63d0\u4f9b\u8cb7\u9032\u3001\u8ce3\u51fa\u6216\u52a0\u78bc\u5efa\u8b70\u3002"])
 
 report = "\n".join([
     f"台股{report_title}｜{today}",

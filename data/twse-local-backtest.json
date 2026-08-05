@@ -1,0 +1,45 @@
+{
+  "source": "TWSE official daily close data; listed stocks only",
+  "data_start": "2023-08-07",
+  "data_end": "2024-05-10",
+  "trading_days": 185,
+  "split": {
+    "train": 111,
+    "validation": 37,
+    "test": 37
+  },
+  "selected": {
+    "lookback": 5,
+    "count": 10,
+    "holding": 5
+  },
+  "validation": {
+    "return": 0.09087666830223706,
+    "mdd": -0.10159876249546229,
+    "trades": 6,
+    "win_rate": 0.6666666666666666
+  },
+  "test": {
+    "return": 0.026552992134158293,
+    "mdd": -0.1166276873473685,
+    "trades": 6,
+    "win_rate": 0.6666666666666666
+  },
+  "benchmark": {
+    "total_return": true,
+    "source": "TWSE official Taiwan 50 total-return index (IR0002)",
+    "validation_net_return": 0.17178164603084278,
+    "test_net_return": 0.03942359933668138,
+    "etf_costs_applied": true
+  },
+  "benchmark_0050_price_return": 0.040839961815293035,
+  "benchmark_0050_total_return": 0.03942359933668138,
+  "decision": "rejected",
+  "cost_assumptions": {
+    "buy_fee": 0.001425,
+    "sell_fee": 0.001425,
+    "stock_sell_tax": 0.003,
+    "etf_sell_tax": 0.001,
+    "one_way_slippage_bps": 10
+  }
+}

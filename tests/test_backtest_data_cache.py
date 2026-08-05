@@ -1,0 +1,30 @@
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+import backtest_data_cache
+
+
+class BacktestCacheTests(unittest.TestCase):
+    def test_all_market_universe_has_priority(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            all_market = root / "historical-universe-v1" / "all-market.json"
+            all_market.parent.mkdir(parents=True)
+            all_market.write_text(json.dumps([{"stock_id": "1101"}, {"stock_id": "2330"}], ensure_ascii=False), encoding="utf-8")
+            semiconductor = root / "historical-universe-v1" / "semiconductor.json"
+            semiconductor.write_text(json.dumps([{"stock_id": "2330"}], ensure_ascii=False), encoding="utf-8")
+            self.assertEqual(backtest_data_cache.eligible_codes(root), ["1101", "2330"])
+
+    def test_universe_loader_accepts_utf8_bom(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            path = root / "historical-universe-v1" / "all-market.json"
+            path.parent.mkdir(parents=True)
+            path.write_text(json.dumps([{"stock_id": "1101"}]), encoding="utf-8-sig")
+            self.assertEqual(backtest_data_cache.eligible_codes(root), ["1101"])
+
+
+if __name__ == "__main__":
+    unittest.main()
