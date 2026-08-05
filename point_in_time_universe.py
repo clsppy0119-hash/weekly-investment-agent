@@ -21,7 +21,7 @@ CODE_FIELDS = (
     "SecuritiesCompanyCode", "CompanyCode", "stock_id",
 )
 ENTRY_FIELDS = ("上市日期", "上櫃日期", "興櫃日期", "掛牌日期", "ListingDate", "DateOfListing", "list_date")
-EXIT_FIELDS = ("終止上市日期", "終止上櫃日期", "終止興櫃日期", "終止日期", "DelistingDate", "null")
+EXIT_FIELDS = ("終止上市日期", "終止上櫃日期", "終止興櫃日期", "終止日期", "DelistingDate", "date", "null")
 
 
 def load(path: Path, default: Any) -> Any:
@@ -55,7 +55,13 @@ def main() -> None:
     cache_dir = Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache"))
     official = cache_dir / "official-listing-history-v1"
     historic = load(cache_dir / "historical-universe-v1" / "semiconductor.json", [])
-    candidate_codes = sorted({str(row.get("stock_id", "")) for row in historic if str(row.get("stock_id", "")).isdigit()})
+    all_market = load(cache_dir / "historical-universe-v1" / "all-market.json", [])
+    delisted = load(cache_dir / "official-listing-history-v1" / "finmind_delisted.json", [])
+    candidate_codes = sorted({
+        str(row.get("stock_id", row.get("SecuritiesCompanyCode", "")))
+        for row in [*historic, *all_market, *delisted]
+        if str(row.get("stock_id", row.get("SecuritiesCompanyCode", ""))).isdigit()
+    })
 
     entries: dict[str, str] = {}
     exits: dict[str, str] = {}
@@ -75,6 +81,13 @@ def main() -> None:
     terminated_rows = load(official / "twse_terminated.json", [])
     source_fields["twse_terminated"] = sorted({str(key) for row in terminated_rows if isinstance(row, dict) for key in row})
     for row in terminated_rows:
+        if isinstance(row, dict):
+            stock, ended = code(row), iso_date(value(row, EXIT_FIELDS))
+            if stock and ended:
+                exits[stock] = max(exits.get(stock, ended), ended)
+    finmind_rows = load(official / "finmind_delisted.json", [])
+    source_fields["finmind_delisted"] = sorted({str(key) for row in finmind_rows if isinstance(row, dict) for key in row})
+    for row in finmind_rows:
         if isinstance(row, dict):
             stock, ended = code(row), iso_date(value(row, EXIT_FIELDS))
             if stock and ended:

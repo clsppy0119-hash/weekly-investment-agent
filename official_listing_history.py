@@ -41,6 +41,19 @@ def fetch_json(url: str) -> Any:
     raise last_error
 
 
+def fetch_finmind_delisting(token: str) -> list[dict[str, Any]]:
+    """Fetch the licensed delisting dataset used for historical exit evidence."""
+    if not token:
+        raise RuntimeError("FINMIND_TOKEN is required for TaiwanStockDelisting")
+    url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockDelisting"
+    request = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
+    with urllib.request.urlopen(request, timeout=60) as response:
+        payload = json.load(response)
+    if not payload.get("status"):
+        raise RuntimeError(str(payload.get("msg", "FinMind delisting request failed")))
+    return payload.get("data", [])
+
+
 def fetch_csv(url: str) -> list[dict[str, str]]:
     request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent/1.0"})
     with urllib.request.urlopen(request, timeout=45) as response:
@@ -74,6 +87,17 @@ def main() -> None:
         except Exception as error:
             source_status[name] = {"officialUrl": url, "ready": False, "error": type(error).__name__}
 
+    try:
+        payload = fetch_finmind_delisting(os.environ.get("FINMIND_TOKEN", "").strip())
+        (cache_root / "finmind_delisted.json").write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+        source_status["finmind_delisted"] = {
+            "officialUrl": "https://finmindtrade.com/analysis/#/data/taiwan_stock_delisting",
+            "ready": True,
+            "records": record_count(payload),
+        }
+    except Exception as error:
+        source_status["finmind_delisted"] = {"ready": False, "error": type(error).__name__}
+
     status = {
         "schemaVersion": 1,
         "provider": "TWSE and TPEx official open data",
@@ -81,7 +105,7 @@ def main() -> None:
         "cacheVisibility": "private GitHub Actions cache; raw official records are not committed",
         "purpose": "membership and exit-date evidence for point-in-time backtest universes",
         "sources": source_status,
-        "ready": successful == len(SOURCES),
+        "ready": successful == len(SOURCES) and source_status.get("finmind_delisted", {}).get("ready", False),
         "promotionGate": "still closed until historical entry and exit dates are reconstructed and audited",
     }
     output = ROOT / "data" / "official-listing-history-status.json"
