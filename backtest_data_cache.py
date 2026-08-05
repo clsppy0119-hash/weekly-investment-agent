@@ -38,6 +38,12 @@ def save(path: Path, payload: Any) -> None:
 
 
 def eligible_codes(cache_dir: Path) -> list[str]:
+    delisted_path = cache_dir / "official-listing-history-v1" / "finmind_delisted.json"
+    delisted_rows = load(delisted_path, []) if delisted_path.exists() else []
+    delisted_codes = {
+        str(row.get("stock_id", "")) for row in delisted_rows
+        if str(row.get("stock_id", "")).isdigit() and len(str(row.get("stock_id", ""))) == 4
+    }
     all_market = cache_dir / "historical-universe-v1" / "all-market.json"
     if all_market.exists():
         rows = load(all_market, [])
@@ -48,13 +54,13 @@ def eligible_codes(cache_dir: Path) -> list[str]:
             and not str(row.get("stock_id", "")).startswith("00")
         }
         if codes:
-            return sorted(codes)
+            return sorted(codes | delisted_codes)
     historical_universe = cache_dir / "historical-universe-v1" / "semiconductor.json"
     if historical_universe.exists():
         rows = load(historical_universe, [])
         codes = {str(row.get("stock_id", "")) for row in rows if str(row.get("stock_id", "")).isdigit()}
         if codes:
-            return sorted(codes)
+            return sorted(codes | delisted_codes)
     stocks = cache_dir / "finmind-fundamentals-v1" / "stocks"
     return sorted(path.stem for path in stocks.glob("*.json") if inspect_stock(path)["fiveYearReady"])
 

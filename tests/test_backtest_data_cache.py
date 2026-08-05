@@ -25,6 +25,17 @@ class BacktestCacheTests(unittest.TestCase):
             path.write_text(json.dumps([{"stock_id": "1101"}]), encoding="utf-8-sig")
             self.assertEqual(backtest_data_cache.eligible_codes(root), ["1101"])
 
+    def test_delisted_codes_are_added_to_all_market_queue(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            universe = root / "historical-universe-v1" / "all-market.json"
+            universe.parent.mkdir(parents=True)
+            universe.write_text(json.dumps([{"stock_id": "1101"}]), encoding="utf-8")
+            listing = root / "official-listing-history-v1" / "finmind_delisted.json"
+            listing.parent.mkdir(parents=True)
+            listing.write_text(json.dumps([{"stock_id": "1230", "date": "2001-11-01"}]), encoding="utf-8")
+            self.assertEqual(backtest_data_cache.eligible_codes(root), ["1101", "1230"])
+
 
 if __name__ == "__main__":
     unittest.main()
