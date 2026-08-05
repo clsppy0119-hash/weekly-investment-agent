@@ -61,6 +61,8 @@ jobs:
         run: python market_membership_snapshots.py
       - name: Cache next total-return batch
         run: python backtest_data_cache.py --batch-size 35
+      - name: Refresh point-in-time coverage after batch
+        run: python market_membership_snapshots.py
       - name: Inspect private input schema safely
         run: python backtest_schema_probe.py
       - name: Persist historical rows to Supabase
