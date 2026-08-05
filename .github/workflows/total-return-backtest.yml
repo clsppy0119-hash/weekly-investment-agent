@@ -47,7 +47,9 @@ jobs:
             python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
           fi
       - name: Verify strict point-in-time universe evidence
-        run: python point_in_time_universe.py
+        run: |
+          python point_in_time_universe.py
+          python market_membership_snapshots.py
       - name: Run auditable total-return backtest
         run: python total_return_backtest.py
       - name: Run explicit fixed-basket backtest
@@ -62,4 +64,5 @@ jobs:
             data/total-return-backtest-status.json
             data/corporate-action-audit-status.json
             data/point-in-time-universe-status.json
+            data/market-membership-snapshot-status.json
             data/fixed-universe-backtest-status.json
