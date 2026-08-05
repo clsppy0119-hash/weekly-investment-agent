@@ -1,4 +1,4 @@
-name: One-year TWSE backtest
+name: Rolling official TWSE backtest
 
 on:
   schedule:
@@ -16,25 +16,63 @@ permissions:
 jobs:
   backtest:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    env:
+      DATA_CACHE_DIR: .private-data-cache
+      FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Download one year of official TWSE data
-        run: python backtest.py collect --days 365
+      - name: Restore and save official TWSE dataset cache
+        uses: actions/cache@v4
+        with:
+          path: backtest_data
+          key: official-twse-history-v1-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            official-twse-history-v1-${{ runner.os }}-
+            one-year-twse-v1-${{ runner.os }}-
+      - name: Restore private total-return inputs
+        uses: actions/cache/restore@v4
+        with:
+          path: .private-data-cache
+          key: backtest-data-v2-${{ runner.os }}-latest
+          restore-keys: backtest-data-v2-${{ runner.os }}-
+      - name: Restore durable total-return rows from Supabase when needed
+        if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
+        shell: bash
+        run: |
+          if ! find .private-data-cache/finmind-backtest-v2/stocks -type f -name '*.json' -print -quit 2>/dev/null | grep -q .; then
+            python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
+          fi
+      - name: Download two years of official TWSE data
+        run: python backtest.py collect --days 730
       - name: Run train validation test backtest
         run: python backtest.py report --benchmark backtest_data/tai50_total_return.json
       - name: Run rolling out-of-sample validation
         run: python walk_forward.py --history backtest_data/twse_daily.jsonl --benchmark backtest_data/tai50_total_return.json --output backtest_data/walk-forward-status.json
+      - name: Refresh point-in-time universe evidence
+        run: |
+          python all_market_universe.py
+          python official_listing_history.py
+          python point_in_time_universe.py
+      - name: Run companion total-return backtest
+        run: python total_return_backtest.py --output backtest_data/total-return-backtest-status.json
+      - name: Audit stock-dividend adjustment mapping
+        run: python corporate_action_audit.py
       - name: Evaluate investment-advice gate
-        run: python investment_advice_gate.py --one-year backtest_data/one_year_backtest.json --rolling backtest_data/walk-forward-status.json --output backtest_data/investment-advice-gate.json
+        run: python investment_advice_gate.py --one-year backtest_data/one_year_backtest.json --total-return backtest_data/total-return-backtest-status.json --rolling backtest_data/walk-forward-status.json --output backtest_data/investment-advice-gate.json
       - name: Upload backtest result
         uses: actions/upload-artifact@v4
         with:
           name: one-year-twse-backtest
-          path: backtest_data/
+          path: |
+            backtest_data/
+            data/corporate-action-audit-status.json
+            data/point-in-time-universe-status.json
       - name: Push result to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

@@ -1,6 +1,9 @@
 name: Total-return backtest
 
 on:
+  schedule:
+    # Every Monday at 09:30 Asia/Taipei (01:30 UTC).
+    - cron: "30 1 * * 1"
   workflow_dispatch:
     inputs:
       codes:

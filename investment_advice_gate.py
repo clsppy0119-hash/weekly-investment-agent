@@ -14,6 +14,18 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 
+BLOCKER_LABELS = {
+    "one_year_out_of_sample_failed": "官方行情保留測試未通過。",
+    "benchmark_not_total_return": "0050 基準不是官方總報酬資料。",
+    "survivorship_bias": "股票範圍仍有生存者偏差。",
+    "total_return_promotion_blocked": "總報酬回測尚未通過升級門檻。",
+    "total_return_not_candidate": "總報酬策略尚未成為候選策略。",
+    "fewer_than_three_rolling_windows": "滾動樣本外視窗少於三個。",
+    "one_or_more_rolling_windows_failed": "至少一個滾動樣本外視窗未跑贏 0050。",
+    "rolling_validation_not_passed": "滾動樣本外驗證尚未通過。",
+}
+
+
 def load(path: Path) -> dict:
     if not path.exists():
         return {}
@@ -46,6 +58,10 @@ def evaluate(one_year: dict, total_return: dict, rolling: dict | None = None) ->
         "adviceEnabled": passed,
         "verdict": "可以產生條件式建議" if passed else "禁止產生買賣建議",
         "blockers": blockers,
+        "blockerDetails": [
+            {"code": code, "message": BLOCKER_LABELS.get(code, code)}
+            for code in blockers
+        ],
         "rule": "只有公平0050總報酬基準、未觸碰測試集通過，且總報酬研究閘門開啟時才可建議",
     }
 
