@@ -9,6 +9,7 @@ import json
 import os
 import urllib.parse
 import urllib.request
+from urllib.error import HTTPError
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -21,8 +22,16 @@ def main() -> None:
     if not token:
         raise SystemExit("missing FINMIND_TOKEN")
     query = urllib.parse.urlencode({"dataset": "TaiwanStockInfo", "token": token})
-    with urllib.request.urlopen(f"{API}?{query}", timeout=30) as response:
-        payload = json.load(response)
+    cache = Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache")) / "historical-universe-v1"
+    cache.mkdir(parents=True, exist_ok=True)
+    try:
+        with urllib.request.urlopen(f"{API}?{query}", timeout=30) as response:
+            payload = json.load(response)
+    except HTTPError as error:
+        if error.code == 402 and (cache / "semiconductor.json").exists():
+            print(json.dumps({"status": "stale_cache", "reason": "FinMind quota limit", "records": len(json.loads((cache / "semiconductor.json").read_text(encoding="utf-8")))}, ensure_ascii=False))
+            return
+        raise
     if payload.get("status") != 200:
         raise SystemExit(str(payload.get("msg", "FinMind API error")))
     rows = [
@@ -31,8 +40,6 @@ def main() -> None:
         and len(str(row.get("stock_id", ""))) == 4
         and str(row.get("industry_category") or "") == "半導體業"
     ]
-    cache = Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache")) / "historical-universe-v1"
-    cache.mkdir(parents=True, exist_ok=True)
     (cache / "semiconductor.json").write_text(json.dumps(rows, ensure_ascii=False), encoding="utf-8")
     types: dict[str, int] = {}
     for row in rows:
