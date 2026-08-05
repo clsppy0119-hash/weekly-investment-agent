@@ -75,6 +75,10 @@ def prioritize_pending(codes: list[str], priority_codes: set[str], delisted_code
     return sorted(codes, key=lambda item: (item not in priority_codes, item not in delisted_codes, item))
 
 
+def existing_cached_codes(stock_dir: Path) -> set[str]:
+    return {path.stem for path in stock_dir.glob("*.json") if path.stem.isdigit()}
+
+
 def fetch(dataset: str, code: str, start: str) -> list[dict[str, Any]]:
     token = os.environ.get("FINMIND_TOKEN", "").strip()
     query = {"dataset": dataset, "data_id": code, "start_date": start}
@@ -142,7 +146,7 @@ def main() -> None:
     cache_dir = args.cache_dir / "finmind-backtest-v2"
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
-    reviewed = set(progress.get("reviewed", [])) & set(codes)
+    reviewed = (set(progress.get("reviewed", [])) | existing_cached_codes(cache_dir / "stocks")) & set(codes)
     unavailable = {code: reason for code, reason in progress.get("unavailable", {}).items() if code in codes}
     delisted_rows = load(args.cache_dir / "official-listing-history-v1" / "finmind_delisted.json", [])
     delisted_codes = {

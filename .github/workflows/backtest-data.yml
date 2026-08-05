@@ -49,6 +49,9 @@ jobs:
           path: .private-data-cache/point-in-time-snapshots-v1
           key: market-membership-v1-${{ runner.os }}-latest
           restore-keys: market-membership-v1-${{ runner.os }}-
+      - name: Merge durable Supabase rows into private cache
+        if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
+        run: python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
       - name: Cache historical semiconductor membership
         run: python historical_semiconductor_universe.py
       - name: Refresh all-market universe queue

@@ -12,6 +12,13 @@ class BacktestCacheTests(unittest.TestCase):
         ordered = backtest_data_cache.prioritize_pending(pending, {"2454", "3008"}, {"1101", "3008"})
         self.assertEqual(ordered, ["3008", "2454", "1101", "2330"])
 
+    def test_restored_stock_files_are_treated_as_reviewed(self):
+        with tempfile.TemporaryDirectory() as folder:
+            stock_dir = Path(folder)
+            (stock_dir / "2330.json").write_text("{}", encoding="utf-8")
+            (stock_dir / "note.txt").write_text("ignore", encoding="utf-8")
+            self.assertEqual(backtest_data_cache.existing_cached_codes(stock_dir), {"2330"})
+
     def test_all_market_universe_has_priority(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
