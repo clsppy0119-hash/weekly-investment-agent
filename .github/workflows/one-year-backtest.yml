@@ -48,9 +48,13 @@ jobs:
           key: market-membership-v1-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             market-membership-v1-${{ runner.os }}-
-      - name: Merge durable total-return rows from Supabase
+      - name: Restore durable total-return rows when cache is empty
         if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
-        run: python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
+        shell: bash
+        run: |
+          if ! find .private-data-cache/finmind-backtest-v2/stocks -type f -name '*.json' -print -quit 2>/dev/null | grep -q .; then
+            python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
+          fi
       - name: Download two years of official TWSE data
         run: python backtest.py collect --days 730
       - name: Run train validation test backtest

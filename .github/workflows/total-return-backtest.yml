@@ -39,9 +39,13 @@ jobs:
           path: .private-data-cache
           key: backtest-data-v2-${{ runner.os }}-latest
           restore-keys: backtest-data-v2-${{ runner.os }}-
-      - name: Merge durable cache from Supabase
+      - name: Restore durable cache when Actions cache is empty
         if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
-        run: python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
+        shell: bash
+        run: |
+          if ! find .private-data-cache/finmind-backtest-v2/stocks -type f -name '*.json' -print -quit 2>/dev/null | grep -q .; then
+            python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
+          fi
       - name: Verify strict point-in-time universe evidence
         run: |
           python point_in_time_universe.py

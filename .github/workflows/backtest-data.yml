@@ -9,6 +9,11 @@ on:
         description: "Optional sample or fixed basket codes, comma-separated"
         required: false
         type: string
+      restore_all:
+        description: "Force one-time full restore from durable Supabase storage"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -49,9 +54,17 @@ jobs:
           path: .private-data-cache/point-in-time-snapshots-v1
           key: market-membership-v1-${{ runner.os }}-latest
           restore-keys: market-membership-v1-${{ runner.os }}-
-      - name: Merge durable Supabase rows into private cache
+      - name: Restore durable Supabase rows when cache is empty or explicitly requested
         if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
-        run: python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
+        shell: bash
+        env:
+          FORCE_SUPABASE_RESTORE: ${{ inputs.restore_all || 'false' }}
+        run: |
+          if [ "$FORCE_SUPABASE_RESTORE" = "true" ] || ! find .private-data-cache/finmind-backtest-v2/stocks -type f -name '*.json' -print -quit 2>/dev/null | grep -q .; then
+            python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
+          else
+            echo "Actions cache present; skipping expensive full Supabase restore."
+          fi
       - name: Cache historical semiconductor membership
         run: python historical_semiconductor_universe.py
       - name: Refresh all-market universe queue
