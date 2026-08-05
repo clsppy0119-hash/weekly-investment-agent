@@ -31,6 +31,19 @@ class BacktestCacheTests(unittest.TestCase):
             status.write_text(json.dumps({"batch": {"cached": {"2454": {}}}}), encoding="utf-8")
             self.assertEqual(supabase_data_sync.paths_from_batch_status(stocks, status), [stocks / "2454.json"])
 
+    def test_supabase_sync_empty_batch_does_not_fall_back_to_all_files(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            stocks = root / "finmind-backtest-v2" / "stocks"
+            stocks.mkdir(parents=True)
+            (stocks / "2330.json").write_text(
+                json.dumps({"TaiwanStockPrice": [{"date": "2026-01-02", "close": 100}]}),
+                encoding="utf-8",
+            )
+            daily, actions = supabase_data_sync.collect(root, [])
+            self.assertEqual(daily, [])
+            self.assertEqual(actions, [])
+
     def test_all_market_universe_has_priority(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

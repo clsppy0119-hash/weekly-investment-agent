@@ -41,7 +41,12 @@ def post(url: str, key: str, table: str, rows: list[dict]) -> None:
 def collect(cache_dir: Path, paths: list[Path] | None = None) -> tuple[list[dict], list[dict]]:
     daily: list[dict] = []
     actions: list[dict] = []
-    for path in sorted(paths or (cache_dir / "finmind-backtest-v2" / "stocks").glob("*.json")):
+    selected_paths = (
+        paths
+        if paths is not None
+        else list((cache_dir / "finmind-backtest-v2" / "stocks").glob("*.json"))
+    )
+    for path in sorted(selected_paths):
         payload = load(path)
         code = path.stem
         for row in payload.get("TaiwanStockPrice", []):
