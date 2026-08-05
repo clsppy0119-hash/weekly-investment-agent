@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from backtest import fetch_day
+from backtest import fetch_day, number
 
 
 ROOT = Path(__file__).resolve().parent
@@ -31,6 +31,18 @@ def ordinary_stock(code: object) -> str:
     return value if re.fullmatch(r"\d{4}", value) and int(value) >= 1000 else ""
 
 
+def tpex_codes(rows: list[list[Any]]) -> set[str]:
+    """Keep only ordinary stocks that had a usable close and volume that day."""
+    result: set[str] = set()
+    for row in rows:
+        if len(row) < 8:
+            continue
+        stock, close, volume = ordinary_stock(row[0]), number(row[2]), number(row[7])
+        if stock and close and close > 0 and volume and volume > 0:
+            result.add(stock)
+    return result
+
+
 def fetch_tpex(day: str) -> set[str]:
     query = urllib.parse.urlencode({"date": day.replace("-", "/"), "type": "EW", "response": "json"})
     request = urllib.request.Request(f"{TPEx_URL}?{query}", headers={"User-Agent": "weekly-investment-agent/1.0"})
@@ -41,7 +53,7 @@ def fetch_tpex(day: str) -> set[str]:
                 payload = json.load(response)
             tables = payload.get("tables", []) if isinstance(payload, dict) else []
             rows = tables[0].get("data", []) if tables else []
-            return {stock for row in rows if row and (stock := ordinary_stock(row[0]))}
+            return tpex_codes(rows)
         except Exception as error:
             last_error = error
             if attempt < 2:

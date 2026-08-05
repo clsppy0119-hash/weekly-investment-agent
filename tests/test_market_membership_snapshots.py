@@ -3,8 +3,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from market_membership_snapshots import evaluate_coverage, load_membership, ordinary_stock, signal_dates
-from total_return_backtest import Series, run_period
+from market_membership_snapshots import evaluate_coverage, load_membership, ordinary_stock, signal_dates, tpex_codes
+from total_return_backtest import Series, research_universe_codes, run_period
 
 
 class MarketMembershipSnapshotTests(unittest.TestCase):
@@ -12,6 +12,23 @@ class MarketMembershipSnapshotTests(unittest.TestCase):
         self.assertEqual(ordinary_stock("2330"), "2330")
         self.assertEqual(ordinary_stock("0050"), "")
         self.assertEqual(ordinary_stock("00679B"), "")
+
+    def test_tpex_snapshot_excludes_non_traded_rows(self):
+        rows = [
+            ["6488", "環球晶", "500", "", "", "", "", "1,000"],
+            ["1234", "停牌", "---", "", "", "", "", "0"],
+            ["00679B", "債券", "26", "", "", "", "", "1,000"],
+        ]
+        self.assertEqual(tpex_codes(rows), {"6488"})
+
+    def test_daily_snapshot_replaces_missing_legacy_entry_date(self):
+        codes = research_universe_codes(
+            {"0050", "2330", "6488"},
+            {"2330": {"entryDate": "1994-09-05"}, "6488": {"entryDate": None}},
+            {"2025-01-02": {"2330", "6488"}},
+            set(),
+        )
+        self.assertEqual(codes, {"2330", "6488"})
 
     def test_signal_dates_match_split_local_rebalances(self):
         calendar = [f"d{index:04d}" for index in range(300)]

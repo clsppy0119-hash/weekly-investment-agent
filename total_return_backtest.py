@@ -205,6 +205,18 @@ def run_period(series: dict[str, Series], dates: list[str], is_etf: bool = False
     return {"totalReturn": total, "annualizedReturn": annualized(total, len(dates)), "mdd": max_drawdown(returns), "periods": len(returns), "trades": trades}
 
 
+def research_universe_codes(payload_codes: set[str], evidence: dict[str, Any],
+                            membership_by_date: dict[str, set[str]], fixed_codes: set[str]) -> set[str]:
+    """Choose candidates from direct daily evidence, with listing dates as fallback."""
+    snapshot_codes = set().union(*membership_by_date.values()) if membership_by_date else set()
+    verified_entry_codes = {
+        code for code, item in evidence.items()
+        if isinstance(item, dict) and item.get("entryDate")
+    }
+    evidence_codes = snapshot_codes if snapshot_codes else verified_entry_codes
+    return (payload_codes - {"0050"}) & (evidence_codes | fixed_codes)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cache-dir", type=Path, default=Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache")))
@@ -231,10 +243,7 @@ def main() -> None:
         item.strip() for item in os.environ.get("FIXED_UNIVERSE_CODES", "").split(",")
         if item.strip().isdigit() and len(item.strip()) == 4
     }
-    verified_codes = {
-        code for code, item in evidence.items()
-        if isinstance(item, dict) and item.get("entryDate")
-    }
+    research_codes = research_universe_codes(set(payloads), evidence, membership_by_date, fixed_codes)
     universe = {
         code: total_return_series(
             code,
@@ -243,7 +252,7 @@ def main() -> None:
             evidence.get(code, {}).get("exitDate"),
         )
         for code, data in payloads.items()
-        if code != "0050" and (code in verified_codes or code in fixed_codes)
+        if code in research_codes
     }
     if not universe:
         raise SystemExit("no officially verifiable stocks available for strict research backtest")
