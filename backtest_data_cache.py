@@ -140,7 +140,16 @@ def main() -> None:
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
     reviewed = set(progress.get("reviewed", [])) & set(codes)
     unavailable = {code: reason for code, reason in progress.get("unavailable", {}).items() if code in codes}
-    selected = [code for code in codes if code not in reviewed and code not in unavailable][: max(1, args.batch_size)]
+    delisted_rows = load(cache_dir / "official-listing-history-v1" / "finmind_delisted.json", [])
+    delisted_codes = {
+        str(row.get("stock_id", "")) for row in delisted_rows
+        if str(row.get("stock_id", "")).isdigit()
+    }
+    pending = [code for code in codes if code not in reviewed and code not in unavailable]
+    # Prioritize historical exits so the anti-survivorship evidence improves
+    # before spending the quota on currently listed names.
+    pending.sort(key=lambda item: (item not in delisted_codes, item))
+    selected = pending[: max(1, args.batch_size)]
     start = f"{date.today().year - max(1, args.years)}-01-01"
 
     cached: dict[str, dict[str, Any]] = {}
