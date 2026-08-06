@@ -24,6 +24,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Validate shared restore action without downloading data
+        uses: ./.github/actions/restore-backtest-inputs
+        with:
+          lookup-only: "true"
       - name: Compile changed Python modules
         run: >-
           python -m py_compile candidate_manifest.py daily_report.py strategy_tracker.py

@@ -1,0 +1,37 @@
+name: Restore verified backtest inputs
+description: Restore the shared private total-return input cache, falling back to durable Supabase rows only when empty.
+
+inputs:
+  supabase-url:
+    description: Supabase project URL
+    required: false
+  supabase-service-role-key:
+    description: Supabase service role key
+    required: false
+  lookup-only:
+    description: Validate cache availability without downloading it
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Restore private total-return inputs
+      uses: actions/cache/restore@v4
+      with:
+        path: .private-data-cache
+        key: backtest-data-v2-${{ runner.os }}-latest
+        restore-keys: backtest-data-v2-${{ runner.os }}-
+        lookup-only: ${{ inputs.lookup-only }}
+    - name: Restore durable rows only when Actions cache is empty
+      if: ${{ inputs.supabase-url != '' && inputs.supabase-service-role-key != '' }}
+      shell: bash
+      env:
+        SUPABASE_URL: ${{ inputs.supabase-url }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ inputs.supabase-service-role-key }}
+      run: |
+        if ! find .private-data-cache/finmind-backtest-v2/stocks -type f -name '*.json' -print -quit 2>/dev/null | grep -q .; then
+          python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
+        else
+          echo "Private Actions cache present; skipping durable restore."
+        fi
