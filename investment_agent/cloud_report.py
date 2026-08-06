@@ -35,13 +35,7 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 def _candidate_codes(mode: str, manifest_path: Path, limit: int) -> list[str]:
     manifest = _load_json(manifest_path)
-    gate = manifest.get("adviceGate", {})
-    if (
-        manifest.get("phase") != "final"
-        or manifest.get("reportMode") != mode
-        or gate.get("status") != "advice_candidate"
-        or gate.get("adviceEnabled") is not True
-    ):
+    if not _manifest_needs_ai(mode, manifest):
         return []
     market = load_market_data().get("quotes", {})
     codes = [
@@ -50,6 +44,23 @@ def _candidate_codes(mode: str, manifest_path: Path, limit: int) -> list[str]:
         if isinstance(item, dict) and item.get("quality", {}).get("passed") is True
     ]
     return list(dict.fromkeys(code for code in codes if code in market))[:limit]
+
+
+def _manifest_needs_ai(mode: str, manifest: dict[str, Any]) -> bool:
+    gate = manifest.get("adviceGate", {})
+    if (
+        manifest.get("phase") != "final"
+        or manifest.get("reportMode") != mode
+        or gate.get("status") != "advice_candidate"
+        or gate.get("adviceEnabled") is not True
+    ):
+        return False
+    return any(
+        isinstance(item, dict)
+        and item.get("quality", {}).get("passed") is True
+        and bool(str(item.get("code", "")).strip())
+        for item in manifest.get("eligibleCandidates", [])
+    )
 
 
 def _research_components() -> tuple[Callable, Callable, Callable]:
@@ -164,11 +175,17 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=("daily", "long", "comprehensive"), required=True)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
-    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--output", type=Path)
     parser.add_argument("--limit", type=int, default=3)
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE)
     parser.add_argument("--status", type=Path, default=DEFAULT_STATUS)
+    parser.add_argument("--eligibility-only", action="store_true")
     args = parser.parse_args()
+    if args.eligibility_only:
+        print("needs_ai=" + ("true" if _manifest_needs_ai(args.mode, _load_json(args.manifest)) else "false"))
+        return 0
+    if args.output is None:
+        parser.error("--output is required unless --eligibility-only is used")
     if not os.environ.get("OPENAI_API_KEY"):
         args.output.write_text("AI 研究未啟用：尚未設定 OPENAI_API_KEY。\n", encoding="utf-8")
         _write_status(args.status, {"mode": args.mode, "outcome": "disabled_missing_key", "cacheStatus": "not_applicable", "candidateCount": 0, "runnerInvocations": 0, "avoidedRunnerInvocations": 0, "tokenUsageAvailable": False})
