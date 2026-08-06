@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from typing import Any
 
+from data_contract import build_contract
 from strategy_tracker import STRATEGY_VERSION, number
 
 
@@ -87,12 +88,17 @@ def build_manifest(
     news_path: Path,
     actions_path: Path,
     gate_path: Path,
+    pit_path: Path | None = None,
 ) -> dict[str, Any]:
+    news = load_json(news_path)
+    pit_status = load_json(pit_path) if pit_path else {}
+    contract = build_contract(quote_data, actions, news, pit_status)
     preview: list[dict[str, Any]] = []
     for style, items in ranked.items():
         for rank, item in enumerate(items, 1):
             score, coverage, code, quote, fundamentals = item
             blockers = _quality_blockers(str(code), int(coverage), fundamentals, actions)
+            blockers.extend(contract["blockers"])
             preview.append(
                 {
                     "code": str(code),
@@ -131,4 +137,5 @@ def build_manifest(
             "newsUpdatedAt": load_json(news_path).get("updatedAt"),
             "corporateActionsPeriod": actions.get("period"),
         },
+        "dataContract": contract,
     }
