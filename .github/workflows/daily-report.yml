@@ -23,21 +23,21 @@ jobs:
         run: python data_access.py --provider finmind
       - name: Fetch attributable market-news headlines
         run: python market_news.py
-      - name: Build daily report
-        run: REPORT_MODE=comprehensive python daily_report.py
+      - name: Build non-persistent candidate preview
+        run: REPORT_MODE=comprehensive REPORT_PHASE=preview REPORT_OUTPUT=data/candidate-preview.txt CANDIDATE_MANIFEST=data/candidate-manifest.json python daily_report.py
       - name: Enrich semiconductor fundamentals
-        run: python finmind_fundamentals.py
-      - name: Rebuild report with verified fundamentals
-        run: REPORT_MODE=comprehensive python daily_report.py
+        run: python finmind_fundamentals.py --candidate-manifest data/candidate-manifest.json
       - name: Verify candidate-pool corporate actions
-        run: python finmind_actions.py --output backtest_data/candidate_actions.json
+        run: python finmind_actions.py --candidate-manifest data/candidate-manifest.json --output backtest_data/candidate_actions.json
+      - name: Build one verified report and decision snapshot
+        run: REPORT_MODE=comprehensive REPORT_PHASE=final CANDIDATE_MANIFEST=data/candidate-manifest.json python daily_report.py
       - name: Install AI agent
         run: python -m pip install "openai-agents>=0.6.0" python-dotenv
       - name: Review comprehensive candidates with AI
         continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: python investment_agent/cloud_report.py --mode comprehensive --report daily-report.txt --output ai-daily-report.txt --limit 3
+        run: python investment_agent/cloud_report.py --mode comprehensive --manifest data/candidate-manifest.json --output ai-daily-report.txt --limit 3
       - name: Upload report artifact
         uses: actions/upload-artifact@v4
         with:
@@ -50,6 +50,7 @@ jobs:
             data/fundamentals-coverage.json
             data/fundamentals-progress.json
             data/data-access-status.json
+            data/candidate-manifest.json
             strategy_data/recommendations.json
       - name: Persist verified financial data
         continue-on-error: true

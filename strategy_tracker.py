@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 from pathlib import Path
 
 
@@ -23,9 +24,14 @@ def load_state(path=DEFAULT_PATH):
 def save_state(state, path=DEFAULT_PATH):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8", newline="\n") as output:
-        json.dump(state, output, ensure_ascii=False, indent=2)
-        output.write("\n")
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        with temporary.open("w", encoding="utf-8", newline="\n") as output:
+            json.dump(state, output, ensure_ascii=False, indent=2)
+            output.write("\n")
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def _outcomes(history, entry_date, entry_price):

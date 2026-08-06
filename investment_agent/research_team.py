@@ -7,7 +7,10 @@ change rankings, or place trades.  All market data is prepared locally first.
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import importlib.metadata
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -66,6 +69,11 @@ def data_quality_agent(stock_code: str) -> dict[str, Any]:
     }
 
 
+def build_evidence_packets(codes: list[str]) -> list[dict[str, Any]]:
+    """Build each deterministic evidence packet once, preserving candidate order."""
+    return [data_quality_agent(code) for code in codes]
+
+
 risk_reviewer = Agent(
     name="投資風險審查角色",
     instructions="""
@@ -109,9 +117,29 @@ def _fallback_report(packets: list[dict[str, Any]], reviews: list[dict[str, str]
     return "\n".join(lines)
 
 
-async def run_research_team(codes: list[str]) -> str:
-    """Coordinate deterministic data checks, parallel risk reviews, then one final report."""
-    packets = [data_quality_agent(code) for code in codes]
+def research_contract() -> dict[str, str]:
+    """Stable identities required to invalidate cached AI output safely."""
+    try:
+        sdk_version = importlib.metadata.version("openai-agents")
+    except importlib.metadata.PackageNotFoundError:
+        sdk_version = "not-installed"
+    risk_prompt = str(getattr(risk_reviewer, "instructions", ""))
+    report_prompt = str(getattr(report_writer, "instructions", ""))
+    return {
+        "model": os.environ.get("OPENAI_MODEL", "agents-sdk-default-unpinned"),
+        "agentsSdkVersion": sdk_version,
+        "riskPromptSha256": hashlib.sha256(risk_prompt.encode("utf-8")).hexdigest(),
+        "reportPromptSha256": hashlib.sha256(report_prompt.encode("utf-8")).hexdigest(),
+        "workflowVersion": "bounded-risk-review-v2",
+    }
+
+
+async def run_research_team_result(
+    codes: list[str],
+    packets: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Return output plus cache safety; failed/fallback AI calls are never cached."""
+    packets = packets if packets is not None else build_evidence_packets(codes)
     reviews = await asyncio.gather(*(_risk_review(packet) for packet in packets))
     final_input = {
         "role": "主協調驗收輸入",
@@ -122,6 +150,12 @@ async def run_research_team(codes: list[str]) -> str:
     try:
         result = await Runner.run(report_writer, json.dumps(final_input, ensure_ascii=False))
         text = str(result.final_output).strip()
-        return text or _fallback_report(packets, reviews)
+        cacheable = bool(text) and not any("error_type" in review for review in reviews)
+        return {"output": text or _fallback_report(packets, reviews), "cacheable": cacheable}
     except Exception:
-        return _fallback_report(packets, reviews)
+        return {"output": _fallback_report(packets, reviews), "cacheable": False}
+
+
+async def run_research_team(codes: list[str]) -> str:
+    """Backward-compatible text-only entrypoint."""
+    return str((await run_research_team_result(codes))["output"])
