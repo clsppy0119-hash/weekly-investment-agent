@@ -2,56 +2,56 @@
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
   "credentialMode": "authenticated",
-  "updatedAt": "2026-08-05T10:12:50.254542+00:00",
+  "updatedAt": "2026-08-06T10:16:27.878284+00:00",
   "activeStage": "半導體",
-  "universeCodes": 2773,
-  "currentStageCodes": 165,
+  "universeCodes": 2776,
+  "currentStageCodes": 161,
   "queriedCodes": [
-    "6485",
-    "6488",
-    "6494",
-    "6510",
-    "6525",
-    "6526",
-    "6532",
-    "6548",
-    "6563",
-    "6568",
-    "6640",
-    "6643",
-    "6651",
-    "6679",
-    "6683",
-    "6684",
-    "6693",
-    "6708",
-    "6716",
-    "6720",
-    "6732",
-    "6786",
-    "6788",
-    "6819",
-    "6823",
-    "6829",
-    "6842",
-    "6895",
-    "6907",
-    "6909"
+    "6920",
+    "6927",
+    "6937",
+    "6953",
+    "6992",
+    "6996",
+    "7415",
+    "7530",
+    "7556",
+    "7669",
+    "7704",
+    "7707",
+    "7712",
+    "7734",
+    "7749",
+    "7751",
+    "7770",
+    "7772",
+    "7796",
+    "7810",
+    "7815",
+    "7828",
+    "7843",
+    "7853",
+    "7856",
+    "7866",
+    "7872",
+    "7873",
+    "7880",
+    "7886"
   ],
   "priorityCodes": [],
-  "successfulCodes": 30,
-  "enrichedCodes": 210,
-  "remainingCodes": 2563,
+  "successfulCodes": 29,
+  "enrichedCodes": 315,
+  "remainingCodes": 2461,
   "stageCoverage": {
     "半導體": {
-      "total": 165,
-      "reviewed": 120,
-      "remaining": 45
+      "total": 161,
+      "reviewed": 150,
+      "remaining": 11
     },
     "電子其他": {
-      "total": 922,
+      "total": 926,
       "reviewed": 0,
-      "remaining": 922
+      "remaining": 926
     },
     "金融": {
       "total": 63,
@@ -59,9 +59,9 @@
       "remaining": 63
     },
     "傳產與其他": {
-      "total": 1410,
+      "total": 1413,
       "reviewed": 0,
-      "remaining": 1410
+      "remaining": 1413
     },
     "興櫃": {
       "total": 213,
@@ -69,11 +69,13 @@
       "remaining": 213
     }
   },
-  "failures": {},
-  "metrics": {
-    "eps": 210,
-    "roe": 210,
-    "debtRatio": 217
+  "failures": {
+    "7772": "TimeoutError"
   },
-  "fiveYearHistory": 126
+  "metrics": {
+    "eps": 317,
+    "roe": 315,
+    "debtRatio": 341
+  },
+  "fiveYearHistory": 137
 }
