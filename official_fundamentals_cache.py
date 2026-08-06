@@ -15,6 +15,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from provenance import record, utc_now
+
 
 ROOT = Path(__file__).resolve().parent
 TWSE = "https://openapi.twse.com.tw/v1/opendata/"
@@ -92,7 +94,17 @@ def main() -> None:
         except Exception as error:
             source_status[name] = {"url": url, "ready": False, "error": f"{type(error).__name__}: {error}"}
 
-    save(args.cache_dir / "official-fundamentals-v1" / "latest-snapshots.json", snapshots)
+    retrieved_at = utc_now()
+    provenance = {
+        name: record(
+            provider="TWSE/MOPS official open data" if name.startswith("twse") else "TPEx/MOPS official open data",
+            dataset=name, endpoint=url, scope={"snapshot": name}, retrieved_at=retrieved_at,
+            # These endpoints publish snapshots without a machine-readable release timestamp.
+            available_at=None, content=snapshots.get(name, []),
+            status="success" if name in snapshots else "failed", visibility="private_cache",
+        ) for name, url in SOURCES.items()
+    }
+    save(args.cache_dir / "official-fundamentals-v1" / "latest-snapshots.json", {"snapshots": snapshots, "provenance": provenance})
     market_sources = {
         "twse": ("twse_revenue", "twse_income", "twse_balance"),
         "tpex": ("tpex_revenue", "tpex_income", "tpex_balance"),
@@ -113,8 +125,9 @@ def main() -> None:
         "schemaVersion": 1,
         "provider": "TWSE／TPEx／MOPS official open data",
         "cacheVisibility": "private GitHub Actions cache; raw rows are not committed",
-        "updatedAt": datetime.now(timezone.utc).isoformat(),
+        "updatedAt": retrieved_at,
         "sources": source_status,
+        "provenance": provenance,
         "semiconductorUniverse": len(semiconductors),
         "semiconductorAnyFundamentalCoverage": len(semiconductors & covered),
         "coverageByMarket": coverage,

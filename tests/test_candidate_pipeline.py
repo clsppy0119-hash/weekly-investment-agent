@@ -10,6 +10,7 @@ import candidate_manifest
 import data_contract
 import finmind_actions
 import finmind_fundamentals
+import provenance
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -173,6 +174,28 @@ class CandidatePipelineTests(unittest.TestCase):
             tracker = root / "missing.json"
             self.assertEqual(finmind_fundamentals.candidate_codes(tracker, "", manifest), ["2330"])
             self.assertEqual(finmind_actions.active_codes(tracker, manifest), ["2330"])
+
+    def test_provenance_never_uses_retrieval_time_as_public_availability(self):
+        metadata = provenance.record(
+            provider="FinMind", dataset="TaiwanStockDividendResult", endpoint="https://example.test/data?token=secret",
+            scope={"code": "2330"}, retrieved_at="2026-08-06T08:00:00Z", effective_date="2026-08-01",
+            content=[{"date": "2026-08-01", "value": 1}],
+        )
+        self.assertIsNone(metadata["availableAt"])
+        self.assertEqual(metadata["quality"], "as_of_missing")
+        self.assertNotIn("token=secret", metadata["endpoint"])
+        self.assertNotIn("secret", json.dumps(metadata, ensure_ascii=False))
+
+    def test_missing_effective_date_is_a_deterministic_contract_blocker(self):
+        contract = data_contract.build_contract(
+            {"updatedAt": "2026-08-06T08:00:00Z", "provenance": {
+                "quote": {"source": "TWSE", "dataset": "quotes", "effectiveDate": "2026-08-06", "availableAt": "2026-08-06T08:00:00Z", "conflictStatus": "no_conflict"},
+                "fundamentals": {"source": "MOPS", "dataset": "statements", "availableAt": "2026-08-06T08:00:00Z", "conflictStatus": "no_conflict"},
+            }},
+            {"source": "FinMind", "dataset": "actions", "effectiveDate": "2026-08-06", "availableAt": "2026-08-06T08:00:00Z", "conflictStatus": "no_conflict"},
+            {}, {"certified": True, "generatedAt": "2026-08-06T08:00:00Z", "availableAt": "2026-08-06T08:00:00Z"},
+        )
+        self.assertIn("contract_fundamentals_effective_date_missing", contract["blockers"])
 
 
 if __name__ == "__main__":

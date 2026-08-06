@@ -13,6 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from provenance import record, utc_now
+
 
 ROOT = Path(__file__).resolve().parent
 MOPS_DOWNLOAD = "https://mopsov.twse.com.tw/server-java/FileDownLoad"
@@ -123,7 +125,19 @@ def main() -> None:
             try:
                 suffix = ".zip" if filing[:2] == b"PK" else ".html"
                 (stock_dir / f"{code}{suffix}").write_bytes(filing)
-                save(stock_dir / f"{code}.json", {"code": code, "period": period, "format": "zip" if suffix == ".zip" else "ixbrl", "source": "MOPS official XBRL download", "cachedAt": datetime.now(timezone.utc).isoformat()})
+                retrieved_at = utc_now()
+                save(stock_dir / f"{code}.json", {
+                    "code": code, "period": period, "format": "zip" if suffix == ".zip" else "ixbrl",
+                    "source": "MOPS official XBRL download", "cachedAt": retrieved_at,
+                    "provenance": record(
+                        provider="MOPS official XBRL disclosures", dataset="XBRL filing", endpoint=MOPS_DOWNLOAD,
+                        scope={"code": code, "period": period}, retrieved_at=retrieved_at,
+                        effective_date=period,
+                        # The download response does not provide the filing publication time.
+                        available_at=None, content={"code": code, "period": period, "format": suffix},
+                        visibility="private_cache",
+                    ),
+                })
                 cached[code] = {"period": period, "format": "zip" if suffix == ".zip" else "ixbrl"}
                 reviewed.add(code)
             except Exception as error:

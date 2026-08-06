@@ -11,6 +11,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from provenance import record, utc_now
+
 ROOT = Path(__file__).resolve().parent
 API = "https://api.finmindtrade.com/api/v4/data"
 STRATEGY = "industry-queue-v3"
@@ -191,6 +193,15 @@ def main() -> None:
         "metrics": {key: sum(1 for code in total_codes if fundamentals.get(code, {}).get(key) is not None) for key in CORE},
         "fiveYearHistory": sum(1 for code in total_codes if fundamentals.get(code, {}).get("financialHistoryYears", 0) >= 5),
     }
+    retrieved_at = utc_now()
+    market.setdefault("provenance", {})["fundamentals"] = record(
+        provider="FinMind authorized API",
+        dataset="TaiwanStockFinancialStatements,TaiwanStockBalanceSheet,TaiwanStockInfo",
+        endpoint=API, scope={"codes": selected, "start": start}, retrieved_at=retrieved_at,
+        effective_date=max((str(value.get("financialPeriod", "")) for value in results.values()), default=None) or None,
+        # Source rows lack an authoritative filing/publication timestamp.
+        available_at=None, content=results, visibility="private_cache",
+    )
     save(args.quotes, market)
     save(args.progress, progress_payload)
     save(args.coverage, coverage)

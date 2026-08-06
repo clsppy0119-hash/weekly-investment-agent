@@ -16,6 +16,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+from provenance import record
+
 
 ROOT = Path(__file__).resolve().parent
 API = "https://api.finmindtrade.com/api/v4/data"
@@ -140,12 +142,20 @@ def build_payload(codes: list[str], cache_path: Path, days: int, ttl_hours: floa
     candidate_key = hashlib.sha256(json.dumps({"codes": codes, "lastEventDates": last_event_dates}, sort_keys=True).encode()).hexdigest()
     cache_payload = {"schemaVersion": CACHE_SCHEMA, "updatedAt": now.isoformat(), "entries": entries}
     _atomic_json(cache_path, cache_payload)
+    events = sorted(events, key=lambda row: (str(row.get("date", "")), str(row.get("code", ""))))
+    provenance = record(
+        provider="FinMind authorized API", dataset="TaiwanStockDividendResult", endpoint=API,
+        scope={"codes": codes, "start": window_start.isoformat(), "end": today.isoformat()},
+        retrieved_at=now.isoformat(), effective_date=max((str(row.get("date", "")) for row in events), default=None),
+        # Provider rows do not establish when the information became public.
+        available_at=None, content=events, visibility="private_cache",
+    )
     return {
         "scope": "active candidate pool only; not full-market total-return coverage",
         "period": {"start": window_start.isoformat(), "end": today.isoformat()},
         "queried_codes": codes,
         "successful_codes": len(verified_codes),
-        "events": sorted(events, key=lambda row: (str(row.get("date", "")), str(row.get("code", "")))),
+        "events": events,
         "failures": failures,
         "cache": {
             "schemaVersion": CACHE_SCHEMA,
@@ -157,6 +167,10 @@ def build_payload(codes: list[str], cache_path: Path, days: int, ttl_hours: floa
             "overlapDays": overlap_days,
             "lastEventDates": last_event_dates,
         },
+        "source": provenance["source"], "dataset": provenance["dataset"],
+        "effectiveDate": provenance["effectiveDate"], "availableAt": provenance["availableAt"],
+        "updatedAt": now.isoformat(), "ingestedAt": provenance["ingestedAt"],
+        "conflictStatus": provenance["conflictStatus"], "provenance": provenance,
     }
 
 
