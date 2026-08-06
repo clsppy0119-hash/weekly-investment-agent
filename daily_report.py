@@ -12,6 +12,8 @@ ADVICE_GATE_PATH = Path(os.environ.get("ADVICE_GATE_PATH", "data/investment-advi
 MANIFEST_PATH = Path(os.environ.get("CANDIDATE_MANIFEST", "data/candidate-manifest.json"))
 ACTIONS_PATH = Path(os.environ.get("CANDIDATE_ACTIONS", "backtest_data/candidate_actions.json"))
 NEWS_PATH = Path(os.environ.get("MARKET_NEWS", "market-news.json"))
+PIT_STATUS_PATH = Path(os.environ.get("PIT_STATUS_PATH", "data/point-in-time-universe-status.json"))
+CONTRACT_PATH = Path(os.environ.get("DATA_CONTRACT_PATH", "data/evidence-contract.json"))
 
 
 def advice_enabled():
@@ -147,8 +149,10 @@ manifest = build_manifest(
     news_path=NEWS_PATH,
     actions_path=ACTIONS_PATH,
     gate_path=ADVICE_GATE_PATH,
+    pit_path=PIT_STATUS_PATH,
 )
 atomic_write_json(MANIFEST_PATH, manifest)
+atomic_write_json(CONTRACT_PATH, manifest["dataContract"])
 eligible_keys = {
     (str(item.get("style", "")), str(item.get("code", "")))
     for item in manifest.get("eligibleCandidates", [])
