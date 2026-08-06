@@ -29,6 +29,16 @@ def file_sha256(path: Path) -> str | None:
         return None
 
 
+def evidence_sha256(path: Path) -> str | None:
+    """Hash evidence content while excluding retrieval-cache diagnostics."""
+    payload = load_json(path)
+    if not payload:
+        return file_sha256(path)
+    payload.pop("cache", None)
+    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
@@ -116,8 +126,8 @@ def build_manifest(
         "eligibleCandidates": eligible if phase == "final" else [],
         "evidenceInputs": {
             "gateSha256": file_sha256(gate_path),
-            "newsSha256": file_sha256(news_path),
-            "corporateActionsSha256": file_sha256(actions_path),
+            "newsSha256": evidence_sha256(news_path),
+            "corporateActionsSha256": evidence_sha256(actions_path),
             "newsUpdatedAt": load_json(news_path).get("updatedAt"),
             "corporateActionsPeriod": actions.get("period"),
         },

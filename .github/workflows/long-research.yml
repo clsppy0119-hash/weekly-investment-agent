@@ -14,6 +14,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Build private evidence-cache key
+        id: evidence-cache-key
+        run: echo "key=market-evidence-v1-${{ runner.os }}-$(date -u +%Y%m%d%H)" >> "$GITHUB_OUTPUT"
+      - name: Restore private market-evidence cache
+        id: restore-market-evidence
+        uses: actions/cache/restore@v4
+        with:
+          path: .private-data-cache/market-evidence-v1
+          key: ${{ steps.evidence-cache-key.outputs.key }}
+          restore-keys: |
+            market-evidence-v1-${{ runner.os }}-
       - name: Fetch attributable market-news headlines
         run: python market_news.py
       - name: Build non-persistent candidate preview
@@ -22,6 +33,12 @@ jobs:
         run: python finmind_actions.py --candidate-manifest data/candidate-manifest.json --output backtest_data/candidate_actions.json
       - name: Build one verified comprehensive research snapshot
         run: REPORT_MODE=comprehensive REPORT_PHASE=final REPORT_OUTPUT=comprehensive-research.txt CANDIDATE_MANIFEST=data/candidate-manifest.json python daily_report.py
+      - name: Save private market-evidence cache
+        if: steps.restore-market-evidence.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .private-data-cache/market-evidence-v1
+          key: ${{ steps.evidence-cache-key.outputs.key }}
       - name: Install AI agent
         run: python -m pip install "openai-agents>=0.6.0" python-dotenv
       - name: Review comprehensive candidates with AI
