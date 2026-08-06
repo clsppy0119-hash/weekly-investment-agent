@@ -15,6 +15,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from provenance import record, utc_now
+
 
 ROOT = Path(__file__).resolve().parent
 SOURCES = {
@@ -80,10 +82,22 @@ def main() -> None:
         except Exception as error:
             sources[market] = {"url": url, "ready": False, "error": f"{type(error).__name__}: {error}"}
 
+    retrieved_at = utc_now()
+    provenance = {
+        market: record(
+            provider="TWSE official open data" if market == "twse" else "TPEx official open data",
+            dataset=f"official_{market}_latest_quotes", endpoint=url, scope={"market": market},
+            retrieved_at=retrieved_at,
+            # Snapshot endpoints do not expose a provider publication timestamp.
+            available_at=None, content=quotes if sources.get(market, {}).get("ready") else {},
+            status="success" if sources.get(market, {}).get("ready") else "failed", visibility="private_cache",
+        ) for market, url in SOURCES.items()
+    }
     payload = {
         "source": "TWSE／TPEx official open data",
-        "updatedAt": datetime.now(timezone.utc).isoformat(),
+        "updatedAt": retrieved_at,
         "quotes": quotes,
+        "provenance": provenance,
     }
     save(args.cache_dir / "official-market-v1" / "latest-quotes.json", payload)
     market_progress_path = args.cache_dir / "finmind-market-v1" / "progress.json"
@@ -98,6 +112,7 @@ def main() -> None:
         "cacheVisibility": "private GitHub Actions cache; raw rows are not committed",
         "updatedAt": payload["updatedAt"],
         "sources": sources,
+        "provenance": provenance,
         "quoteCount": len(quotes),
         "semiconductorCoverage": {
             "knownCodes": len(semiconductor_codes),

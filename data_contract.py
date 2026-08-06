@@ -52,6 +52,8 @@ def _record(
     if quality is None:
         if not source or source == "unknown":
             quality = "source_missing"
+        elif not effective_date:
+            quality = "effective_date_missing"
         elif not available_at:
             quality = "as_of_missing"
         elif conflict_status != "no_conflict":
