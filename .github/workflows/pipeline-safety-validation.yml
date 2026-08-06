@@ -1,0 +1,33 @@
+name: Pipeline safety validation
+
+on:
+  pull_request:
+    paths:
+      - "candidate_manifest.py"
+      - "daily_report.py"
+      - "finmind_actions.py"
+      - "finmind_fundamentals.py"
+      - "strategy_tracker.py"
+      - "investment_agent/cloud_report.py"
+      - "investment_agent/research_team.py"
+      - "tests/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+
+jobs:
+  local-equivalent-safety-suite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile changed Python modules
+        run: >-
+          python -m py_compile candidate_manifest.py daily_report.py strategy_tracker.py
+          finmind_fundamentals.py finmind_actions.py investment_agent/cloud_report.py
+          investment_agent/research_team.py
+      - name: Run deterministic safety tests
+        run: python -m unittest discover -s tests -v

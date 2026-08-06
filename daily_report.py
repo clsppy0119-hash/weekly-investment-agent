@@ -3,11 +3,15 @@ import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from candidate_manifest import atomic_write_json, build_manifest, load_json
 from strategy_tracker import record_recommendations, review_summary
 
 
 TZ_TAIPEI = timezone(timedelta(hours=8))
 ADVICE_GATE_PATH = Path(os.environ.get("ADVICE_GATE_PATH", "data/investment-advice-gate.json"))
+MANIFEST_PATH = Path(os.environ.get("CANDIDATE_MANIFEST", "data/candidate-manifest.json"))
+ACTIONS_PATH = Path(os.environ.get("CANDIDATE_ACTIONS", "backtest_data/candidate_actions.json"))
+NEWS_PATH = Path(os.environ.get("MARKET_NEWS", "market-news.json"))
 
 
 def advice_enabled():
@@ -118,17 +122,44 @@ def market_news_lines():
 
 
 report_mode = os.environ.get("REPORT_MODE", "comprehensive")
+report_phase = os.environ.get("REPORT_PHASE", "final").strip().lower()
+if report_phase not in {"preview", "final"}:
+    raise SystemExit("REPORT_PHASE must be preview or final")
 strategy_advice_enabled = advice_enabled()
 styles = [("comprehensive", "綜合投資研究")]
 report_title = "綜合投資研究日報"
 sections = []
 ranked_by_style = {}
+preview_ranked_by_style = {
+    key: candidates(key, quotes, fundamentals)
+    for key, _title in styles
+}
+advice_gate = load_json(ADVICE_GATE_PATH)
+actions = load_json(ACTIONS_PATH)
+manifest = build_manifest(
+    report_date=today,
+    report_mode=report_mode,
+    phase=report_phase,
+    ranked=preview_ranked_by_style,
+    quote_data=data,
+    advice_gate=advice_gate,
+    actions=actions,
+    news_path=NEWS_PATH,
+    actions_path=ACTIONS_PATH,
+    gate_path=ADVICE_GATE_PATH,
+)
+atomic_write_json(MANIFEST_PATH, manifest)
+eligible_keys = {
+    (str(item.get("style", "")), str(item.get("code", "")))
+    for item in manifest.get("eligibleCandidates", [])
+}
 for key, title in styles:
-    items = candidates(key, quotes, fundamentals)
+    items = [
+        item for item in preview_ranked_by_style[key]
+        if (key, str(item[2])) in eligible_keys
+    ]
     ranked_by_style[key] = items
     if not strategy_advice_enabled:
-        items = []
-        ranked_by_style[key] = []
         lines = ["\u7b56\u7565\u5c1a\u672a\u901a\u904e\u6a23\u672c\u5916\u9a57\u8b49\uff1b\u76ee\u524d\u50c5\u63d0\u4f9b\u7814\u7a76\u8cc7\u6599\uff0c\u4e0d\u63d0\u4f9b\u8cb7\u9032\u3001\u8ce3\u51fa\u6216\u52a0\u78bc\u5efa\u8b70\u3002"]
     lines = [candidate_line(item) for item in items] or ["• 暫無資料完整度足夠的候選，請待資料更新後再檢視。"]
     sections.extend(["", f"【{title}｜優先研究候選】", *lines])
@@ -150,8 +181,15 @@ report = "\n".join([
     "消息僅供追蹤與研究，需閱讀原始來源確認脈絡；不構成買賣建議或報酬保證。",
 ])
 
-tracking_state = record_recommendations(today, report_mode, ranked_by_style, data)
-report += "\n\n" + review_summary(tracking_state)
+if report_phase == "final":
+    tracking_state = record_recommendations(today, report_mode, ranked_by_style, data)
+    report += "\n\n" + review_summary(tracking_state)
 
-with open(os.environ.get("REPORT_OUTPUT", "daily-report.txt"), "w", encoding="utf-8") as output:
-    output.write(report)
+report_output = Path(os.environ.get("REPORT_OUTPUT", "daily-report.txt"))
+report_output.parent.mkdir(parents=True, exist_ok=True)
+temporary_report = report_output.with_name(f".{report_output.name}.{os.getpid()}.tmp")
+try:
+    temporary_report.write_text(report, encoding="utf-8")
+    os.replace(temporary_report, report_output)
+finally:
+    temporary_report.unlink(missing_ok=True)

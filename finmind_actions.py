@@ -21,7 +21,16 @@ ROOT = Path(__file__).resolve().parent
 API = "https://api.finmindtrade.com/api/v4/data"
 
 
-def active_codes(tracker: Path) -> list[str]:
+def active_codes(tracker: Path, manifest: Path | None = None) -> list[str]:
+    if manifest and manifest.exists():
+        payload = json.loads(manifest.read_text(encoding="utf-8-sig"))
+        codes = {
+            str(item.get("code", ""))
+            for item in payload.get("previewCandidates", [])
+            if isinstance(item, dict) and str(item.get("code", "")).isdigit()
+        }
+        if codes:
+            return sorted(codes)
     if not tracker.exists():
         return []
     rows = json.loads(tracker.read_text(encoding="utf-8")).get("recommendations", [])
@@ -61,10 +70,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=ROOT / "backtest_data" / "candidate_actions.json")
     parser.add_argument("--tracker", type=Path, default=ROOT / "strategy_data" / "recommendations.json")
+    parser.add_argument("--candidate-manifest", type=Path, default=None)
     parser.add_argument("--days", type=int, default=365)
     parser.add_argument("--workers", type=int, default=3)
     args = parser.parse_args()
-    codes = active_codes(args.tracker)
+    codes = active_codes(args.tracker, args.candidate_manifest)
     end = date.today()
     start = end - timedelta(days=args.days)
     events: list[dict] = []

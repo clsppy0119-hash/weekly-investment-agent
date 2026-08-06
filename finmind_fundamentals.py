@@ -43,8 +43,14 @@ def fetch(dataset: str, code: str = "", start: str = "") -> list[dict]:
     return payload.get("data", [])
 
 
-def candidate_codes(tracker: Path, extra: str) -> list[str]:
+def candidate_codes(tracker: Path, extra: str, manifest: Path | None = None) -> list[str]:
     codes = {item.strip() for item in extra.split(",") if item.strip().isdigit()}
+    candidate_manifest = load(manifest) if manifest else {}
+    codes.update(
+        str(item.get("code", ""))
+        for item in candidate_manifest.get("previewCandidates", [])
+        if isinstance(item, dict)
+    )
     rows = load(tracker).get("recommendations", [])
     if rows:
         newest = max(str(row.get("date", "")) for row in rows)
@@ -113,6 +119,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--quotes", type=Path, default=ROOT / "quotes.json")
     parser.add_argument("--tracker", type=Path, default=ROOT / "strategy_data" / "recommendations.json")
+    parser.add_argument("--candidate-manifest", type=Path, default=None)
     parser.add_argument("--codes", default="")
     parser.add_argument("--coverage", type=Path, default=ROOT / "data" / "fundamentals-coverage.json")
     parser.add_argument("--progress", type=Path, default=ROOT / "data" / "fundamentals-progress.json")
@@ -139,7 +146,7 @@ def main() -> None:
     active_stage = STAGES[active_index]
     stage_codes = by_stage[active_stage]
     pending = [code for code in stage_codes if code not in reviewed[active_stage]]
-    priority = [code for code in candidate_codes(args.tracker, args.codes) if code in pending]
+    priority = [code for code in candidate_codes(args.tracker, args.codes, args.candidate_manifest) if code in pending]
     selected = list(dict.fromkeys(priority + pending))[: max(1, args.batch_size)]
 
     start = f"{date.today().year - 5}-01-01"

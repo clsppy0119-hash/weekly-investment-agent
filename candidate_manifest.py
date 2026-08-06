@@ -1,0 +1,124 @@
+"""Deterministic candidate hand-off between data enrichment and AI review."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+from pathlib import Path
+from typing import Any
+
+from strategy_tracker import STRATEGY_VERSION, number
+
+
+REQUIRED_FINAL_METRICS = ("revenueYoY", "eps", "roe", "debtRatio")
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def file_sha256(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        temporary.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _quality_blockers(
+    code: str,
+    coverage: int,
+    fundamentals: dict[str, Any],
+    actions: dict[str, Any],
+) -> list[str]:
+    blockers: list[str] = []
+    if coverage < 80:
+        blockers.append("analysis_coverage_below_80")
+    blockers.extend(
+        f"missing_{metric}"
+        for metric in REQUIRED_FINAL_METRICS
+        if not number(fundamentals.get(metric))
+    )
+    if fundamentals.get("financialHistoryYears", 0) < 5:
+        blockers.append("fewer_than_five_financial_years")
+    queried = {str(item) for item in actions.get("queried_codes", [])}
+    failures = actions.get("failures", {}) if isinstance(actions.get("failures"), dict) else {}
+    if code not in queried or code in failures:
+        blockers.append("corporate_actions_not_verified")
+    return blockers
+
+
+def build_manifest(
+    *,
+    report_date: str,
+    report_mode: str,
+    phase: str,
+    ranked: dict[str, list[tuple]],
+    quote_data: dict[str, Any],
+    advice_gate: dict[str, Any],
+    actions: dict[str, Any],
+    news_path: Path,
+    actions_path: Path,
+    gate_path: Path,
+) -> dict[str, Any]:
+    preview: list[dict[str, Any]] = []
+    for style, items in ranked.items():
+        for rank, item in enumerate(items, 1):
+            score, coverage, code, quote, fundamentals = item
+            blockers = _quality_blockers(str(code), int(coverage), fundamentals, actions)
+            preview.append(
+                {
+                    "code": str(code),
+                    "name": quote.get("name", code),
+                    "style": style,
+                    "rank": rank,
+                    "score": score,
+                    "coverage": coverage,
+                    "quality": {"passed": not blockers, "blockers": blockers},
+                }
+            )
+    advice_enabled = (
+        advice_gate.get("status") == "advice_candidate"
+        and advice_gate.get("adviceEnabled") is True
+    )
+    eligible = [item for item in preview if advice_enabled and item["quality"]["passed"]]
+    return {
+        "schemaVersion": 1,
+        "reportDate": report_date,
+        "reportMode": report_mode,
+        "phase": phase,
+        "strategyVersion": STRATEGY_VERSION,
+        "quoteUpdatedAt": quote_data.get("updatedAt"),
+        "adviceGate": {
+            "status": advice_gate.get("status", "research_only"),
+            "adviceEnabled": advice_enabled,
+            "blockers": advice_gate.get("blockers", []),
+        },
+        "candidateOrder": [item["code"] for item in preview],
+        "previewCandidates": preview,
+        "eligibleCandidates": eligible if phase == "final" else [],
+        "evidenceInputs": {
+            "gateSha256": file_sha256(gate_path),
+            "newsSha256": file_sha256(news_path),
+            "corporateActionsSha256": file_sha256(actions_path),
+            "newsUpdatedAt": load_json(news_path).get("updatedAt"),
+            "corporateActionsPeriod": actions.get("period"),
+        },
+    }

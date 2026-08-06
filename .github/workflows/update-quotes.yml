@@ -14,9 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Record current strategy candidates
+      - name: Preview current strategy candidates without recording
         env:
-          REPORT_OUTPUT: strategy-snapshot.txt
+          REPORT_PHASE: preview
+          REPORT_OUTPUT: data/candidate-preview.txt
+          CANDIDATE_MANIFEST: data/candidate-manifest.json
         run: python daily_report.py
       - name: Download official closing prices
         run: |
@@ -145,7 +147,9 @@ jobs:
           PY
       - name: Refresh strategy outcomes
         env:
+          REPORT_PHASE: final
           REPORT_OUTPUT: strategy-snapshot.txt
+          CANDIDATE_MANIFEST: data/candidate-manifest.json
         run: python daily_report.py
       - name: Commit refreshed data
         run: |
