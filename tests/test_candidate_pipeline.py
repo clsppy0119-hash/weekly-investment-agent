@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import candidate_manifest
 import finmind_actions
 import finmind_fundamentals
 
@@ -14,6 +15,14 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 class CandidatePipelineTests(unittest.TestCase):
+    def test_cache_diagnostics_do_not_change_evidence_hash(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "evidence.json"
+            path.write_text(json.dumps({"items": [{"id": 1}], "cache": {"status": "miss"}}), encoding="utf-8")
+            first = candidate_manifest.evidence_sha256(path)
+            path.write_text(json.dumps({"items": [{"id": 1}], "cache": {"status": "hit", "ageSeconds": 10}}), encoding="utf-8")
+            self.assertEqual(first, candidate_manifest.evidence_sha256(path))
+
     def _write_fixture(self, root: Path, gate: dict) -> None:
         quote = {
             "updatedAt": "2026-08-06T08:00:00+08:00",
