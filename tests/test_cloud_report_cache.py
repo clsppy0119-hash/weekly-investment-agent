@@ -23,6 +23,14 @@ def manifest(*, status="advice_candidate", enabled=True, news="news-a"):
 
 
 class CloudReportCacheTests(unittest.TestCase):
+    def test_manifest_eligibility_requires_final_open_gate_and_passed_candidate(self):
+        self.assertTrue(cloud_report._manifest_needs_ai("comprehensive", manifest()))
+        self.assertFalse(cloud_report._manifest_needs_ai("comprehensive", manifest(status="research_only", enabled=False)))
+        failed = manifest()
+        failed["eligibleCandidates"][0]["quality"]["passed"] = False
+        self.assertFalse(cloud_report._manifest_needs_ai("comprehensive", failed))
+        self.assertFalse(cloud_report._manifest_needs_ai("daily", manifest()))
+
     def test_usage_status_distinguishes_zero_call_hit_and_generation(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
