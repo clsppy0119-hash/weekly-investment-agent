@@ -55,6 +55,7 @@ jobs:
         if: steps.ai-eligibility.outputs.needs_ai == 'true'
         run: python -m pip install "openai-agents>=0.6.0" python-dotenv
       - name: Restore private content-addressed AI cache
+        if: steps.ai-eligibility.outputs.needs_ai == 'true'
         uses: actions/cache/restore@v4
         with:
           path: .private-data-cache/ai-review-v1

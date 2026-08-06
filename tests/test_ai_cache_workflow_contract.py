@@ -10,6 +10,9 @@ class AiCacheWorkflowContractTests(unittest.TestCase):
         for relative in ("daily-report.yml", "long-research.yml"):
             workflow = (ROOT / ".github/workflows" / relative).read_text(encoding="utf-8")
             self.assertIn("path: .private-data-cache/ai-review-v1", workflow)
+            restore = workflow.index("Restore private content-addressed AI cache")
+            review = workflow.index("Review comprehensive candidates with AI")
+            self.assertIn("if: steps.ai-eligibility.outputs.needs_ai == 'true'", workflow[restore:review])
             self.assertIn("restore-keys: ai-review-v1-${{ runner.os }}-", workflow)
             self.assertIn("payload.get(\"cacheStatus\") == \"stored\"", workflow)
             self.assertIn("if: steps.ai-cache-status.outputs.save == 'true'", workflow)
