@@ -4,9 +4,46 @@ import unittest
 from pathlib import Path
 
 import backtest_data_cache
+import supabase_data_sync
 
 
 class BacktestCacheTests(unittest.TestCase):
+    def test_official_snapshot_gap_has_first_priority(self):
+        pending = ["1101", "2330", "2454", "3008"]
+        ordered = backtest_data_cache.prioritize_pending(pending, {"2454", "3008"}, {"1101", "3008"})
+        self.assertEqual(ordered, ["3008", "2454", "1101", "2330"])
+
+    def test_restored_stock_files_are_treated_as_reviewed(self):
+        with tempfile.TemporaryDirectory() as folder:
+            stock_dir = Path(folder)
+            (stock_dir / "2330.json").write_text("{}", encoding="utf-8")
+            (stock_dir / "note.txt").write_text("ignore", encoding="utf-8")
+            self.assertEqual(backtest_data_cache.existing_cached_codes(stock_dir), {"2330"})
+
+    def test_supabase_sync_uses_only_current_batch_files(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            stocks = root / "stocks"
+            stocks.mkdir()
+            (stocks / "2330.json").write_text("{}", encoding="utf-8")
+            (stocks / "2454.json").write_text("{}", encoding="utf-8")
+            status = root / "status.json"
+            status.write_text(json.dumps({"batch": {"cached": {"2454": {}}}}), encoding="utf-8")
+            self.assertEqual(supabase_data_sync.paths_from_batch_status(stocks, status), [stocks / "2454.json"])
+
+    def test_supabase_sync_empty_batch_does_not_fall_back_to_all_files(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            stocks = root / "finmind-backtest-v2" / "stocks"
+            stocks.mkdir(parents=True)
+            (stocks / "2330.json").write_text(
+                json.dumps({"TaiwanStockPrice": [{"date": "2026-01-02", "close": 100}]}),
+                encoding="utf-8",
+            )
+            daily, actions = supabase_data_sync.collect(root, [])
+            self.assertEqual(daily, [])
+            self.assertEqual(actions, [])
+
     def test_all_market_universe_has_priority(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

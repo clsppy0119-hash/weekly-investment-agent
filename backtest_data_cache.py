@@ -71,6 +71,14 @@ def fixed_universe_codes() -> list[str]:
     return sorted({item.strip() for item in raw.split(",") if item.strip().isdigit()})
 
 
+def prioritize_pending(codes: list[str], priority_codes: set[str], delisted_codes: set[str]) -> list[str]:
+    return sorted(codes, key=lambda item: (item not in priority_codes, item not in delisted_codes, item))
+
+
+def existing_cached_codes(stock_dir: Path) -> set[str]:
+    return {path.stem for path in stock_dir.glob("*.json") if path.stem.isdigit()}
+
+
 def fetch(dataset: str, code: str, start: str) -> list[dict[str, Any]]:
     token = os.environ.get("FINMIND_TOKEN", "").strip()
     query = {"dataset": dataset, "data_id": code, "start_date": start}
@@ -126,6 +134,7 @@ def main() -> None:
                 skipped = dict(previous)
                 skipped["updatedAt"] = datetime.now(timezone.utc).isoformat()
                 skipped["skippedDueToQuota"] = True
+                skipped["batch"] = {"requested": 0, "cached": {}, "unavailable": {}, "failures": {}}
                 save(args.status, skipped)
                 print(json.dumps(skipped, ensure_ascii=False))
                 return
@@ -138,17 +147,20 @@ def main() -> None:
     cache_dir = args.cache_dir / "finmind-backtest-v2"
     progress_path = cache_dir / "progress.json"
     progress = load(progress_path, {"reviewed": [], "unavailable": {}})
-    reviewed = set(progress.get("reviewed", [])) & set(codes)
+    reviewed = (set(progress.get("reviewed", [])) | existing_cached_codes(cache_dir / "stocks")) & set(codes)
     unavailable = {code: reason for code, reason in progress.get("unavailable", {}).items() if code in codes}
-    delisted_rows = load(cache_dir / "official-listing-history-v1" / "finmind_delisted.json", [])
+    delisted_rows = load(args.cache_dir / "official-listing-history-v1" / "finmind_delisted.json", [])
     delisted_codes = {
         str(row.get("stock_id", "")) for row in delisted_rows
         if str(row.get("stock_id", "")).isdigit()
     }
+    priority_path = args.cache_dir / "point-in-time-snapshots-v2" / "missing-price-codes.json"
+    priority_codes = set(load(priority_path, [])) if priority_path.exists() else set()
     pending = [code for code in codes if code not in reviewed and code not in unavailable]
-    # Prioritize historical exits so the anti-survivorship evidence improves
-    # before spending the quota on currently listed names.
-    pending.sort(key=lambda item: (item not in delisted_codes, item))
+    # First fill codes proven to exist in an official rebalance-date snapshot;
+    # within that group, historical exits remain first.  This spends the quota
+    # directly on the evidence needed to open the point-in-time gate.
+    pending = prioritize_pending(pending, priority_codes, delisted_codes)
     selected = pending[: max(1, args.batch_size)]
     start = f"{date.today().year - max(1, args.years)}-01-01"
 
@@ -199,6 +211,7 @@ def main() -> None:
             "eligibleStocks": len(eligible), "fixedUniverseCodes": fixed_codes, "benchmarkCodes": list(BENCHMARK_CODES),
             "required": len(codes), "cached": len(reviewed), "unavailable": len(unavailable),
             "remaining": max(0, len(codes) - len(reviewed) - len(unavailable)),
+            "pointInTimePriorityRemaining": len(priority_codes - reviewed - set(unavailable)),
         },
         "quotaLimited": any("402" in value or "Payment Required" in value for value in failures.values()),
     }

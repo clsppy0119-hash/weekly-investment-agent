@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from market_membership_snapshots import SNAPSHOT_DIR_NAME, load_membership
+
 
 ROOT = Path(__file__).resolve().parent
 BUY_FEE = 0.001425
@@ -166,13 +168,16 @@ def annualized(total_return: float, days: int) -> float | None:
 
 def run_period(series: dict[str, Series], dates: list[str], is_etf: bool = False,
                lookback: int = LOOKBACK, holding: int = HOLDING, picks_count: int = PICKS,
-               ranking_mode: str = "momentum") -> dict[str, Any]:
+               ranking_mode: str = "momentum",
+               membership_by_date: dict[str, set[str]] | None = None) -> dict[str, Any]:
     returns: list[float] = []
     trades = 0
     for index in range(lookback, len(dates) - holding, holding):
         signal, entry, exit_ = dates[index], dates[index + 1], dates[index + holding]
         ranked = []
         for code, item in series.items():
+            if membership_by_date is not None and code not in membership_by_date.get(signal, set()):
+                continue
             if item.entry_date and signal < item.entry_date:
                 continue
             if item.exit_date and exit_ >= item.exit_date:
@@ -200,6 +205,18 @@ def run_period(series: dict[str, Series], dates: list[str], is_etf: bool = False
     return {"totalReturn": total, "annualizedReturn": annualized(total, len(dates)), "mdd": max_drawdown(returns), "periods": len(returns), "trades": trades}
 
 
+def research_universe_codes(payload_codes: set[str], evidence: dict[str, Any],
+                            membership_by_date: dict[str, set[str]], fixed_codes: set[str]) -> set[str]:
+    """Choose candidates from direct daily evidence, with listing dates as fallback."""
+    snapshot_codes = set().union(*membership_by_date.values()) if membership_by_date else set()
+    verified_entry_codes = {
+        code for code, item in evidence.items()
+        if isinstance(item, dict) and item.get("entryDate")
+    }
+    evidence_codes = snapshot_codes if snapshot_codes else verified_entry_codes
+    return (payload_codes - {"0050"}) & (evidence_codes | fixed_codes)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cache-dir", type=Path, default=Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache")))
@@ -212,6 +229,10 @@ def main() -> None:
     official_dir = args.cache_dir / "official-listing-history-v1"
     certification_path = official_dir / "universe-certification.json"
     universe_status = load(certification_path) if certification_path.exists() else {}
+    snapshot_dir = args.cache_dir / SNAPSHOT_DIR_NAME
+    snapshot_status_path = ROOT / "data" / "market-membership-snapshot-status.json"
+    snapshot_status = load(snapshot_status_path) if snapshot_status_path.exists() else {}
+    membership_by_date = load_membership(snapshot_dir)
     evidence_path = official_dir / "semiconductor-membership-evidence.json"
     evidence = load(evidence_path) if evidence_path.exists() else {}
     if "0050" not in payloads:
@@ -222,10 +243,7 @@ def main() -> None:
         item.strip() for item in os.environ.get("FIXED_UNIVERSE_CODES", "").split(",")
         if item.strip().isdigit() and len(item.strip()) == 4
     }
-    verified_codes = {
-        code for code, item in evidence.items()
-        if isinstance(item, dict) and item.get("entryDate")
-    }
+    research_codes = research_universe_codes(set(payloads), evidence, membership_by_date, fixed_codes)
     universe = {
         code: total_return_series(
             code,
@@ -234,7 +252,7 @@ def main() -> None:
             evidence.get(code, {}).get("exitDate"),
         )
         for code, data in payloads.items()
-        if code != "0050" and (code in verified_codes or code in fixed_codes)
+        if code in research_codes
     }
     if not universe:
         raise SystemExit("no officially verifiable stocks available for strict research backtest")
@@ -248,7 +266,7 @@ def main() -> None:
         raise SystemExit("insufficient benchmark history")
     train_end, validation_end = int(len(calendar) * 0.6), int(len(calendar) * 0.8)
     splits = {"train": calendar[:train_end], "validation": calendar[train_end:validation_end], "test": calendar[validation_end:]}
-    results = {name: run_period(universe, days) for name, days in splits.items()}
+    results = {name: run_period(universe, days, membership_by_date=membership_by_date) for name, days in splits.items()}
     benchmark_results = {name: run_period({benchmark.code: benchmark}, days, is_etf=True) for name, days in splits.items()}
     performance_passed = (
         results["validation"]["periods"] >= 5
@@ -271,7 +289,7 @@ def main() -> None:
     # survivorship bias.
     # This is intentionally derived only from the strict official verifier;
     # price history or today's membership must never open this gate.
-    point_in_time_universe = bool(universe_status.get("certified", False))
+    point_in_time_universe = bool(snapshot_status.get("certified", False))
     promotion_blocked = (
         not stock_adjustment_validated
         or not point_in_time_universe
@@ -282,7 +300,7 @@ def main() -> None:
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "status": "research_only" if performance_passed and promotion_blocked else ("candidate" if performance_passed else "rejected"),
-        "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar), "pointInTimeMembership": point_in_time_universe, "inclusionRule": "explicit fixed basket" if fixed_codes else "official entry-date evidence only"},
+        "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar), "pointInTimeMembership": point_in_time_universe, "inclusionRule": "explicit fixed basket" if fixed_codes else "official TWSE/TPEx daily membership snapshots"},
         "strategy": {"name": "60-day total-return momentum", "lookbackDays": LOOKBACK, "holdingDays": HOLDING, "picks": PICKS},
         "costs": {"buyFee": BUY_FEE, "sellFee": SELL_FEE, "stockSellTax": STOCK_SELL_TAX, "etfSellTax": ETF_SELL_TAX, "oneWaySlippageBps": SLIPPAGE_BPS},
         "dividends": {"cash": "reinvested at ex-dividend date close", "stockDividendEvents": stock_events, "stockDividendMatchedEvents": stock_matches, "stockDividendReferencePriceError": stock_error, "stock": "share count adjusted using validated ex-right reference-price mapping"},

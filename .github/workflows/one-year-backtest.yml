@@ -41,7 +41,14 @@ jobs:
           path: .private-data-cache
           key: backtest-data-v2-${{ runner.os }}-latest
           restore-keys: backtest-data-v2-${{ runner.os }}-
-      - name: Restore durable total-return rows from Supabase when needed
+      - name: Restore and save official point-in-time snapshots
+        uses: actions/cache@v4
+        with:
+          path: .private-data-cache/point-in-time-snapshots-v2
+          key: market-membership-v2-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            market-membership-v2-${{ runner.os }}-
+      - name: Restore durable total-return rows when cache is empty
         if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
         shell: bash
         run: |
@@ -59,6 +66,7 @@ jobs:
           python all_market_universe.py
           python official_listing_history.py
           python point_in_time_universe.py
+          python market_membership_snapshots.py
       - name: Run companion total-return backtest
         run: python total_return_backtest.py --output backtest_data/total-return-backtest-status.json
       - name: Audit stock-dividend adjustment mapping
@@ -73,6 +81,7 @@ jobs:
             backtest_data/
             data/corporate-action-audit-status.json
             data/point-in-time-universe-status.json
+            data/market-membership-snapshot-status.json
       - name: Push result to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
