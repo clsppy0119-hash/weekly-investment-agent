@@ -33,19 +33,11 @@ jobs:
           path: .private-data-cache
           key: historical-fundamentals-v1-${{ runner.os }}-unavailable
           restore-keys: historical-fundamentals-v1-${{ runner.os }}-
-      - name: Restore private total-return inputs
-        uses: actions/cache/restore@v4
+      - name: Restore shared verified backtest inputs
+        uses: ./.github/actions/restore-backtest-inputs
         with:
-          path: .private-data-cache
-          key: backtest-data-v2-${{ runner.os }}-latest
-          restore-keys: backtest-data-v2-${{ runner.os }}-
-      - name: Restore durable cache when Actions cache is empty
-        if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
-        shell: bash
-        run: |
-          if ! find .private-data-cache/finmind-backtest-v2/stocks -type f -name '*.json' -print -quit 2>/dev/null | grep -q .; then
-            python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
-          fi
+          supabase-url: ${{ secrets.SUPABASE_URL }}
+          supabase-service-role-key: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       - name: Verify strict point-in-time universe evidence
         run: |
           python point_in_time_universe.py

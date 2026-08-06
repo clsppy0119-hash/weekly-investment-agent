@@ -35,12 +35,11 @@ jobs:
           restore-keys: |
             official-twse-history-v1-${{ runner.os }}-
             one-year-twse-v1-${{ runner.os }}-
-      - name: Restore private total-return inputs
-        uses: actions/cache/restore@v4
+      - name: Restore shared verified backtest inputs
+        uses: ./.github/actions/restore-backtest-inputs
         with:
-          path: .private-data-cache
-          key: backtest-data-v2-${{ runner.os }}-latest
-          restore-keys: backtest-data-v2-${{ runner.os }}-
+          supabase-url: ${{ secrets.SUPABASE_URL }}
+          supabase-service-role-key: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       - name: Restore and save official point-in-time snapshots
         uses: actions/cache@v4
         with:
@@ -48,13 +47,6 @@ jobs:
           key: market-membership-v2-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             market-membership-v2-${{ runner.os }}-
-      - name: Restore durable total-return rows when cache is empty
-        if: ${{ env.SUPABASE_URL != '' && env.SUPABASE_SERVICE_ROLE_KEY != '' }}
-        shell: bash
-        run: |
-          if ! find .private-data-cache/finmind-backtest-v2/stocks -type f -name '*.json' -print -quit 2>/dev/null | grep -q .; then
-            python supabase_data_restore.py --output-dir .private-data-cache/finmind-backtest-v2/stocks
-          fi
       - name: Download two years of official TWSE data
         run: python backtest.py collect --days 730
       - name: Run train validation test backtest
