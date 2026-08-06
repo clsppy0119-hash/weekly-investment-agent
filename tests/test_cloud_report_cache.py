@@ -23,6 +23,37 @@ def manifest(*, status="advice_candidate", enabled=True, news="news-a"):
 
 
 class CloudReportCacheTests(unittest.TestCase):
+    def test_usage_status_distinguishes_zero_call_hit_and_generation(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            path = root / "manifest.json"
+            path.write_text(json.dumps(manifest()), encoding="utf-8")
+            calls = {"count": 0}
+
+            async def run_team(codes, evidence):
+                calls["count"] += 1
+                return {"output": "review", "cacheable": True, "runner_invocations": len(codes) + 1}
+
+            components = (lambda codes: [{"stock_code": code} for code in codes], lambda: {"model": "test-model"}, run_team)
+            with patch.object(cloud_report, "load_market_data", return_value={"quotes": {"2330": {}}}), patch.object(cloud_report, "_research_components", return_value=components):
+                _, generated = asyncio.run(cloud_report._build_with_status("comprehensive", path, 3, root / "cache"))
+                _, hit = asyncio.run(cloud_report._build_with_status("comprehensive", path, 3, root / "cache"))
+            self.assertEqual(generated["runnerInvocations"], 2)
+            self.assertEqual(generated["cacheStatus"], "stored")
+            self.assertEqual(hit["runnerInvocations"], 0)
+            self.assertEqual(hit["avoidedRunnerInvocations"], 2)
+            self.assertEqual(calls["count"], 1)
+
+    def test_research_only_usage_status_is_zero_call(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            path = root / "manifest.json"
+            path.write_text(json.dumps(manifest(status="research_only", enabled=False)), encoding="utf-8")
+            with patch.object(cloud_report, "load_market_data", return_value={"quotes": {"2330": {}}}), patch.object(cloud_report, "_research_components", side_effect=AssertionError("must not load")):
+                _, status = asyncio.run(cloud_report._build_with_status("comprehensive", path, 3, root / "cache"))
+            self.assertEqual(status["runnerInvocations"], 0)
+            self.assertEqual(status["outcome"], "no_eligible_candidates")
+
     def test_hash_invalidates_for_every_declared_contract_input(self):
         base_manifest = manifest()
         base_packets = [{"stock_code": "2330", "quote_updated_at": "a"}]

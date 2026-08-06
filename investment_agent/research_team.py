@@ -151,9 +151,9 @@ async def run_research_team_result(
         result = await Runner.run(report_writer, json.dumps(final_input, ensure_ascii=False))
         text = str(result.final_output).strip()
         cacheable = bool(text) and not any("error_type" in review for review in reviews)
-        return {"output": text or _fallback_report(packets, reviews), "cacheable": cacheable}
+        return {"output": text or _fallback_report(packets, reviews), "cacheable": cacheable, "runner_invocations": len(packets) + 1}
     except Exception:
-        return {"output": _fallback_report(packets, reviews), "cacheable": False}
+        return {"output": _fallback_report(packets, reviews), "cacheable": False, "runner_invocations": len(packets) + 1}
 
 
 async def run_research_team(codes: list[str]) -> str:

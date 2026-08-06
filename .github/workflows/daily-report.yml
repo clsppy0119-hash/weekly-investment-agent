@@ -68,6 +68,7 @@ jobs:
             data/fundamentals-progress.json
             data/data-access-status.json
             data/candidate-manifest.json
+            data/ai-usage-status.json
             strategy_data/recommendations.json
       - name: Persist verified financial data
         continue-on-error: true

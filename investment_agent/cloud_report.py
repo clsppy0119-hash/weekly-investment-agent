@@ -14,6 +14,7 @@ from typing import Any, Callable
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MANIFEST = ROOT / "data" / "candidate-manifest.json"
 DEFAULT_CACHE = ROOT / ".private-data-cache" / "ai-review-v1"
+DEFAULT_STATUS = ROOT / "data" / "ai-usage-status.json"
 NO_ELIGIBLE_CANDIDATES = (
     "目前沒有通過資料品質與樣本外策略門檻的候選；本次未呼叫 AI，"
     "亦不提供買進、賣出或加碼建議。"
@@ -116,23 +117,47 @@ def _write_cache(cache_dir: Path, evidence_hash: str, output: str) -> None:
         temporary.unlink(missing_ok=True)
 
 
-async def _build(mode: str, manifest_path: Path, limit: int, cache_dir: Path) -> str:
+def _write_status(path: Path, status: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"schemaVersion": 1, "generatedAt": datetime.now(timezone.utc).isoformat(), **status}
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        temporary.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+async def _build_with_status(mode: str, manifest_path: Path, limit: int, cache_dir: Path) -> tuple[str, dict[str, Any]]:
     codes = _candidate_codes(mode, manifest_path, limit)
+    base = {"mode": mode, "candidateCount": len(codes), "tokenUsageAvailable": False}
     if not codes:
-        return NO_ELIGIBLE_CANDIDATES
+        return NO_ELIGIBLE_CANDIDATES, {**base, "outcome": "no_eligible_candidates", "cacheStatus": "not_applicable", "runnerInvocations": 0, "avoidedRunnerInvocations": 0}
     manifest = _load_json(manifest_path)
     build_packets, build_contract, run_team = _research_components()
     packets = build_packets(codes)
     contract = build_contract()
     evidence_hash = _evidence_hash(manifest, packets, contract)
+    identity = {"evidenceHash": evidence_hash, "model": contract.get("model", "unknown")}
     cached = _read_cache(cache_dir, evidence_hash)
     if cached is not None:
-        return cached
+        return cached, {**base, **identity, "outcome": "cache_hit", "cacheStatus": "hit", "runnerInvocations": 0, "avoidedRunnerInvocations": len(codes) + 1}
     result = await run_team(codes, packets)
     output = str(result.get("output", "")).strip() or NO_ELIGIBLE_CANDIDATES
-    if result.get("cacheable") is True and output != NO_ELIGIBLE_CANDIDATES:
+    cacheable = result.get("cacheable") is True and output != NO_ELIGIBLE_CANDIDATES
+    if cacheable:
         _write_cache(cache_dir, evidence_hash, output)
-    return output
+    return output, {
+        **base, **identity,
+        "outcome": "generated" if cacheable else "generated_not_cacheable",
+        "cacheStatus": "stored" if cacheable else "not_stored",
+        "runnerInvocations": int(result.get("runner_invocations", len(codes) + 1)),
+        "avoidedRunnerInvocations": 0,
+    }
+
+
+async def _build(mode: str, manifest_path: Path, limit: int, cache_dir: Path) -> str:
+    return (await _build_with_status(mode, manifest_path, limit, cache_dir))[0]
 
 
 def main() -> int:
@@ -142,22 +167,17 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--limit", type=int, default=3)
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE)
+    parser.add_argument("--status", type=Path, default=DEFAULT_STATUS)
     args = parser.parse_args()
     if not os.environ.get("OPENAI_API_KEY"):
         args.output.write_text("AI 研究未啟用：尚未設定 OPENAI_API_KEY。\n", encoding="utf-8")
+        _write_status(args.status, {"mode": args.mode, "outcome": "disabled_missing_key", "cacheStatus": "not_applicable", "candidateCount": 0, "runnerInvocations": 0, "avoidedRunnerInvocations": 0, "tokenUsageAvailable": False})
         return 2
-    args.output.write_text(
-        asyncio.run(
-            _build(
-                args.mode,
-                args.manifest,
-                max(1, min(args.limit, 3)),
-                args.cache_dir,
-            )
-        )
-        + "\n",
-        encoding="utf-8",
+    output, status = asyncio.run(
+        _build_with_status(args.mode, args.manifest, max(1, min(args.limit, 3)), args.cache_dir)
     )
+    args.output.write_text(output + "\n", encoding="utf-8")
+    _write_status(args.status, status)
     return 0
 
 

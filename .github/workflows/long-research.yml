@@ -56,6 +56,7 @@ jobs:
             backtest_data/candidate_actions.json
             market-news.json
             data/candidate-manifest.json
+            data/ai-usage-status.json
       - name: Push to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
