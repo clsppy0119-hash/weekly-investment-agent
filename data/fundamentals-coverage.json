@@ -2,51 +2,42 @@
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
   "credentialMode": "authenticated",
-  "updatedAt": "2026-08-06T10:16:27.878284+00:00",
+  "updatedAt": "2026-08-07T05:54:11.884041+00:00",
   "activeStage": "半導體",
-  "universeCodes": 2776,
+  "universeCodes": 2778,
   "currentStageCodes": 161,
   "queriedCodes": [
-    "6920",
-    "6927",
-    "6937",
-    "6953",
-    "6992",
-    "6996",
-    "7415",
-    "7530",
-    "7556",
-    "7669",
-    "7704",
-    "7707",
-    "7712",
-    "7734",
-    "7749",
-    "7751",
-    "7770",
-    "7772",
-    "7796",
-    "7810",
-    "7815",
-    "7828",
-    "7843",
-    "7853",
-    "7856",
-    "7866",
-    "7872",
-    "7873",
-    "7880",
-    "7886"
+    "7887",
+    "7894",
+    "7898",
+    "7899",
+    "7909",
+    "7913",
+    "7918",
+    "8024",
+    "8040",
+    "8054",
+    "8086",
+    "8088",
+    "8091",
+    "8098",
+    "8102",
+    "8110",
+    "8150",
+    "8227",
+    "8277",
+    "8299",
+    "8383"
   ],
   "priorityCodes": [],
-  "successfulCodes": 29,
-  "enrichedCodes": 315,
-  "remainingCodes": 2461,
+  "successfulCodes": 21,
+  "enrichedCodes": 347,
+  "remainingCodes": 2431,
   "stageCoverage": {
     "半導體": {
       "total": 161,
-      "reviewed": 150,
-      "remaining": 11
+      "reviewed": 171,
+      "remaining": 0
     },
     "電子其他": {
       "total": 926,
@@ -59,23 +50,21 @@
       "remaining": 63
     },
     "傳產與其他": {
-      "total": 1413,
+      "total": 1414,
       "reviewed": 0,
-      "remaining": 1413
+      "remaining": 1414
     },
     "興櫃": {
-      "total": 213,
+      "total": 214,
       "reviewed": 0,
-      "remaining": 213
+      "remaining": 214
     }
   },
-  "failures": {
-    "7772": "TimeoutError"
-  },
+  "failures": {},
   "metrics": {
-    "eps": 317,
-    "roe": 315,
-    "debtRatio": 341
+    "eps": 350,
+    "roe": 347,
+    "debtRatio": 367
   },
-  "fiveYearHistory": 137
+  "fiveYearHistory": 150
 }
