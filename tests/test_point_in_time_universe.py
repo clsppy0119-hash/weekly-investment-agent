@@ -16,13 +16,30 @@ class PointInTimeUniverseTests(unittest.TestCase):
         self.assertEqual(certification(candidates, entries, {}, {"2222"}), (False, [], ["2222"]))
         self.assertEqual(certification(candidates, entries, {"2222": "2020-01-01"}, {"2222"}), (True, [], []))
 
-    def test_stock_is_never_traded_outside_official_listing_interval(self):
+    def test_no_price_outside_the_official_listing_interval_is_ever_used(self):
+        """Listing bounds constrain prices, not the decision to enter.
+
+        The stock lists on 01-04 and delists on 01-09.  Two signals fall inside
+        the listed window, and both may trade: on the second one the engine
+        cannot know the delisting is coming, so it enters and is forced out at
+        the last price inside the interval.  Refusing that entry would be
+        look-ahead -- it would let the backtest sidestep precisely the
+        positions that end badly.
+        """
         dates = [f"2026-01-{day:02d}" for day in range(1, 11)]
         values = {day: float(index + 1) for index, day in enumerate(dates)}
         stock = Series("1111", values, 0, "2026-01-04", "2026-01-09")
         result = run_period({"1111": stock}, dates, lookback=2, holding=2, picks_count=1)
-        self.assertEqual(result["periods"], 1)
-        self.assertEqual(result["trades"], 1)
+        self.assertEqual(result["periods"], 2)
+        self.assertEqual(result["trades"], 2)
+
+    def test_signal_before_listing_is_still_refused(self):
+        """Entry-side point-in-time integrity must stay intact."""
+        dates = [f"2026-01-{day:02d}" for day in range(1, 11)]
+        values = {day: float(index + 1) for index, day in enumerate(dates)}
+        stock = Series("1111", values, 0, "2026-01-08", None)
+        result = run_period({"1111": stock}, dates, lookback=2, holding=2, picks_count=1)
+        self.assertEqual(result["periods"], 0)
 
 
 if __name__ == "__main__":

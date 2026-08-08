@@ -164,6 +164,10 @@ def collect(days: int, output: Path, workers: int, end: date | None = None, requ
     existing: dict[str, dict] = {}
     if output.exists():
         for line in output.read_text(encoding="utf-8").splitlines():
+            # An interrupted or fully failed run can leave blank lines behind;
+            # without this the cache is poisoned and every later run dies here.
+            if not line.strip():
+                continue
             row = json.loads(line)
             existing[row["date"]] = row
     wanted = weekday_dates(days, end)
@@ -205,22 +209,43 @@ def run_slice(history: list[dict[str, tuple[float, float]]], lookback: int, coun
     returns: list[float] = []
     signals = 0
     wins = 0
+    unfilled = 0
+    stale_exits = 0
     index = lookback
     while index + holding + 1 < len(history):
-        today, past, entry, exit_ = history[index], history[index - lookback], history[index + 1], history[index + holding + 1]
+        today, past = history[index], history[index - lookback]
+        window = history[index + 1:index + holding + 2]
         ranked = []
+        # Rank on signal-day information only.  Requiring an entry or exit price
+        # here would let a stock that stops trading during the holding period
+        # leave the candidate pool instead of taking its loss, which is exactly
+        # the survivorship bias the point-in-time gate is meant to prevent.
         for code, (price, volume) in today.items():
             previous = past.get(code)
-            entry_price = entry.get(code)
-            exit_price = exit_.get(code)
-            if not previous or not entry_price or not exit_price or volume < 500_000:
+            if not previous or volume < 500_000:
                 continue
             momentum = price / previous[0] - 1
             if price >= 10 and momentum > -0.25:
-                ranked.append((momentum, code, entry_price[0], exit_price[0]))
-        picks = sorted(ranked, reverse=True)[:count]
-        if picks:
-            gross = mean(exit_price / entry_price - 1 for _, _, entry_price, exit_price in picks)
+                ranked.append((momentum, code))
+        trade_returns: list[float] = []
+        for _, code in sorted(ranked, reverse=True)[:count]:
+            entry_price = window[0].get(code)
+            if not entry_price:
+                # No tradable price on the entry day; that slot stays in cash.
+                unfilled += 1
+                continue
+            exit_price = window[-1].get(code)
+            if not exit_price:
+                # Exit at the last observed price instead of dropping the
+                # position.  These are counted so a run that leans on the
+                # fallback is visible rather than silently flattering.
+                exit_price = next((day[code] for day in reversed(window[:-1]) if code in day), None)
+                stale_exits += 1
+            if not exit_price:
+                continue
+            trade_returns.append(exit_price[0] / entry_price[0] - 1)
+        if trade_returns:
+            gross = mean(trade_returns)
             net = (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - STOCK_SELL_TAX - SLIPPAGE_BPS / 10_000) - 1
             returns.append(net)
             signals += 1
@@ -233,7 +258,8 @@ def run_slice(history: list[dict[str, tuple[float, float]]], lookback: int, coun
         equity *= 1 + value
         peak = max(peak, equity)
         drawdown = min(drawdown, equity / peak - 1)
-    return {"return": equity - 1, "mdd": drawdown, "trades": signals, "win_rate": wins / signals if signals else 0.0, "returns": returns}
+    return {"return": equity - 1, "mdd": drawdown, "trades": signals, "win_rate": wins / signals if signals else 0.0,
+            "returns": returns, "unfilled": unfilled, "stale_exits": stale_exits}
 
 
 def baseline_0050_price_proxy(history: list[dict[str, tuple[float, float]]]) -> float | None:
