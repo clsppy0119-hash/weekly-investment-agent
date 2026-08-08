@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-09 01:11 Taipei time",
+  "updatedAt": "2026-08-09 01:20 Taipei time",
   "provenance": {
     "quote": {
       "schemaVersion": 1,
@@ -12,8 +12,8 @@
       "observationTime": null,
       "effectiveDate": "2026-08-09",
       "availableAt": "2026-08-09T14:00:00+08:00",
-      "retrievedAt": "2026-08-08T17:11:52.734022+00:00",
-      "ingestedAt": "2026-08-08T17:11:52.734022+00:00",
+      "retrievedAt": "2026-08-08T17:20:02.243278+00:00",
+      "ingestedAt": "2026-08-08T17:20:02.243278+00:00",
       "timezone": "UTC",
       "contentHash": "29e44ba43072ffae4ad550dda23376126e79b023c8a54128eddb0eb46c96fa08",
       "schemaHash": "407868f2de8d8f774838c00cc03806c84abc40c34d438da5f02ec53d8d1a69a1",
@@ -35,8 +35,8 @@
       "observationTime": null,
       "effectiveDate": "2026-08-09",
       "availableAt": "2026-08-09T14:00:00+08:00",
-      "retrievedAt": "2026-08-08T17:11:52.734022+00:00",
-      "ingestedAt": "2026-08-08T17:11:52.734022+00:00",
+      "retrievedAt": "2026-08-08T17:20:02.243278+00:00",
+      "ingestedAt": "2026-08-08T17:20:02.243278+00:00",
       "timezone": "UTC",
       "contentHash": "a5917d4721129153f5bb4f2686db3fe4af176534055defec5cdd0efb8644fd24",
       "schemaHash": "3da8020d4b43bac1d0b61abb02a712d624ce0d40ea420948e61e462d2529f43f",
