@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from data_contract import build_contract
-from quote_provenance import available_at, build, conflict_status
+from quote_provenance import available_at, build, conflict_status, trading_date
 
 RETRIEVED = "2026-08-07T09:30:00+00:00"
 
@@ -63,6 +63,24 @@ def test_an_overlap_keeps_the_snapshot_out_of_verified():
 
     assert provenance["quote"]["conflictStatus"] == "conflict_unresolved"
     assert provenance["quote"]["quality"] != "verified"
+
+
+def test_a_holiday_run_keeps_the_previous_session_date():
+    """The weekday schedule fires on holidays; the exchanges do not open."""
+    unchanged = {"2330": {"price": 1000.0}, "6488": {"price": 500.0}}
+
+    assert trading_date("2026-10-10", unchanged, unchanged, "2026-10-09") == "2026-10-09"
+
+
+def test_a_moved_price_means_a_new_session():
+    previous = {"2330": {"price": 1000.0}}
+    today = {"2330": {"price": 1015.0}}
+
+    assert trading_date("2026-10-12", today, previous, "2026-10-09") == "2026-10-12"
+
+
+def test_a_first_ever_run_uses_the_run_date():
+    assert trading_date("2026-08-07", {"2330": {"price": 1000.0}}, {}, None) == "2026-08-07"
 
 
 def test_the_modelled_assumption_is_recorded_in_the_record():

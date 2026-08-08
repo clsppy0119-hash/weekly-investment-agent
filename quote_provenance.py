@@ -44,6 +44,25 @@ def available_at(trading_date: str) -> str:
     return datetime.combine(day, SESSION_CLOSE, tzinfo=TAIPEI).isoformat()
 
 
+def trading_date(today: str, quotes: dict[str, Any], previous: dict[str, Any],
+                 previous_date: str | None) -> str:
+    """The date the prices belong to, which is not always the date of the run.
+
+    The schedule is weekday-only, but a public holiday still fires it and the
+    exchanges return the previous session unchanged. Stamping that with the
+    run's date would backdate the next session's close onto a day the market
+    never opened -- the exact mislabelling this module exists to prevent. When
+    no price has moved, the previous trading date is kept.
+    """
+    if not previous or not previous_date:
+        return today
+    moved = any(
+        isinstance(values, dict) and previous.get(code, {}).get("price") != values.get("price")
+        for code, values in quotes.items()
+    )
+    return today if moved else previous_date
+
+
 def conflict_status(code_sets: dict[str, Iterable[str]]) -> tuple[str, list[str]]:
     """``no_conflict`` only when no code was returned by two exchanges."""
     seen: dict[str, str] = {}
