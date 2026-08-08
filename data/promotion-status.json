@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-08T16:32:39.132040+00:00",
+  "stage": "screening_assistant",
+  "stageLabel": "篩選助手：可提供附證據的候選清單，最終判斷由人做。",
+  "recommendations": 15,
+  "horizons": {
+    "5": {
+      "settled": 4,
+      "rebalances": 4,
+      "meanExcessPerRebalance": 0.09992499999999999,
+      "stdev": 0.21472584652683677,
+      "tStat": 0.9307216771178145,
+      "ci95": [
+        -0.029375,
+        0.31765
+      ],
+      "conclusive": false
+    },
+    "20": {
+      "settled": 0,
+      "rebalances": 0,
+      "conclusive": false,
+      "reason": "fewer_than_three_rebalances"
+    },
+    "60": {
+      "settled": 0,
+      "rebalances": 0,
+      "conclusive": false,
+      "reason": "fewer_than_three_rebalances"
+    }
+  },
+  "blockers": {
+    "assisted_selection": [
+      "20 日已結算 0/30 筆"
+    ],
+    "autonomous_selection": [
+      "60 日已結算 0/60 筆",
+      "investment-advice-gate 尚未開啟"
+    ]
+  },
+  "note": "前瞻結果以 0050 總報酬為基準；追蹤層尚未記錄合格池，因此無法在此檢驗『優於同池』，該項目目前僅能由回測評估。"
+}
