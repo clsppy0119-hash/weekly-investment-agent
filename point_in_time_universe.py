@@ -5,6 +5,7 @@ availability is never used as a substitute for membership evidence.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
@@ -56,6 +57,31 @@ def iso_date(raw: str) -> str:
     return ""
 
 
+def named_certification(codes: list[str], entries: dict[str, str], exits: dict[str, str],
+                        known_exited: set[str]) -> dict[str, Any]:
+    """Membership evidence for the stocks a report actually names.
+
+    The universe-wide rule is what a backtest needs: a single stock without a
+    listing date means the historical sample may be missing companies, so the
+    whole sample is suspect. A shortlist makes a much narrower claim -- these
+    named stocks, today -- and one unrelated microcap with a missing listing
+    date says nothing about it. Scoping the check to what is being claimed
+    keeps the guarantee exact instead of making it unreachable.
+    """
+    missing_entry = sorted(stock for stock in codes if stock not in entries)
+    missing_exit = sorted(stock for stock in codes if stock in known_exited and stock not in exits)
+    exited = sorted(stock for stock in codes if stock in exits)
+    return {
+        "codes": sorted(codes),
+        "entryVerified": len(codes) - len(missing_entry),
+        "missingEntry": missing_entry,
+        "missingExit": missing_exit,
+        "alreadyExited": exited,
+        # An exited stock must never appear in a shortlist offered as current.
+        "certified": bool(codes) and not missing_entry and not missing_exit and not exited,
+    }
+
+
 def certification(candidate_codes: list[str], entries: dict[str, str], exits: dict[str, str],
                   known_exited: set[str]) -> tuple[bool, list[str], list[str]]:
     """Require entry evidence for all candidates and exit evidence for known exits.
@@ -70,7 +96,28 @@ def certification(candidate_codes: list[str], entries: dict[str, str], exits: di
     return certified, missing_entry, missing_exit
 
 
+def manifest_codes(path: Path | None) -> list[str]:
+    """Stock codes the current report intends to name, if a manifest exists."""
+    if not path or not path.exists():
+        return []
+    try:
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    codes = {
+        str(item.get("code", "")).strip()
+        for key in ("previewCandidates", "eligibleCandidates")
+        for item in manifest.get(key, [])
+        if isinstance(item, dict)
+    }
+    return sorted(code for code in codes if code)
+
+
 def main() -> None:
+    parser = argparse.ArgumentParser(description="建立 point-in-time 會員資格證據")
+    parser.add_argument("--candidate-manifest", type=Path, default=None,
+                        help="另外針對本次報告實際列出的標的做範圍收斂的認證")
+    args = parser.parse_args()
     cache_dir = Path(os.environ.get("DATA_CACHE_DIR", ROOT / ".private-data-cache"))
     official = cache_dir / "official-listing-history-v1"
     historic = load(cache_dir / "historical-universe-v1" / "semiconductor.json", [])
@@ -147,6 +194,9 @@ def main() -> None:
         "sourceFieldNames": source_fields,
         "certified": certified,
         "promotionGate": "open" if certified else "closed: official historical membership evidence is incomplete",
+        # Scoped to the stocks this report names; see named_certification.
+        "candidateCertification": named_certification(
+            manifest_codes(args.candidate_manifest), entries, exits, known_exited),
         "cacheVisibility": "private GitHub Actions cache; stock-level evidence is not committed",
     }
     (official / "universe-certification.json").write_text(

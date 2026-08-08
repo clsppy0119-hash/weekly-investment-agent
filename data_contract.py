@@ -74,6 +74,22 @@ def _record(
     }
 
 
+def _point_in_time_quality(pit_status: dict[str, Any]) -> str:
+    """Certify against what the report claims, not against the whole universe.
+
+    The universe-wide rule is what a backtest needs: one stock without a listing
+    date means the historical sample may be missing companies. A shortlist makes
+    a narrower claim -- these named stocks, today -- so when the report names
+    specific candidates, their own membership evidence is what has to hold. The
+    universe rule still applies whenever no candidates are named, and it remains
+    the gate that governs backtest promotion elsewhere.
+    """
+    scoped = pit_status.get("candidateCertification")
+    if isinstance(scoped, dict) and scoped.get("codes"):
+        return "verified" if scoped.get("certified") is True else "pit_candidate_not_certified"
+    return "verified" if pit_status.get("certified") is True else "pit_not_certified"
+
+
 def build_contract(
     quote_data: dict[str, Any],
     actions: dict[str, Any],
@@ -109,7 +125,7 @@ def build_contract(
         _record(
             "point_in_time", "TWSE/TPEx/MOPS official", "listing-and-exit-evidence",
             _iso(pit_status.get("generatedAt")), _iso(pit_status.get("availableAt")), _iso(pit_status.get("generatedAt")), pit_status,
-            conflict_status="no_conflict", quality="verified" if pit_status.get("certified") is True else "pit_not_certified",
+            conflict_status="no_conflict", quality=_point_in_time_quality(pit_status),
         ),
         _record(
             "market_news", "attributable_news_feed", "headline_monitor", None,

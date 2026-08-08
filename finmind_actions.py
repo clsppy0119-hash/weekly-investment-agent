@@ -17,6 +17,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from provenance import record
+from quote_provenance import available_at
 
 
 ROOT = Path(__file__).resolve().parent
@@ -143,13 +144,22 @@ def build_payload(codes: list[str], cache_path: Path, days: int, ttl_hours: floa
     cache_payload = {"schemaVersion": CACHE_SCHEMA, "updatedAt": now.isoformat(), "entries": entries}
     _atomic_json(cache_path, cache_payload)
     events = sorted(events, key=lambda row: (str(row.get("date", "")), str(row.get("code", ""))))
+    # An ex-rights reference price is published by the exchange on the ex-dividend
+    # trading day itself, so availability follows session rules rather than
+    # anything the provider asserts -- the same basis used for the daily quote
+    # snapshot. With no events in the window the evidence is "none as of today",
+    # which is established by today's close.
+    effective_date = max((str(row.get("date", "")) for row in events), default=None) or today.isoformat()
     provenance = record(
         provider="FinMind authorized API", dataset="TaiwanStockDividendResult", endpoint=API,
         scope={"codes": codes, "start": window_start.isoformat(), "end": today.isoformat()},
-        retrieved_at=now.isoformat(), effective_date=max((str(row.get("date", "")) for row in events), default=None),
-        # Provider rows do not establish when the information became public.
-        available_at=None, content=events, visibility="private_cache",
+        retrieved_at=now.isoformat(), effective_date=effective_date,
+        available_at=available_at(effective_date), content=events, visibility="private_cache",
+        conflict_status="no_conflict" if not failures else "conflict_unresolved",
     )
+    provenance["availableAtBasis"] = (
+        "modelled: 14:00 Taipei on the ex-dividend trading date, when the exchange "
+        "publishes the reference price; not the provider fetch time")
     return {
         "scope": "active candidate pool only; not full-market total-return coverage",
         "period": {"start": window_start.isoformat(), "end": today.isoformat()},
