@@ -151,8 +151,15 @@ jobs:
           # Without this the evidence contract reads the source as unknown and
           # discards every candidate the screener ranked.
           import quote_provenance
+          # A holiday still fires the weekday schedule and returns the previous
+          # session, so the run date is not necessarily the session date.
+          session_date = quote_provenance.trading_date(
+            today, quotes, existing.get("quotes", {}),
+            existing.get("provenance", {}).get("quote", {}).get("effectiveDate"),
+          )
+          if session_date != today: print(f"no price moved; keeping session date {session_date}")
           provenance = quote_provenance.build(
-            trading_date=today,
+            trading_date=session_date,
             retrieved_at=datetime.now(timezone.utc).isoformat(),
             quotes=quotes, fundamentals=fundamentals, code_sets=market_codes,
           )
