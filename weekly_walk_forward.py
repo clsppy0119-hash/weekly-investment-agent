@@ -19,10 +19,16 @@ from total_return_backtest import (
 )
 
 
-def benchmark_return(series: Series, dates: list[str]) -> float:
+def benchmark_return(series: Series, dates: list[str]) -> float | None:
+    """Net 0050 total return over ``dates``; ``None`` when the window is unusable.
+
+    Returning 0.0 here would silently turn the promotion rule into "did the
+    strategy make any positive return", so a missing benchmark must fail the
+    window rather than lower the bar.
+    """
     values = [series.values[day] for day in dates if day in series.values]
-    if len(values) < 2:
-        return 0.0
+    if len(values) < 2 or values[0] <= 0:
+        return None
     gross = values[-1] / values[0] - 1
     return (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - BUY_FEE - ETF_SELL_TAX - SLIPPAGE_BPS / 10_000) - 1
 
@@ -56,7 +62,13 @@ def evaluate(cache_dir: Path, benchmark_path: Path, codes: set[str], train_days:
             "parameters": {"lookback": lookback, "holding": holding, "picks": picks, "ranking": mode},
             "validation": {"strategy": validation_result["totalReturn"], "benchmark": validation_benchmark, "periods": validation_result["periods"]},
             "test": {"strategy": test_result["totalReturn"], "benchmark": test_benchmark, "periods": test_result["periods"]},
-            "passed": validation_result["periods"] >= 3 and test_result["periods"] >= 3 and validation_result["totalReturn"] > validation_benchmark and test_result["totalReturn"] > test_benchmark,
+            "passed": (
+                validation_benchmark is not None and test_benchmark is not None
+                and validation_result["periods"] >= 3 and test_result["periods"] >= 3
+                and validation_result["totalReturn"] > validation_benchmark
+                and test_result["totalReturn"] > test_benchmark
+            ),
+            "benchmarkAvailable": validation_benchmark is not None and test_benchmark is not None,
         })
         start += step
     blockers = []
@@ -64,6 +76,8 @@ def evaluate(cache_dir: Path, benchmark_path: Path, codes: set[str], train_days:
         blockers.append("fewer_than_three_rolling_windows")
     if any(not item["passed"] for item in windows):
         blockers.append("one_or_more_rolling_windows_failed")
+    if any(not item["benchmarkAvailable"] for item in windows):
+        blockers.append("benchmark_unavailable_for_one_or_more_windows")
     direct_official = benchmark_path.name.startswith("tai50_official")
     return {
         "schemaVersion": 1,

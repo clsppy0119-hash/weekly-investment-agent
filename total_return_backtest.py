@@ -174,33 +174,51 @@ def run_period(series: dict[str, Series], dates: list[str], is_etf: bool = False
     trades = 0
     for index in range(lookback, len(dates) - holding, holding):
         signal, entry, exit_ = dates[index], dates[index + 1], dates[index + holding]
+        window = dates[index + 1:index + holding + 1]
         ranked = []
         for code, item in series.items():
             if membership_by_date is not None and code not in membership_by_date.get(signal, set()):
                 continue
             if item.entry_date and signal < item.entry_date:
                 continue
-            if item.exit_date and exit_ >= item.exit_date:
+            # Only signal-day knowledge may exclude a candidate.  Screening on
+            # the delisting date, the entry price, or the exit price would drop
+            # exactly the positions that lose money during the holding period.
+            if item.exit_date and signal >= item.exit_date:
                 continue
-            if signal in item.values and dates[index - lookback] in item.values and entry in item.values and exit_ in item.values:
-                momentum = item.values[signal] / item.values[dates[index - lookback]] - 1
-                if ranking_mode == "risk_adjusted":
-                    trail = [item.values[day] for day in dates[max(0, index - 20):index + 1] if day in item.values]
-                    if len(trail) < 10:
-                        continue
-                    daily = [trail[pos] / trail[pos - 1] - 1 for pos in range(1, len(trail))]
-                    momentum /= max(pstdev(daily), 0.01)
-                gross = item.values[exit_] / item.values[entry] - 1
-                ranked.append((momentum, gross))
-        picks = sorted(ranked, reverse=True)[:picks_count]
-        if not picks:
+            if signal not in item.values or dates[index - lookback] not in item.values:
+                continue
+            momentum = item.values[signal] / item.values[dates[index - lookback]] - 1
+            if ranking_mode == "risk_adjusted":
+                trail = [item.values[day] for day in dates[max(0, index - 20):index + 1] if day in item.values]
+                if len(trail) < 10:
+                    continue
+                daily = [trail[pos] / trail[pos - 1] - 1 for pos in range(1, len(trail))]
+                momentum /= max(pstdev(daily), 0.01)
+            ranked.append((momentum, code))
+        realised: list[float] = []
+        for _, code in sorted(ranked, reverse=True)[:picks_count]:
+            item = series[code]
+            limit = item.exit_date
+            if limit and entry >= limit:
+                continue  # already gone by the fill; the slot stays in cash
+            if entry not in item.values:
+                continue  # no tradable price on the entry day
+            # Exit on the last day that is both observed and still inside the
+            # listing interval.  Holding to the nominal exit would price the
+            # position after delisting; skipping the trade would instead hand
+            # the engine future knowledge that the position was doomed.
+            tradable = [day for day in window if day in item.values and (not limit or day < limit)]
+            if not tradable:
+                continue
+            realised.append(item.values[tradable[-1]] / item.values[entry] - 1)
+        if not realised:
             continue
-        gross = sum(item[1] for item in picks) / len(picks)
-        slippage = 2 * SLIPPAGE_BPS / 10_000
+        gross = sum(realised) / len(realised)
         sell_tax = ETF_SELL_TAX if is_etf else STOCK_SELL_TAX
         net = (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - sell_tax - SLIPPAGE_BPS / 10_000) - 1
         returns.append(net)
-        trades += len(picks)
+        trades += len(realised)
     total = math.prod(1 + item for item in returns) - 1 if returns else 0.0
     return {"totalReturn": total, "annualizedReturn": annualized(total, len(dates)), "mdd": max_drawdown(returns), "periods": len(returns), "trades": trades}
 

@@ -16,16 +16,22 @@
       "quoteUpdatedAt": "2026-08-01 23:44 Taipei time",
       "outcomes": {
         "5": {
-          "status": "pending",
-          "observations": 4
+          "status": "complete",
+          "date": "2026-08-07",
+          "price": 297.0,
+          "grossReturnPct": 1.37,
+          "netReturnPct": 0.57,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": -0.58,
+          "excessReturnPct": 1.15
         },
         "20": {
           "status": "pending",
-          "observations": 4
+          "observations": 5
         },
         "60": {
           "status": "pending",
-          "observations": 4
+          "observations": 5
         }
       },
       "decisionRecord": {
@@ -70,7 +76,22 @@
         ],
         "reconstructed": true,
         "reconstructionNote": "此筆為舊紀錄補建；資料快照日期以本次補建日為準。"
-      }
+      },
+      "priceTrail": {
+        "2026-08-03": 281.0,
+        "2026-08-04": 284.5,
+        "2026-08-05": 282.5,
+        "2026-08-06": 293.0,
+        "2026-08-07": 297.0
+      },
+      "benchmarkTrail": {
+        "2026-08-03": 102.0,
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.85
     },
     {
       "id": "2026-08-02:short:swing:3006",
@@ -87,16 +108,22 @@
       "quoteUpdatedAt": "2026-08-01 23:44 Taipei time",
       "outcomes": {
         "5": {
-          "status": "pending",
-          "observations": 4
+          "status": "complete",
+          "date": "2026-08-07",
+          "price": 256.5,
+          "grossReturnPct": 42.5,
+          "netReturnPct": 41.38,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": -0.58,
+          "excessReturnPct": 41.97
         },
         "20": {
           "status": "pending",
-          "observations": 4
+          "observations": 5
         },
         "60": {
           "status": "pending",
-          "observations": 4
+          "observations": 5
         }
       },
       "decisionRecord": {
@@ -141,7 +168,22 @@
         ],
         "reconstructed": true,
         "reconstructionNote": "此筆為舊紀錄補建；資料快照日期以本次補建日為準。"
-      }
+      },
+      "priceTrail": {
+        "2026-08-03": 198.0,
+        "2026-08-04": 217.5,
+        "2026-08-05": 239.0,
+        "2026-08-06": 258.0,
+        "2026-08-07": 256.5
+      },
+      "benchmarkTrail": {
+        "2026-08-03": 102.0,
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.85
     },
     {
       "id": "2026-08-02:short:swing:2303",
@@ -158,16 +200,22 @@
       "quoteUpdatedAt": "2026-08-01 23:44 Taipei time",
       "outcomes": {
         "5": {
-          "status": "pending",
-          "observations": 4
+          "status": "complete",
+          "date": "2026-08-07",
+          "price": 116.0,
+          "grossReturnPct": -4.13,
+          "netReturnPct": -4.88,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": -0.58,
+          "excessReturnPct": -4.3
         },
         "20": {
           "status": "pending",
-          "observations": 4
+          "observations": 5
         },
         "60": {
           "status": "pending",
-          "observations": 4
+          "observations": 5
         }
       },
       "decisionRecord": {
@@ -212,7 +260,22 @@
         ],
         "reconstructed": true,
         "reconstructionNote": "此筆為舊紀錄補建；資料快照日期以本次補建日為準。"
-      }
+      },
+      "priceTrail": {
+        "2026-08-03": 118.0,
+        "2026-08-04": 118.5,
+        "2026-08-05": 122.0,
+        "2026-08-06": 121.5,
+        "2026-08-07": 116.0
+      },
+      "benchmarkTrail": {
+        "2026-08-03": 102.0,
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.85
     },
     {
       "id": "2026-08-02:comprehensive:comprehensive:2451",
@@ -269,18 +332,39 @@
       },
       "outcomes": {
         "5": {
-          "status": "pending",
-          "observations": 4
+          "status": "complete",
+          "date": "2026-08-07",
+          "price": 297.0,
+          "grossReturnPct": 1.37,
+          "netReturnPct": 0.57,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": -0.58,
+          "excessReturnPct": 1.15
         },
         "20": {
           "status": "pending",
-          "observations": 4
+          "observations": 5
         },
         "60": {
           "status": "pending",
-          "observations": 4
+          "observations": 5
         }
-      }
+      },
+      "priceTrail": {
+        "2026-08-03": 281.0,
+        "2026-08-04": 284.5,
+        "2026-08-05": 282.5,
+        "2026-08-06": 293.0,
+        "2026-08-07": 297.0
+      },
+      "benchmarkTrail": {
+        "2026-08-03": 102.0,
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.85
     },
     {
       "id": "2026-08-02:comprehensive:comprehensive:6292",
@@ -339,17 +423,26 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "20": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "60": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         }
-      }
+      },
+      "priceTrail": {},
+      "benchmarkTrail": {
+        "2026-08-03": 102.0,
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.85
     },
     {
       "id": "2026-08-02:comprehensive:comprehensive:4995",
@@ -408,17 +501,26 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "20": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "60": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         }
-      }
+      },
+      "priceTrail": {},
+      "benchmarkTrail": {
+        "2026-08-03": 102.0,
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.85
     },
     {
       "id": "2026-08-02:comprehensive:comprehensive:3227",
@@ -476,17 +578,26 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "20": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "60": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         }
-      }
+      },
+      "priceTrail": {},
+      "benchmarkTrail": {
+        "2026-08-03": 102.0,
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.85
     },
     {
       "id": "2026-08-03:comprehensive:comprehensive:2451",
@@ -554,7 +665,20 @@
           "status": "pending",
           "observations": 4
         }
-      }
+      },
+      "priceTrail": {
+        "2026-08-04": 284.5,
+        "2026-08-05": 282.5,
+        "2026-08-06": 293.0,
+        "2026-08-07": 297.0
+      },
+      "benchmarkTrail": {
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.0
     },
     {
       "id": "2026-08-03:comprehensive:comprehensive:6292",
@@ -613,17 +737,25 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "20": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "60": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         }
-      }
+      },
+      "priceTrail": {},
+      "benchmarkTrail": {
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.0
     },
     {
       "id": "2026-08-03:comprehensive:comprehensive:3227",
@@ -681,17 +813,25 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "20": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         },
         "60": {
           "status": "pending",
-          "observations": 4
+          "observations": 0
         }
-      }
+      },
+      "priceTrail": {},
+      "benchmarkTrail": {
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.0
     },
     {
       "id": "2026-08-03:comprehensive:comprehensive:4967",
@@ -760,7 +900,20 @@
           "status": "pending",
           "observations": 4
         }
-      }
+      },
+      "priceTrail": {
+        "2026-08-04": 256.5,
+        "2026-08-05": 265.5,
+        "2026-08-06": 280.0,
+        "2026-08-07": 280.0
+      },
+      "benchmarkTrail": {
+        "2026-08-04": 100.65,
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 102.0
     },
     {
       "id": "2026-08-04:comprehensive:comprehensive:2451",
@@ -828,7 +981,18 @@
           "status": "pending",
           "observations": 3
         }
-      }
+      },
+      "priceTrail": {
+        "2026-08-05": 282.5,
+        "2026-08-06": 293.0,
+        "2026-08-07": 297.0
+      },
+      "benchmarkTrail": {
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 100.65
     },
     {
       "id": "2026-08-04:comprehensive:comprehensive:6292",
@@ -887,17 +1051,24 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 3
+          "observations": 0
         },
         "20": {
           "status": "pending",
-          "observations": 3
+          "observations": 0
         },
         "60": {
           "status": "pending",
-          "observations": 3
+          "observations": 0
         }
-      }
+      },
+      "priceTrail": {},
+      "benchmarkTrail": {
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 100.65
     },
     {
       "id": "2026-08-04:comprehensive:comprehensive:4967",
@@ -966,7 +1137,18 @@
           "status": "pending",
           "observations": 3
         }
-      }
+      },
+      "priceTrail": {
+        "2026-08-05": 265.5,
+        "2026-08-06": 280.0,
+        "2026-08-07": 280.0
+      },
+      "benchmarkTrail": {
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 100.65
     },
     {
       "id": "2026-08-04:comprehensive:comprehensive:3227",
@@ -1024,17 +1206,24 @@
       "outcomes": {
         "5": {
           "status": "pending",
-          "observations": 3
+          "observations": 0
         },
         "20": {
           "status": "pending",
-          "observations": 3
+          "observations": 0
         },
         "60": {
           "status": "pending",
-          "observations": 3
+          "observations": 0
         }
-      }
+      },
+      "priceTrail": {},
+      "benchmarkTrail": {
+        "2026-08-05": 103.8,
+        "2026-08-06": 103.3,
+        "2026-08-07": 102.85
+      },
+      "benchmarkEntryPrice": 100.65
     }
   ],
   "lastReviewedAt": "2026-08-07"

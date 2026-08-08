@@ -4,9 +4,13 @@ import os
 from pathlib import Path
 
 
+from backtest import BUY_FEE, ETF_SELL_TAX, SELL_FEE, SLIPPAGE_BPS, STOCK_SELL_TAX
+
+
 DEFAULT_PATH = Path("strategy_data/recommendations.json")
 HORIZONS = (5, 20, 60)
 STRATEGY_VERSION = "2.0"
+BENCHMARK_CODE = "0050"
 
 
 def number(value):
@@ -34,16 +38,66 @@ def save_state(state, path=DEFAULT_PATH):
         temporary.unlink(missing_ok=True)
 
 
-def _outcomes(history, entry_date, entry_price):
-    rows = [row for row in history if row.get("date", "") > entry_date and isinstance(row.get("close"), (int, float))]
-    result = {}
+def _net(gross, sell_tax=STOCK_SELL_TAX):
+    """Round-trip return after costs, on the same model the backtest uses.
+
+    Tracking that ignores costs reports a better number than the backtest for
+    the identical trade, so the two can never be checked against each other.
+    """
+    return (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - sell_tax - SLIPPAGE_BPS / 10_000) - 1
+
+
+def _extend_trail(trail, history, entry_date):
+    """Accumulate observed closes after ``entry_date`` into an append-only trail.
+
+    ``quotes.json`` keeps only a short rolling window of history, so outcomes
+    derived from it directly can never reach the longer horizons, and the ones
+    that do settle drift as the window slides.  Each recommendation therefore
+    carries its own trail, which only ever grows.
+    """
+    for row in history:
+        day = row.get("date", "")
+        close = row.get("close")
+        if day > entry_date and number(close) and day not in trail:
+            trail[day] = float(close)
+    return trail
+
+
+def _settle(outcomes, trail, entry_price, benchmark_trail, benchmark_entry):
+    """Fill in horizons the trail can now support; never revise a settled one."""
+    days = sorted(trail)
     for horizon in HORIZONS:
-        if len(rows) >= horizon:
-            exit_row = rows[horizon - 1]
-            result[str(horizon)] = {"status": "complete", "date": exit_row["date"], "price": exit_row["close"], "returnPct": round((exit_row["close"] / entry_price - 1) * 100, 2)}
+        key = str(horizon)
+        settled = outcomes.get(key, {})
+        if settled.get("status") == "complete" and "netReturnPct" in settled:
+            continue  # already settled; the trail behind it must not be re-read
+        # A legacy "complete" without a net return came from the old rolling
+        # window, where the horizon drifted and costs were ignored.  Those are
+        # re-settled from the trail rather than trusted.
+        if len(days) < horizon:
+            outcomes[key] = {"status": "pending", "observations": len(days)}
+            continue
+        day = days[horizon - 1]
+        gross = trail[day] / entry_price - 1
+        record = {
+            "status": "complete",
+            "date": day,
+            "price": trail[day],
+            "grossReturnPct": round(gross * 100, 2),
+            "netReturnPct": round(_net(gross) * 100, 2),
+            # Cash and stock dividends are not reconstructed here, so a holding
+            # that goes ex-dividend inside the window reads as a loss it did not
+            # take.  Flagged rather than silently folded into the number.
+            "priceReturnOnly": True,
+        }
+        if number(benchmark_entry) and benchmark_entry > 0 and day in benchmark_trail:
+            benchmark_net = _net(benchmark_trail[day] / benchmark_entry - 1, ETF_SELL_TAX)
+            record["benchmarkNetReturnPct"] = round(benchmark_net * 100, 2)
+            record["excessReturnPct"] = round((_net(gross) - benchmark_net) * 100, 2)
         else:
-            result[str(horizon)] = {"status": "pending", "observations": len(rows)}
-    return result
+            record["benchmarkAvailable"] = False
+        outcomes[key] = record
+    return outcomes
 
 
 def _risk_flags(quote, fund, coverage):
@@ -125,6 +179,8 @@ def record_recommendations(report_date, report_mode, ranked, quote_data, path=DE
     recommendations = state.setdefault("recommendations", [])
     existing = {item.get("id") for item in recommendations}
     history = quote_data.get("history", {})
+    benchmark_history = history.get(BENCHMARK_CODE, [])
+    benchmark_price = quote_data.get("quotes", {}).get(BENCHMARK_CODE, {}).get("price")
     for style, items in ranked.items():
         for rank, item in enumerate(items, 1):
             score, coverage, code, quote, fund = item
@@ -132,12 +188,16 @@ def record_recommendations(report_date, report_mode, ranked, quote_data, path=DE
             if record_id in existing:
                 continue
             snapshot_quote = {**quote, "updatedAt": quote_data.get("updatedAt")}
-            recommendations.append({"id": record_id, "date": report_date, "mode": report_mode, "style": style, "rank": rank, "code": code, "name": quote.get("name", code), "entryPrice": quote.get("price"), "score": score, "coverage": coverage, "strategyVersion": STRATEGY_VERSION, "quoteUpdatedAt": quote_data.get("updatedAt"), "decisionRecord": _decision_snapshot(report_date, score, coverage, snapshot_quote, fund), "outcomes": {}})
+            recommendations.append({"id": record_id, "date": report_date, "mode": report_mode, "style": style, "rank": rank, "code": code, "name": quote.get("name", code), "entryPrice": quote.get("price"), "benchmarkEntryPrice": benchmark_price, "score": score, "coverage": coverage, "strategyVersion": STRATEGY_VERSION, "quoteUpdatedAt": quote_data.get("updatedAt"), "decisionRecord": _decision_snapshot(report_date, score, coverage, snapshot_quote, fund), "outcomes": {}, "priceTrail": {}})
             existing.add(record_id)
     for item in recommendations:
         price = item.get("entryPrice")
-        if isinstance(price, (int, float)) and price > 0:
-            item["outcomes"] = _outcomes(history.get(item.get("code"), []), item.get("date", ""), price)
+        if number(price) and price > 0:
+            entry_date = item.get("date", "")
+            trail = _extend_trail(item.setdefault("priceTrail", {}), history.get(item.get("code"), []), entry_date)
+            benchmark_trail = _extend_trail(item.setdefault("benchmarkTrail", {}), benchmark_history, entry_date)
+            item["outcomes"] = _settle(item.get("outcomes") or {}, trail, price,
+                                       benchmark_trail, item.get("benchmarkEntryPrice"))
         if "decisionRecord" not in item:
             # 舊紀錄沒有原始快照；明確標示為補建，不把今天資料偽裝成當日資料。
             quote = {**quote_data.get("quotes", {}).get(item.get("code"), {}), "updatedAt": quote_data.get("updatedAt")}
@@ -151,17 +211,52 @@ def record_recommendations(report_date, report_mode, ranked, quote_data, path=DE
     return state
 
 
+def horizon_review(state):
+    """Settled results per horizon.
+
+    The 5-, 20- and 60-day results for one recommendation are three views of the
+    same position, not three independent observations, and they cover different
+    holding periods.  Pooling them inflates the sample and averages returns that
+    are not comparable, so each horizon is reported on its own.
+    """
+    review = {}
+    for horizon in HORIZONS:
+        net = []
+        excess = []
+        for item in state.get("recommendations", []):
+            result = item.get("outcomes", {}).get(str(horizon), {})
+            if result.get("status") != "complete":
+                continue
+            net.append(result["netReturnPct"])
+            if "excessReturnPct" in result:
+                excess.append(result["excessReturnPct"])
+        entry = {"settled": len(net)}
+        if net:
+            entry["winRatePct"] = round(sum(1 for value in net if value > 0) / len(net) * 100)
+            entry["meanNetReturnPct"] = round(sum(net) / len(net), 2)
+        if excess:
+            entry["benchmarked"] = len(excess)
+            entry["meanExcessReturnPct"] = round(sum(excess) / len(excess), 2)
+            entry["beatBenchmarkPct"] = round(sum(1 for value in excess if value > 0) / len(excess) * 100)
+        review[str(horizon)] = entry
+    return review
+
+
 def review_summary(state):
-    completed = []
-    for item in state.get("recommendations", []):
-        for result in item.get("outcomes", {}).values():
-            if result.get("status") == "complete":
-                completed.append(result["returnPct"])
-    if not completed:
-        return "策略追蹤：已開始保存候選紀錄；累積至少 5 個後續交易日後產生首輪績效檢討。"
-    positive = sum(1 for value in completed if value > 0)
-    average = sum(completed) / len(completed)
-    return f"策略追蹤：已完成 {len(completed)} 筆區間檢核，正報酬率 {positive / len(completed) * 100:.0f}%，平均報酬 {average:+.2f}%。"
+    review = horizon_review(state)
+    lines = []
+    for horizon in HORIZONS:
+        entry = review[str(horizon)]
+        if not entry["settled"]:
+            lines.append(f"　{horizon:>2} 日：尚未結算。")
+            continue
+        line = f"　{horizon:>2} 日：{entry['settled']} 筆，勝率 {entry['winRatePct']}%，扣成本平均 {entry['meanNetReturnPct']:+.2f}%"
+        if "meanExcessReturnPct" in entry:
+            line += f"，對 0050 超額 {entry['meanExcessReturnPct']:+.2f}%（{entry['beatBenchmarkPct']}% 跑贏）"
+        lines.append(line + "。")
+    if all(not review[str(horizon)]["settled"] for horizon in HORIZONS):
+        return "策略追蹤：已開始保存候選紀錄，尚無任何期間結算。"
+    return "策略追蹤（各期間分開統計，報酬已扣手續費、證交稅與滑價；未還原股利）：\n" + "\n".join(lines)
 
 
 def main():

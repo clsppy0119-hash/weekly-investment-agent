@@ -6,3 +6,9 @@ __pycache__/
 .private-data-cache/
 data/audit-log.jsonl
 data/remote-total-return-*/
+
+# Agent scratch copies of the whole tree; never part of the project.
+.node*-*/
+.tmp-*/
+.pipeline-fix/
+.restore-fix/
