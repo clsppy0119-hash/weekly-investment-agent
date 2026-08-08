@@ -122,7 +122,8 @@ def fundamental_records(quotes: dict[str, dict], published: dict[str, dict]) -> 
 
 def run_range(history: list[dict], dates: list[str], start: int, end: int, style: str, picks: int,
               holding: int, min_volume: float, weights: dict | None = None,
-              minimum_coverage: int | None = None, pit: object | None = None) -> dict:
+              minimum_coverage: int | None = None, pit: object | None = None,
+              continuous_trend: bool = False) -> dict:
     """Signals inside ``[start, end)``, exits kept inside it too.
 
     Moving averages read days before ``start`` on purpose: that is past data at
@@ -144,7 +145,8 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
         # carries an empty record and `coverage` reflects that honestly.
         published = pit.as_of(dates[index]) if pit is not None else {}
         selected = candidates(style, quotes, fundamental_records(quotes, published), picks,
-                              weights=weights, minimum_coverage=minimum_coverage)
+                              weights=weights, minimum_coverage=minimum_coverage,
+                              continuous_trend=continuous_trend)
         window = history[index + 1:index + holding + 2]
         trade_returns: list[float] = []
         for _score, _coverage, code, _quote, _fund in selected:
@@ -185,7 +187,8 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
 
 
 def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
-             min_volume: float, drop: tuple[str, ...] = (), pit: object | None = None) -> dict:
+             min_volume: float, drop: tuple[str, ...] = (), pit: object | None = None,
+             continuous_trend: bool = False) -> dict:
     dates, history = load_history(data)
     if len(history) < 120:
         raise SystemExit(f"歷史資料只有 {len(history)} 個交易日，不足 120，無法切出樣本外測試。")
@@ -207,7 +210,7 @@ def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
     result = {}
     for name, (start, end) in parts.items():
         run = run_range(history, dates, start, end, style, picks, holding, min_volume,
-                        weights, coverage_floor, pit)
+                        weights, coverage_floor, pit, continuous_trend)
         run["benchmark"] = benchmark_total_return(benchmark, dates[start:end])
         run["excess"] = None if run["benchmark"] is None else run["return"] - run["benchmark"]
         per_rebalance = []
@@ -244,14 +247,17 @@ def main() -> None:
     parser.add_argument("--min-volume", type=float, default=500_000)
     parser.add_argument("--drop", action="append", default=[],
                         help="研究用：從權重中移除某個因子，可重複（例如 --drop change）")
+    parser.add_argument("--continuous-trend", action="store_true",
+                        help="研究用：趨勢因子改用與均線的乖離幅度，取代二元的 75/35")
     parser.add_argument("--fundamentals-cache", type=Path, default=None,
                         help="私有歷史財報快取目錄；提供後才能回測依賴基本面的 style")
     parser.add_argument("--output", type=Path, default=Path("data/strategy-backtest.json"))
     args = parser.parse_args()
     pit = PointInTimeFundamentals.from_cache(args.fundamentals_cache) if args.fundamentals_cache else None
     result = evaluate(args.input, args.benchmark, args.style, args.picks, args.holding,
-                      args.min_volume, tuple(args.drop), pit)
+                      args.min_volume, tuple(args.drop), pit, args.continuous_trend)
     result["droppedFactors"] = list(args.drop)
+    result["continuousTrend"] = args.continuous_trend
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(result, ensure_ascii=False, indent=2))

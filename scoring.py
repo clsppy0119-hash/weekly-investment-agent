@@ -34,7 +34,24 @@ def score_metric(value, thresholds, default=None):
     return thresholds[-1][1]
 
 
-def metrics(quote: dict, fund: dict) -> dict:
+TREND_SLOPE = 2.5
+
+
+def trend_score(price, average, continuous: bool):
+    """Position relative to a moving average.
+
+    The shipped form is binary, which discards how far above the average a
+    stock sits and makes scores tie in large blocks.  The continuous form keeps
+    the distance; it is opt-in until a backtest shows it is worth shipping.
+    """
+    if not (number(price) and number(average)) or average <= 0:
+        return None
+    if not continuous:
+        return 75 if price >= average else 35
+    return max(0.0, min(100.0, 50 + (price / average - 1) * 100 * TREND_SLOPE))
+
+
+def metrics(quote: dict, fund: dict, continuous_trend: bool = False) -> dict:
     """Per-factor scores, or ``None`` where the input is missing."""
     return {
         "revenue": score_metric(fund.get("revenueYoY"), [(20, 90), (10, 80), (0, 65), (-10, 45), (-999999, 20)]),
@@ -44,31 +61,34 @@ def metrics(quote: dict, fund: dict) -> dict:
         "pe": score_metric(-fund["pe"], [(-12, 85), (-20, 75), (-30, 60), (-45, 40), (-999999, 20)]) if number(fund.get("pe")) and fund["pe"] > 0 else None,
         "pb": score_metric(-fund["pb"], [(-1.5, 85), (-3, 70), (-6, 50), (-999999, 30)]) if number(fund.get("pb")) and fund["pb"] > 0 else None,
         "dividend": (85 if 3 <= fund["dividendYield"] <= 8 else 45 if fund["dividendYield"] > 10 else 65 if fund["dividendYield"] >= 2 else 35) if number(fund.get("dividendYield")) else None,
-        "trend20": (75 if quote.get("price") >= quote.get("ma20") else 35) if number(quote.get("price")) and number(quote.get("ma20")) else None,
-        "trend5": (75 if quote.get("price") >= quote.get("ma5") else 35) if number(quote.get("price")) and number(quote.get("ma5")) else None,
+        "trend20": trend_score(quote.get("price"), quote.get("ma20"), continuous_trend),
+        "trend5": trend_score(quote.get("price"), quote.get("ma5"), continuous_trend),
         "change": min(90, 65 + quote["change"] * 3) if number(quote.get("change")) and quote["change"] > 0 else max(15, 50 + quote["change"] * 3) if number(quote.get("change")) else None,
     }
 
 
-def score_quote(quote: dict, fund: dict, style: str, weights: dict | None = None) -> tuple[int, int]:
+def score_quote(quote: dict, fund: dict, style: str, weights: dict | None = None,
+                continuous_trend: bool = False) -> tuple[int, int]:
     """Weighted score and the weight actually backed by present data.
 
     ``weights`` overrides the style's table, which lets research measure one
     factor's contribution without editing the shipped weights.
     """
     weights = WEIGHTS[style] if weights is None else weights
-    metric = metrics(quote, fund)
+    metric = metrics(quote, fund, continuous_trend)
     available_weight = sum(weight for key, weight in weights.items() if number(metric[key]))
     weighted = sum(metric[key] * weight for key, weight in weights.items() if number(metric[key]))
     return (round(weighted / available_weight) if available_weight else 0), available_weight
 
 
-def stock_score(code, style, quotes, fundamentals, weights: dict | None = None):
-    return score_quote(quotes.get(code, {}), fundamentals.get(code, {}), style, weights)
+def stock_score(code, style, quotes, fundamentals, weights: dict | None = None,
+                continuous_trend: bool = False):
+    return score_quote(quotes.get(code, {}), fundamentals.get(code, {}), style, weights, continuous_trend)
 
 
 def candidates(style, quotes, fundamentals, picks: int = DEFAULT_PICKS,
-               weights: dict | None = None, minimum_coverage: int | None = None):
+               weights: dict | None = None, minimum_coverage: int | None = None,
+               continuous_trend: bool = False):
     ranked = []
     if minimum_coverage is None:
         minimum_coverage = MINIMUM_COVERAGE[style]
@@ -76,7 +96,7 @@ def candidates(style, quotes, fundamentals, picks: int = DEFAULT_PICKS,
         quote = quotes.get(code, {})
         if not (code.isdigit() and len(code) == 4 and number(quote.get("price"))):
             continue
-        score, coverage = stock_score(code, style, quotes, fundamentals, weights)
+        score, coverage = stock_score(code, style, quotes, fundamentals, weights, continuous_trend)
         if score >= MINIMUM_SCORE and coverage >= minimum_coverage:
             ranked.append((score, coverage, code, quote, fund))
     # Scores tie constantly -- the trend factors are binary and `change` is
