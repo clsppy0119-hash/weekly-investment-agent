@@ -18,12 +18,14 @@ from __future__ import annotations
 import argparse
 import json
 from datetime import datetime, timezone
+from math import sqrt
 from pathlib import Path
-from statistics import mean
+from random import Random
+from statistics import mean, stdev
 
 from backtest import (
-    BUY_FEE, DEFAULT_BENCHMARK, DEFAULT_DATA, SELL_FEE, SLIPPAGE_BPS,
-    STOCK_SELL_TAX, benchmark_total_return, load_history,
+    BUY_FEE, DEFAULT_BENCHMARK, DEFAULT_DATA, ETF_SELL_TAX, SELL_FEE,
+    SLIPPAGE_BPS, STOCK_SELL_TAX, benchmark_total_return, load_history,
 )
 from point_in_time_fundamentals import PointInTimeFundamentals
 from scoring import MINIMUM_COVERAGE, WEIGHTS, candidates
@@ -51,6 +53,54 @@ def factor_quotes(history: list[dict], index: int, min_volume: float) -> dict[st
             "change": (price / previous[0] - 1) * 100 if previous else None,
         }
     return quotes
+
+
+def benchmark_series(path: Path) -> dict[str, float]:
+    rows = json.loads(path.read_text(encoding="utf-8-sig"))
+    return {str(row.get("date")): row["total_return"] for row in rows
+            if isinstance(row, dict) and isinstance(row.get("total_return"), (int, float))}
+
+
+def benchmark_between(series: dict[str, float], entry: str, exit_: str) -> float | None:
+    """Net 0050 return over one holding period, on ETF costs."""
+    start, end = series.get(entry), series.get(exit_)
+    if not start or end is None or start <= 0:
+        return None
+    gross = end / start - 1
+    return (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - ETF_SELL_TAX - SLIPPAGE_BPS / 10_000) - 1
+
+
+def significance(excess: list[float], resamples: int = 2000, seed: int = 20260808) -> dict:
+    """Is the per-rebalance edge distinguishable from luck?
+
+    A cumulative return says nothing about reliability: nine rebalances can
+    compound to a large number on one lucky pick.  The t statistic and the
+    bootstrap interval are what decide whether an edge is real, and a interval
+    spanning zero means the variant has not been shown to work.
+    """
+    count = len(excess)
+    if count < 3:
+        return {"rebalances": count, "conclusive": False, "reason": "fewer_than_three_rebalances"}
+    average = mean(excess)
+    spread = stdev(excess)
+    t_stat = average / (spread / sqrt(count)) if spread else None
+    generator = Random(seed)
+    means = []
+    for _ in range(resamples):
+        sample = [excess[generator.randrange(count)] for _ in range(count)]
+        means.append(mean(sample))
+    means.sort()
+    low = means[int(0.025 * resamples)]
+    high = means[int(0.975 * resamples) - 1]
+    return {
+        "rebalances": count,
+        "meanExcessPerRebalance": average,
+        "stdev": spread,
+        "tStat": t_stat,
+        "ci95": [low, high],
+        # An interval containing zero cannot support a promotion decision.
+        "conclusive": low > 0 or high < 0,
+    }
 
 
 def fundamental_records(quotes: dict[str, dict], published: dict[str, dict]) -> dict[str, dict]:
@@ -81,6 +131,7 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
     never reaches into the next split.
     """
     returns: list[float] = []
+    rebalances: list[dict] = []
     wins = 0
     unfilled = 0
     stale_exits = 0
@@ -114,6 +165,9 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
             gross = mean(trade_returns)
             net = (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - STOCK_SELL_TAX - SLIPPAGE_BPS / 10_000) - 1
             returns.append(net)
+            # Kept per rebalance so the split's edge can be tested for
+            # significance instead of resting on one cumulative number.
+            rebalances.append({"entry": dates[index + 1], "exit": dates[index + holding + 1], "net": net})
             wins += net > 0
         index += holding
     equity = peak = 1.0
@@ -126,7 +180,7 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
         "return": equity - 1, "mdd": drawdown, "trades": len(returns),
         "win_rate": wins / len(returns) if returns else 0.0,
         "unfilled": unfilled, "stale_exits": stale_exits, "rebalances_without_candidates": no_candidate,
-        "returns": returns,
+        "returns": returns, "rebalances": rebalances,
     }
 
 
@@ -149,13 +203,21 @@ def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
     if weights is not None:
         reachable = sum(weights.get(key, 0) for key in ("trend20", "trend5", "change"))
         coverage_floor = min(MINIMUM_COVERAGE[style], reachable)
+    series = benchmark_series(benchmark)
     result = {}
     for name, (start, end) in parts.items():
         run = run_range(history, dates, start, end, style, picks, holding, min_volume,
                         weights, coverage_floor, pit)
         run["benchmark"] = benchmark_total_return(benchmark, dates[start:end])
         run["excess"] = None if run["benchmark"] is None else run["return"] - run["benchmark"]
+        per_rebalance = []
+        for item in run["rebalances"]:
+            reference = benchmark_between(series, item["entry"], item["exit"])
+            if reference is not None:
+                per_rebalance.append(item["net"] - reference)
+        run["significance"] = significance(per_rebalance)
         run.pop("returns")
+        run.pop("rebalances")
         result[name] = run
     return {
         "schemaVersion": 1,
