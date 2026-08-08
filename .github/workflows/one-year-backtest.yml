@@ -47,6 +47,15 @@ jobs:
           key: market-membership-v2-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
             market-membership-v2-${{ runner.os }}-
+      # Written by the hourly historical-fundamentals workflow; needed so the
+      # production scoring rule can be backtested with the financial factors it
+      # actually uses, not on technicals alone.
+      - name: Restore private historical fundamentals cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .private-data-cache/finmind-fundamentals-v1
+          key: historical-fundamentals-v1-${{ runner.os }}-unavailable
+          restore-keys: historical-fundamentals-v1-${{ runner.os }}-
       - name: Download two years of official TWSE data
         run: python backtest.py collect --days 730
       - name: Run train validation test backtest
@@ -63,6 +72,17 @@ jobs:
         run: python total_return_backtest.py --output backtest_data/total-return-backtest-status.json
       - name: Audit stock-dividend adjustment mapping
         run: python corporate_action_audit.py
+      # The two backtests above validate momentum rules.  This one runs the
+      # ranking rule the daily report actually ships, so a passing result says
+      # something about the recommendations users receive.
+      - name: Backtest the shipped scoring rule
+        run: |
+          python point_in_time_fundamentals.py --cache-dir .private-data-cache || true
+          python strategy_backtest.py --style comprehensive --picks 3 --holding 5 \
+            --fundamentals-cache .private-data-cache \
+            --output backtest_data/strategy-backtest-comprehensive.json
+          python strategy_backtest.py --style swing --picks 3 --holding 5 \
+            --output backtest_data/strategy-backtest-swing.json
       - name: Evaluate investment-advice gate
         run: python investment_advice_gate.py --one-year backtest_data/one_year_backtest.json --total-return backtest_data/total-return-backtest-status.json --rolling backtest_data/walk-forward-status.json --output backtest_data/investment-advice-gate.json
       - name: Upload backtest result
