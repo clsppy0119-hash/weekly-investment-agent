@@ -43,6 +43,9 @@ jobs:
                 time.sleep(attempt * 2)
           # 保留上一期有效財報；每日資料源缺少個股時，不再把舊值清空。
           fundamentals = {code: dict(values) for code, values in existing.get("fundamentals", {}).items()}
+          # Kept per exchange so provenance can verify the two returned disjoint
+          # code sets rather than assuming it.
+          market_codes = {"twse": set(), "tpex": set()}
           for url, market in [("https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL", "twse"), ("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes", "tpex")]:
             rows = fetch_json(url)
             for row in rows:
@@ -51,7 +54,9 @@ jobs:
               price = row.get("ClosingPrice", "") if market == "twse" else row.get("Close", "")
               volume = row.get("TradeVolume", "") if market == "twse" else row.get("TradingShares", "")
               change = row.get("Change", "")
-              try: quotes[str(code).strip()] = {"name": str(name).strip(), "price": float(str(price).replace(",", "")), "volume": float(str(volume).replace(",", "")), "change": float(str(change).replace(",", "").replace("+", ""))}
+              try:
+                quotes[str(code).strip()] = {"name": str(name).strip(), "price": float(str(price).replace(",", "")), "volume": float(str(volume).replace(",", "")), "change": float(str(change).replace(",", "").replace("+", ""))}
+                market_codes[market].add(str(code).strip())
               except (TypeError, ValueError): pass
           def number(value):
             try: return float(str(value).replace(",", ""))
@@ -143,7 +148,16 @@ jobs:
             closes = [item["close"] for item in history[code]]
             quote["ma5"] = sum(closes[-5:]) / 5 if len(closes) >= 5 else None
             quote["ma20"] = sum(closes[-20:]) / 20 if len(closes) >= 20 else None
-          with open("quotes.json", "w", encoding="utf-8") as f: json.dump({"updatedAt": datetime.now(tz).strftime("%Y-%m-%d %H:%M Taipei time"), "quotes": quotes, "fundamentals": fundamentals, "history": history}, f, ensure_ascii=False, indent=2)
+          # Without this the evidence contract reads the source as unknown and
+          # discards every candidate the screener ranked.
+          import quote_provenance
+          provenance = quote_provenance.build(
+            trading_date=today,
+            retrieved_at=datetime.now(timezone.utc).isoformat(),
+            quotes=quotes, fundamentals=fundamentals, code_sets=market_codes,
+          )
+          print("quote provenance:", provenance["quote"]["quality"], "| conflict:", provenance["quote"]["conflictStatus"], "| overlaps:", len(provenance["quote"]["overlappingCodes"]))
+          with open("quotes.json", "w", encoding="utf-8") as f: json.dump({"updatedAt": datetime.now(tz).strftime("%Y-%m-%d %H:%M Taipei time"), "provenance": provenance, "quotes": quotes, "fundamentals": fundamentals, "history": history}, f, ensure_ascii=False, indent=2)
           PY
       - name: Refresh strategy outcomes
         env:
