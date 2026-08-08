@@ -103,6 +103,20 @@ def significance(excess: list[float], resamples: int = 2000, seed: int = 2026080
     }
 
 
+def net_of_costs(gross: float) -> float:
+    """One round trip in a stock, after fees, transaction tax and slippage."""
+    return (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) \
+        * (1 - SELL_FEE - STOCK_SELL_TAX - SLIPPAGE_BPS / 10_000) - 1
+
+
+def pool_summary(rebalances: list[dict]) -> dict:
+    excess = [item["poolExcess"] for item in rebalances if item["poolExcess"] is not None]
+    sizes = sorted(item["poolSize"] for item in rebalances)
+    summary = significance(excess)
+    summary["medianPoolSize"] = sizes[len(sizes) // 2] if sizes else 0
+    return summary
+
+
 def fundamental_records(quotes: dict[str, dict], published: dict[str, dict]) -> dict[str, dict]:
     """Merge published financials with the ratios that need a live price.
 
@@ -144,9 +158,12 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
         # filed on that day can influence the pick.  Without a cache every name
         # carries an empty record and `coverage` reflects that honestly.
         published = pit.as_of(dates[index]) if pit is not None else {}
-        selected = candidates(style, quotes, fundamental_records(quotes, published), picks,
+        # Rank the whole eligible pool once: the head is what the product would
+        # recommend, the rest is the pool it was chosen from.
+        eligible = candidates(style, quotes, fundamental_records(quotes, published), None,
                               weights=weights, minimum_coverage=minimum_coverage,
                               continuous_trend=continuous_trend)
+        selected = eligible[:picks]
         window = history[index + 1:index + holding + 2]
         trade_returns: list[float] = []
         for _score, _coverage, code, _quote, _fund in selected:
@@ -163,13 +180,31 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
             trade_returns.append(exit_price[0] / entry[0] - 1)
         if not selected:
             no_candidate += 1
+        # What an equal-weighted holding of every eligible name would have
+        # returned. Beating 0050 mixes the screen's skill with whatever the
+        # size and sector tilt did; this isolates the screen itself, which is
+        # the question that matters when the product is a shortlist.
+        eligible_returns = []
+        for _s, _c, code, _q, _f in eligible:
+            entry = window[0].get(code)
+            if not entry:
+                continue
+            close = window[-1].get(code) or next(
+                (day[code] for day in reversed(window[:-1]) if code in day), None)
+            if close:
+                eligible_returns.append(close[0] / entry[0] - 1)
         if trade_returns:
-            gross = mean(trade_returns)
-            net = (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - STOCK_SELL_TAX - SLIPPAGE_BPS / 10_000) - 1
+            net = net_of_costs(mean(trade_returns))
             returns.append(net)
             # Kept per rebalance so the split's edge can be tested for
             # significance instead of resting on one cumulative number.
-            rebalances.append({"entry": dates[index + 1], "exit": dates[index + holding + 1], "net": net})
+            # The pool is charged the same round trip, so the comparison is
+            # selection skill rather than a costs artefact.
+            pool_excess = net - net_of_costs(mean(eligible_returns)) if eligible_returns else None
+            rebalances.append({
+                "entry": dates[index + 1], "exit": dates[index + holding + 1], "net": net,
+                "poolExcess": pool_excess, "poolSize": len(eligible_returns),
+            })
             wins += net > 0
         index += holding
     equity = peak = 1.0
@@ -183,6 +218,9 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
         "win_rate": wins / len(returns) if returns else 0.0,
         "unfilled": unfilled, "stale_exits": stale_exits, "rebalances_without_candidates": no_candidate,
         "returns": returns, "rebalances": rebalances,
+        # The screening question: did ranking beat holding the pool it ranked?
+        # Beating 0050 also rewards the pool's size tilt; this does not.
+        "versusEligiblePool": pool_summary(rebalances),
     }
 
 

@@ -86,9 +86,10 @@ def stock_score(code, style, quotes, fundamentals, weights: dict | None = None,
     return score_quote(quotes.get(code, {}), fundamentals.get(code, {}), style, weights, continuous_trend)
 
 
-def candidates(style, quotes, fundamentals, picks: int = DEFAULT_PICKS,
+def candidates(style, quotes, fundamentals, picks: int | None = DEFAULT_PICKS,
                weights: dict | None = None, minimum_coverage: int | None = None,
                continuous_trend: bool = False):
+    """Ranked eligible candidates; ``picks=None`` returns the whole pool."""
     ranked = []
     if minimum_coverage is None:
         minimum_coverage = MINIMUM_COVERAGE[style]
@@ -105,4 +106,4 @@ def candidates(style, quotes, fundamentals, picks: int = DEFAULT_PICKS,
     # Taiwan skews to small speculative listings.  Break on traded volume
     # instead, keeping the code only as a last resort for reproducibility.
     ranked.sort(key=lambda item: (item[0], item[1], item[3].get("volume") or 0, item[2]), reverse=True)
-    return ranked[:picks]
+    return ranked if picks is None else ranked[:picks]
