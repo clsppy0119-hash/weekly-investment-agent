@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-09 10:54 Taipei time",
+  "updatedAt": "2026-08-09 16:36 Taipei time",
   "provenance": {
     "quote": {
       "schemaVersion": 1,
@@ -12,8 +12,8 @@
       "observationTime": null,
       "effectiveDate": "2026-08-07",
       "availableAt": "2026-08-07T14:00:00+08:00",
-      "retrievedAt": "2026-08-09T02:54:09.001011+00:00",
-      "ingestedAt": "2026-08-09T02:54:09.001011+00:00",
+      "retrievedAt": "2026-08-09T08:36:31.428227+00:00",
+      "ingestedAt": "2026-08-09T08:36:31.428227+00:00",
       "timezone": "UTC",
       "contentHash": "29e44ba43072ffae4ad550dda23376126e79b023c8a54128eddb0eb46c96fa08",
       "schemaHash": "407868f2de8d8f774838c00cc03806c84abc40c34d438da5f02ec53d8d1a69a1",
@@ -26,26 +26,25 @@
     },
     "fundamentals": {
       "schemaVersion": 1,
-      "provider": "FinMind authorized API",
-      "source": "FinMind authorized API",
-      "sourceDataset": "TaiwanStockFinancialStatements,TaiwanStockBalanceSheet,TaiwanStockInfo",
-      "dataset": "TaiwanStockFinancialStatements,TaiwanStockBalanceSheet,TaiwanStockInfo",
-      "endpoint": "https://api.finmindtrade.com/api/v4/data",
-      "scopeHash": "1e4a8f715ee4ec7bc72d65ae2b87726581df0bdd3958252c58e27addbc6f9709",
+      "provider": "TWSE/TPEx OpenAPI",
+      "source": "TWSE/TPEx OpenAPI",
+      "sourceDataset": "BWIBBU_ALL + t187ap05/06/07 (MOPS open data)",
+      "dataset": "BWIBBU_ALL + t187ap05/06/07 (MOPS open data)",
+      "endpoint": "https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL",
+      "scopeHash": "5f7ec58d77853613087335c5e8e0f5602671534ec47caef6fcdd9a8a23b560de",
       "observationTime": null,
-      "effectiveDate": "2026-06-30",
-      "availableAt": "2026-08-09",
-      "retrievedAt": "2026-08-09T07:37:13.097228+00:00",
-      "ingestedAt": "2026-08-09T07:37:13.097228+00:00",
+      "effectiveDate": "2026-08-07",
+      "availableAt": "2026-08-07T14:00:00+08:00",
+      "retrievedAt": "2026-08-09T08:36:31.428227+00:00",
+      "ingestedAt": "2026-08-09T08:36:31.428227+00:00",
       "timezone": "UTC",
-      "contentHash": "99a3ab0a812f294fdfdf837e43a4b136011db0a3649005e81b8ceca9b0f4f7ec",
-      "schemaHash": "632df5dbb13a2ab10ad3fcbb78a3a902f78d841e4c07781618a03596859f81dd",
+      "contentHash": "d0ba8903578226b9c32d0a52b0e172ab8d69e8d2a0f6926950ff02b747ad20bc",
+      "schemaHash": "5f7ec58d77853613087335c5e8e0f5602671534ec47caef6fcdd9a8a23b560de",
       "status": "success",
-      "quality": "conflict_unresolved",
-      "conflictStatus": "unknown",
-      "visibility": "private_cache",
-      "availableAtBasis": "public no later than this: the earlier of the statutory TWSE filing deadline for the reported period and the date the rows were held",
-      "statutoryDeadline": "2026-08-14"
+      "quality": "verified",
+      "conflictStatus": "no_conflict",
+      "visibility": "public_source",
+      "availableAtBasis": "modelled: 14:00 Taipei on the trading date, after the 13:30 close"
     }
   },
   "quotes": {
@@ -75419,7 +75418,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.24,
       "roe": 16.985993042943505,
-      "debtRatio": 65.34018891516362
+      "debtRatio": 65.34018891516362,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1216": {
       "pe": 18.29,
@@ -75435,7 +75435,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.56,
       "roe": 19.856469425335103,
-      "debtRatio": 72.243895301896
+      "debtRatio": 72.243895301896,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1217": {
       "pe": 20.33,
@@ -75540,7 +75541,8 @@
       "debtRatio": 46.42130323805404,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "食品工業"
+      "industry": "食品工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1233": {
       "pe": 35.12,
@@ -75567,7 +75569,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.6,
       "roe": 2.6126220193354186,
-      "debtRatio": 24.315485539651522
+      "debtRatio": 24.315485539651522,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1235": {
       "pe": null,
@@ -75770,7 +75773,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.77,
       "roe": 5.625399025800539,
-      "debtRatio": 49.80813776315435
+      "debtRatio": 49.80813776315435,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1323": {
       "pe": 15.71,
@@ -75786,7 +75790,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.02,
       "roe": 7.00328702604365,
-      "debtRatio": 42.422110926326404
+      "debtRatio": 42.422110926326404,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1324": {
       "pe": null,
@@ -75824,7 +75829,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.11,
       "roe": 4.67553634902782,
-      "debtRatio": 23.32958551031598
+      "debtRatio": 23.32958551031598,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1337": {
       "pe": null,
@@ -75895,7 +75901,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.1,
       "roe": 28.345221004944793,
-      "debtRatio": 41.09359901421825
+      "debtRatio": 41.09359901421825,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1402": {
       "pe": 17.08,
@@ -75944,7 +75951,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.17,
       "roe": 3.9580287247515735,
-      "debtRatio": 55.15079912939428
+      "debtRatio": 55.15079912939428,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1414": {
       "pe": 67.41,
@@ -75982,7 +75990,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.09,
       "roe": -1.4879129802243163,
-      "debtRatio": 14.327309302428382
+      "debtRatio": 14.327309302428382,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1418": {
       "pe": null,
@@ -76020,7 +76029,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.41,
       "roe": 2.3988015653191694,
-      "debtRatio": 14.420530319827929
+      "debtRatio": 14.420530319827929,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1432": {
       "pe": 2.77,
@@ -76047,7 +76057,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.5,
       "roe": 3.4561059513149894,
-      "debtRatio": 24.338644799394277
+      "debtRatio": 24.338644799394277,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1435": {
       "pe": null,
@@ -76074,7 +76085,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.14,
       "roe": 0.8189198369673353,
-      "debtRatio": 70.02703730772517
+      "debtRatio": 70.02703730772517,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1437": {
       "pe": 10.72,
@@ -76222,7 +76234,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.65,
       "roe": 3.4869163895698927,
-      "debtRatio": 16.648576513458284
+      "debtRatio": 16.648576513458284,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1452": {
       "pe": null,
@@ -76238,7 +76251,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.07,
       "roe": -0.6631938436921097,
-      "debtRatio": 6.423362732568252
+      "debtRatio": 6.423362732568252,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1453": {
       "pe": 100.91,
@@ -76276,7 +76290,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.91,
       "roe": 15.629007095832574,
-      "debtRatio": 37.850128772522176
+      "debtRatio": 37.850128772522176,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1456": {
       "pe": 4.12,
@@ -76465,7 +76480,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 12.35,
       "roe": 23.346518632376206,
-      "debtRatio": 24.001096089107865
+      "debtRatio": 24.001096089107865,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1477": {
       "pe": 15.29,
@@ -76482,7 +76498,8 @@
       "debtRatio": 42.046590970539796,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "紡織纖維"
+      "industry": "紡織纖維",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1503": {
       "pe": 28.84,
@@ -76564,7 +76581,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.12,
       "roe": 1.0133862449360618,
-      "debtRatio": 51.77986273507968
+      "debtRatio": 51.77986273507968,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1516": {
       "pe": 725.0,
@@ -76635,7 +76653,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.9,
       "roe": 10.051333342544332,
-      "debtRatio": 43.71884943548478
+      "debtRatio": 43.71884943548478,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1525": {
       "pe": 46.73,
@@ -76651,7 +76670,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.13,
       "roe": -0.39401878916706945,
-      "debtRatio": 15.842790731260752
+      "debtRatio": 15.842790731260752,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1526": {
       "pe": null,
@@ -76755,7 +76775,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.64,
       "roe": 10.895122385078473,
-      "debtRatio": 50.279550391064184
+      "debtRatio": 50.279550391064184,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1536": {
       "pe": null,
@@ -76859,7 +76880,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.93,
       "roe": 4.852696383502629,
-      "debtRatio": 57.84429560526677
+      "debtRatio": 57.84429560526677,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1568": {
       "pe": 20.82,
@@ -76882,14 +76904,15 @@
       "cumulativeRevenueYoY": -6.2680764414874774,
       "revenuePeriod": "11506",
       "industry": "電子零組件業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 3.21,
-      "roe": 6.82,
-      "debtRatio": 43.02,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 1.65,
+      "roe": 6.542249966059785,
+      "debtRatio": 43.02483459871884,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:29:04.858124+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1583": {
       "pe": 17.56,
@@ -76938,7 +76961,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.3,
       "roe": 9.170891756853432,
-      "debtRatio": 42.413145272825446
+      "debtRatio": 42.413145272825446,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1598": {
       "pe": null,
@@ -76987,7 +77011,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.85,
       "roe": 11.658073729073802,
-      "debtRatio": 38.79261842245699
+      "debtRatio": 38.79261842245699,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1608": {
       "pe": 3.03,
@@ -77003,7 +77028,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 7.04,
       "roe": 49.3628297350434,
-      "debtRatio": 37.39738044072737
+      "debtRatio": 37.39738044072737,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1609": {
       "pe": 15.5,
@@ -77118,7 +77144,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -1.62,
       "roe": -17.94550099368114,
-      "debtRatio": 72.85007578108666
+      "debtRatio": 72.85007578108666,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1702": {
       "pe": 46.53,
@@ -77200,7 +77227,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.56,
       "roe": 15.890678624940268,
-      "debtRatio": 47.83686438622135
+      "debtRatio": 47.83686438622135,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1713": {
       "pe": 9.72,
@@ -77227,7 +77255,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.89,
       "roe": 16.072612123581003,
-      "debtRatio": 29.6020569067739
+      "debtRatio": 29.6020569067739,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1717": {
       "pe": 34.84,
@@ -77243,7 +77272,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.09,
       "roe": 8.046660698475215,
-      "debtRatio": 51.77380178041457
+      "debtRatio": 51.77380178041457,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1718": {
       "pe": 41.29,
@@ -77292,7 +77322,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.43,
       "roe": 1.581347425409361,
-      "debtRatio": 36.326648884967916
+      "debtRatio": 36.326648884967916,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1723": {
       "pe": 27.27,
@@ -77309,7 +77340,8 @@
       "debtRatio": 32.061371801983746,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "化學生技醫療"
+      "industry": "化學生技醫療",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1725": {
       "pe": 18.52,
@@ -77358,7 +77390,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.5,
       "roe": 15.98207576283876,
-      "debtRatio": 34.29703935374545
+      "debtRatio": 34.29703935374545,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1731": {
       "pe": 13.97,
@@ -77374,7 +77407,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.95,
       "roe": 11.47823628524591,
-      "debtRatio": 37.011263083608426
+      "debtRatio": 37.011263083608426,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1732": {
       "pe": 30.22,
@@ -77434,7 +77468,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.27,
       "roe": 14.479408037746222,
-      "debtRatio": 70.84931355989039
+      "debtRatio": 70.84931355989039,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1737": {
       "pe": 16.36,
@@ -77450,7 +77485,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.87,
       "roe": 5.189269466318666,
-      "debtRatio": 19.92495430935061
+      "debtRatio": 19.92495430935061,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1752": {
       "pe": 15.76,
@@ -77466,7 +77502,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.84,
       "roe": 6.945785622743693,
-      "debtRatio": 38.80198758659153
+      "debtRatio": 38.80198758659153,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1760": {
       "pe": 23.73,
@@ -77505,7 +77542,8 @@
       "debtRatio": 37.933895124546645,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "化學生技醫療"
+      "industry": "化學生技醫療",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1776": {
       "pe": 34.69,
@@ -77543,7 +77581,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.76,
       "roe": 6.334592977219527,
-      "debtRatio": 28.748766469501145
+      "debtRatio": 28.748766469501145,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1789": {
       "pe": 378.0,
@@ -77559,7 +77598,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.02,
       "roe": -0.3632204977262156,
-      "debtRatio": 15.360817177134036
+      "debtRatio": 15.360817177134036,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1795": {
       "pe": 12.82,
@@ -77597,7 +77637,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.06,
       "roe": 0.9521321409145779,
-      "debtRatio": 18.429544764916315
+      "debtRatio": 18.429544764916315,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1806": {
       "pe": 57.0,
@@ -77701,7 +77742,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.22,
       "roe": 2.4289116624220504,
-      "debtRatio": 50.10206752827047
+      "debtRatio": 50.10206752827047,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1907": {
       "pe": 22.04,
@@ -77739,7 +77781,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.03,
       "roe": 0.5590575556912035,
-      "debtRatio": 51.14889495707061
+      "debtRatio": 51.14889495707061,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2006": {
       "pe": 11.75,
@@ -77756,7 +77799,8 @@
       "debtRatio": 35.77454832201521,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "鋼鐵工業"
+      "industry": "鋼鐵工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2007": {
       "pe": null,
@@ -77794,7 +77838,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.49,
       "roe": 3.985344451262382,
-      "debtRatio": 21.61232900444051
+      "debtRatio": 21.61232900444051,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2010": {
       "pe": 9.14,
@@ -77810,7 +77855,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.35,
       "roe": 13.70716587961864,
-      "debtRatio": 45.336634638982055
+      "debtRatio": 45.336634638982055,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2012": {
       "pe": null,
@@ -77826,7 +77872,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.19,
       "roe": -1.786411201232269,
-      "debtRatio": 61.37952388967823
+      "debtRatio": 61.37952388967823,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2013": {
       "pe": 12.63,
@@ -77842,7 +77889,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.44,
       "roe": 10.447978183165551,
-      "debtRatio": 65.22136094975606
+      "debtRatio": 65.22136094975606,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2014": {
       "pe": null,
@@ -77858,7 +77906,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.07,
       "roe": 1.6452092208816982,
-      "debtRatio": 53.43438507480066
+      "debtRatio": 53.43438507480066,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2015": {
       "pe": 15.37,
@@ -77875,7 +77924,8 @@
       "debtRatio": 15.808353978392608,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "鋼鐵工業"
+      "industry": "鋼鐵工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2017": {
       "pe": null,
@@ -77990,7 +78040,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.66,
       "roe": 17.18344734665093,
-      "debtRatio": 59.65946011248572
+      "debtRatio": 59.65946011248572,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2031": {
       "pe": 6.97,
@@ -78006,7 +78057,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.23,
       "roe": 27.116545043684653,
-      "debtRatio": 59.274496015115105
+      "debtRatio": 59.274496015115105,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2032": {
       "pe": 11.61,
@@ -78022,7 +78074,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.02,
       "roe": 14.79867953922228,
-      "debtRatio": 23.54616944918564
+      "debtRatio": 23.54616944918564,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2033": {
       "pe": 50.0,
@@ -78038,7 +78091,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.15,
       "roe": 2.30213484975216,
-      "debtRatio": 15.23399922120542
+      "debtRatio": 15.23399922120542,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2034": {
       "pe": null,
@@ -78083,14 +78137,15 @@
       "cumulativeRevenueYoY": 98.94781003339511,
       "revenuePeriod": "11506",
       "industry": "電子零組件業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 181.39,
-      "roe": 62.84,
-      "debtRatio": 28.35,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 110.96,
+      "roe": 62.65285150684198,
+      "debtRatio": 28.352046712125574,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:29:06.884896+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2062": {
       "pe": 89.05,
@@ -78161,7 +78216,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.26,
       "roe": 17.18494051715551,
-      "debtRatio": 50.26169059957636
+      "debtRatio": 50.26169059957636,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2104": {
       "pe": null,
@@ -78243,7 +78299,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.08,
       "roe": 15.873305512802204,
-      "debtRatio": 23.877221324717286
+      "debtRatio": 23.877221324717286,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2115": {
       "pe": 17.76,
@@ -78336,7 +78393,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -2.6,
       "roe": -8.80131938668025,
-      "debtRatio": 21.661525742637004
+      "debtRatio": 21.661525742637004,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2228": {
       "pe": 17.82,
@@ -78407,7 +78465,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.42,
       "roe": -4.974805875872591,
-      "debtRatio": 34.698737048014124
+      "debtRatio": 34.698737048014124,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2243": {
       "pe": 16.08,
@@ -78484,16 +78543,17 @@
       "revenueYoY": 36.97501592365457,
       "cumulativeRevenueYoY": 25.081749832478973,
       "revenuePeriod": "11506",
-      "eps": 8.55,
-      "financialPeriod": "2026-06-30",
-      "roe": 21.89,
-      "debtRatio": 59.6,
+      "eps": 4.8,
+      "financialPeriod": "115Q2",
+      "roe": 22.553202157173782,
+      "debtRatio": 59.604372244126466,
       "cashFlow": null,
-      "financialSource": "FinMind 授權基本面資料",
+      "financialSource": "TWSE/TPEx",
       "industry": "電子工業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:29:10.852809+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2302": {
       "pe": 54.3,
@@ -78523,16 +78583,17 @@
       "revenueYoY": 22.8543590392003,
       "cumulativeRevenueYoY": 11.279653514892827,
       "revenuePeriod": "11506",
-      "eps": 6.68,
-      "financialPeriod": "2026-06-30",
-      "roe": 21.33,
-      "debtRatio": 33.34,
+      "eps": 4.68,
+      "financialPeriod": "115Q2",
+      "roe": 26.284120513339776,
+      "debtRatio": 33.341985637574375,
       "cashFlow": null,
-      "financialSource": "FinMind 授權基本面資料",
+      "financialSource": "TWSE/TPEx",
       "industry": "電子工業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:29:11.108465+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2305": {
       "pe": 98.15,
@@ -78562,16 +78623,17 @@
       "revenueYoY": 55.42638489110967,
       "cumulativeRevenueYoY": 41.01765691988111,
       "revenuePeriod": "11506",
-      "eps": 31.42,
-      "financialPeriod": "2026-06-30",
-      "roe": 29.97,
-      "debtRatio": 53.58,
+      "eps": 17.59,
+      "financialPeriod": "115Q2",
+      "roe": 29.126199287970657,
+      "debtRatio": 53.57775470079575,
       "cashFlow": null,
-      "financialSource": "FinMind 授權基本面資料",
+      "financialSource": "TWSE/TPEx",
       "industry": "電子零組件業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:29:13.090420+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2312": {
       "pe": 30.1,
@@ -78602,14 +78664,15 @@
       "cumulativeRevenueYoY": 13.196704575605436,
       "revenuePeriod": "11506",
       "industry": "電子零組件業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 6.21,
-      "roe": 16.54,
-      "debtRatio": 51.87,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 2.5,
+      "roe": 12.280479722398592,
+      "debtRatio": 51.866031915835244,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:29:16.305728+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2314": {
       "pe": null,
@@ -78772,16 +78835,17 @@
       "revenueYoY": 3.620312967366914,
       "cumulativeRevenueYoY": 10.655082062962112,
       "revenuePeriod": "11506",
-      "eps": 2.59,
-      "financialPeriod": "2026-06-30",
-      "roe": 10.73,
-      "debtRatio": 38.44,
+      "eps": 0.96,
+      "financialPeriod": "115Q2",
+      "roe": 7.834735663718593,
+      "debtRatio": 38.43654479999405,
       "cashFlow": null,
-      "financialSource": "FinMind 授權基本面資料",
+      "financialSource": "TWSE/TPEx",
       "industry": "電子工業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:29:22.265150+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2330": {
       "pe": 31.86,
@@ -78849,16 +78913,17 @@
       "revenueYoY": 216.09461825395996,
       "cumulativeRevenueYoY": 128.75502117306723,
       "revenuePeriod": "11506",
-      "eps": 4.19,
-      "financialPeriod": "2026-06-30",
-      "roe": 16.01,
-      "debtRatio": 35.77,
+      "eps": 4.82,
+      "financialPeriod": "115Q2",
+      "roe": 30.72158164859887,
+      "debtRatio": 35.77321276616327,
       "cashFlow": null,
-      "financialSource": "FinMind 授權基本面資料",
+      "financialSource": "TWSE/TPEx",
       "industry": "電子工業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:36:52.413731+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2338": {
       "pe": null,
@@ -78889,14 +78954,15 @@
       "cumulativeRevenueYoY": 2.167343922289935,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "eps": -2.16,
-      "roe": -15.07,
-      "debtRatio": 54.93,
-      "financialPeriod": "2026-06-30",
+      "eps": -0.93,
+      "roe": -13.69720910190731,
+      "debtRatio": 54.93421651690521,
+      "financialPeriod": "115Q2",
       "financialHistoryYears": 6,
-      "financialSource": "FinMind 授權基本面資料",
+      "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-09T07:36:54.598885+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2342": {
       "pe": null,
@@ -78927,14 +78993,15 @@
       "cumulativeRevenueYoY": 139.19764936720955,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "eps": 9.06,
-      "roe": 29.95,
-      "debtRatio": 40.78,
-      "financialPeriod": "2026-06-30",
+      "eps": 7.65,
+      "roe": 39.54832232841247,
+      "debtRatio": 40.77740873757521,
+      "financialPeriod": "115Q2",
       "financialHistoryYears": 6,
-      "financialSource": "FinMind 授權基本面資料",
+      "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-09T07:36:54.615151+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2345": {
       "pe": 34.8,
@@ -78946,14 +79013,15 @@
       "cumulativeRevenueYoY": 60.28045047959245,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 63.65,
-      "roe": 65.58,
-      "debtRatio": 65.32,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 34.7,
+      "roe": 56.07464932124716,
+      "debtRatio": 65.32427085715298,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:36:54.868660+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2347": {
       "pe": 12.78,
@@ -78965,14 +79033,15 @@
       "cumulativeRevenueYoY": 77.39100370968649,
       "revenuePeriod": "11506",
       "industry": "電子通路業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 7.31,
-      "roe": 16.46,
-      "debtRatio": 70.33,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 4.12,
+      "roe": 15.976964196617354,
+      "debtRatio": 70.32763422723868,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:36:56.812611+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2348": {
       "pe": 17.2,
@@ -79033,14 +79102,15 @@
       "cumulativeRevenueYoY": 1.027010066226975,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 0.78,
-      "roe": 2.88,
-      "debtRatio": 69.11,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 0.58,
+      "roe": 3.9887457204265204,
+      "debtRatio": 69.10887126631071,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:36:57.175437+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2353": {
       "pe": 18.01,
@@ -79052,14 +79122,15 @@
       "cumulativeRevenueYoY": 23.349259169842632,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 1.68,
-      "roe": 9.0,
-      "debtRatio": 67.67,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 0.96,
+      "roe": 8.287283489124855,
+      "debtRatio": 67.67077971851492,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:36:58.989005+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2354": {
       "pe": 26.19,
@@ -79071,14 +79142,15 @@
       "cumulativeRevenueYoY": -21.902523102560878,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 2.36,
-      "roe": 3.04,
-      "debtRatio": 36.29,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 1.1,
+      "roe": 2.691411452450782,
+      "debtRatio": 36.28717073777652,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:36:59.001398+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2355": {
       "pe": 23.93,
@@ -79166,14 +79238,15 @@
       "cumulativeRevenueYoY": 90.60268702714609,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 39.29,
-      "roe": 58.22,
-      "debtRatio": 47.08,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 21.27,
+      "roe": 54.451913824869536,
+      "debtRatio": 47.08150733733756,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:37:03.330532+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2362": {
       "pe": 8.31,
@@ -79185,14 +79258,15 @@
       "cumulativeRevenueYoY": 17.640110908914885,
       "revenuePeriod": "11506",
       "industry": "電腦及週邊設備業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 6.07,
-      "roe": 8.24,
-      "debtRatio": 57.37,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 4.05,
+      "roe": 9.97525339878152,
+      "debtRatio": 57.37123192715693,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:37:03.472222+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2363": {
       "pe": 31.59,
@@ -79348,14 +79422,15 @@
       "cumulativeRevenueYoY": 51.372858958918776,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "2026-06-30",
-      "financialSource": "FinMind 授權基本面資料",
-      "eps": 3.36,
-      "roe": 13.54,
-      "debtRatio": 37.89,
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 1.55,
+      "roe": 11.181725969403235,
+      "debtRatio": 37.88859911565547,
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:37:09.589771+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2375": {
       "pe": 35.71,
@@ -79478,7 +79553,8 @@
       "debtRatio": 63.22801305840192,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2385": {
       "pe": 11.39,
@@ -79494,7 +79570,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.06,
       "roe": 16.259655025091924,
-      "debtRatio": 52.037869533223294
+      "debtRatio": 52.037869533223294,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2387": {
       "pe": 12.89,
@@ -79510,7 +79587,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.66,
       "roe": 2.8839966874850598,
-      "debtRatio": 42.63747631039382
+      "debtRatio": 42.63747631039382,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2388": {
       "pe": 432.78,
@@ -79571,7 +79649,8 @@
       "debtRatio": 40.50216509389477,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2397": {
       "pe": 24.25,
@@ -79587,7 +79666,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.05,
       "roe": 11.477780029794534,
-      "debtRatio": 61.215105998582295
+      "debtRatio": 61.215105998582295,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2399": {
       "pe": 27.28,
@@ -79669,7 +79749,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 23.38,
       "roe": 47.257746737742174,
-      "debtRatio": 16.778415948685712
+      "debtRatio": 16.778415948685712,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2409": {
       "pe": 76.72,
@@ -79718,7 +79799,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.53,
       "roe": 21.296346308047127,
-      "debtRatio": 76.08319064733105
+      "debtRatio": 76.08319064733105,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2415": {
       "pe": 16.43,
@@ -79757,7 +79839,8 @@
       "debtRatio": 49.05474292479466,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2420": {
       "pe": 14.04,
@@ -79784,7 +79867,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.78,
       "roe": 25.452741882387464,
-      "debtRatio": 50.2139241160336
+      "debtRatio": 50.2139241160336,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2423": {
       "pe": 21.49,
@@ -79877,7 +79961,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.09,
       "roe": 0.47595320819446735,
-      "debtRatio": 67.9806894720142
+      "debtRatio": 67.9806894720142,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2431": {
       "pe": null,
@@ -79904,7 +79989,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.82,
       "roe": 8.746953074773007,
-      "debtRatio": 40.664272432683845
+      "debtRatio": 40.664272432683845,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2433": {
       "pe": 13.75,
@@ -79973,7 +80059,8 @@
       "debtRatio": 54.439344785268496,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2440": {
       "pe": null,
@@ -80001,7 +80088,8 @@
       "debtRatio": 18.34314386816842,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "半導體業"
+      "industry": "半導體業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2442": {
       "pe": 3.7,
@@ -80051,7 +80139,8 @@
       "debtRatio": 42.17598480416897,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2451": {
       "pe": 5.17,
@@ -80062,16 +80151,17 @@
       "revenueYoY": 381.5468504599107,
       "cumulativeRevenueYoY": 422.1697253819397,
       "revenuePeriod": "11506",
-      "eps": 57.76,
-      "financialPeriod": "2026-06-30",
-      "roe": 87.87,
-      "debtRatio": 28.68,
+      "eps": 46.63,
+      "financialPeriod": "115Q2",
+      "roe": 104.0728258328507,
+      "debtRatio": 28.679982924350973,
       "cashFlow": null,
-      "financialSource": "FinMind 授權基本面資料",
+      "financialSource": "TWSE/TPEx",
       "industry": "電子工業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:29:02.660318+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2453": {
       "pe": 16.82,
@@ -80099,7 +80189,8 @@
       "debtRatio": 45.05776945082058,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "半導體業"
+      "industry": "半導體業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2455": {
       "pe": 89.22,
@@ -80116,7 +80207,8 @@
       "debtRatio": 35.398259810279754,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2457": {
       "pe": null,
@@ -80206,7 +80298,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.66,
       "roe": 4.704306410517972,
-      "debtRatio": 55.34872838505358
+      "debtRatio": 55.34872838505358,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2465": {
       "pe": 64.47,
@@ -80244,7 +80337,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 7.16,
       "roe": 14.097630209221586,
-      "debtRatio": 44.00203595204917
+      "debtRatio": 44.00203595204917,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2468": {
       "pe": 27.03,
@@ -80271,7 +80365,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.6,
       "roe": 17.395316512790302,
-      "debtRatio": 47.88026859386422
+      "debtRatio": 47.88026859386422,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2472": {
       "pe": 26.53,
@@ -80309,7 +80404,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.98,
       "roe": 14.603242359842792,
-      "debtRatio": 27.64336319558691
+      "debtRatio": 27.64336319558691,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2477": {
       "pe": 13.8,
@@ -80348,7 +80444,8 @@
       "debtRatio": 65.4186716270742,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2481": {
       "pe": 42.22,
@@ -80386,7 +80483,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.4,
       "roe": 3.2426681367948436,
-      "debtRatio": 38.47372498029786
+      "debtRatio": 38.47372498029786,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2484": {
       "pe": 51.58,
@@ -80402,7 +80500,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.86,
       "roe": 6.713029280203021,
-      "debtRatio": 19.246106275384616
+      "debtRatio": 19.246106275384616,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2485": {
       "pe": 1012.5,
@@ -80429,7 +80528,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.91,
       "roe": 6.455682535878599,
-      "debtRatio": 57.59832102531561
+      "debtRatio": 57.59832102531561,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2488": {
       "pe": 10.06,
@@ -80445,7 +80545,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.21,
       "roe": 12.708154657875653,
-      "debtRatio": 34.07296599041211
+      "debtRatio": 34.07296599041211,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2489": {
       "pe": 28.3,
@@ -80483,7 +80584,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.93,
       "roe": 7.090713235487176,
-      "debtRatio": 34.44458332282429
+      "debtRatio": 34.44458332282429,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2493": {
       "pe": 50.83,
@@ -80510,7 +80612,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.61,
       "roe": 7.3045815385789234,
-      "debtRatio": 42.69369554486788
+      "debtRatio": 42.69369554486788,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2496": {
       "pe": 9.83,
@@ -80526,7 +80629,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.48,
       "roe": 10.619469026548673,
-      "debtRatio": 43.208623210284095
+      "debtRatio": 43.208623210284095,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2497": {
       "pe": 21.02,
@@ -80553,7 +80657,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.62,
       "roe": -3.9760912807899644,
-      "debtRatio": 32.55979995934581
+      "debtRatio": 32.55979995934581,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2501": {
       "pe": 5.7,
@@ -80668,7 +80773,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.87,
       "roe": 13.151820469096029,
-      "debtRatio": 57.498972899974795
+      "debtRatio": 57.498972899974795,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2524": {
       "pe": 59.91,
@@ -80706,7 +80812,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.57,
       "roe": 7.561621928201505,
-      "debtRatio": 65.26051625018434
+      "debtRatio": 65.26051625018434,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2530": {
       "pe": 9.92,
@@ -80744,7 +80851,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 6.32,
       "roe": 29.429723426946065,
-      "debtRatio": 64.05601347033846
+      "debtRatio": 64.05601347033846,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2536": {
       "pe": 4.67,
@@ -80760,7 +80868,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.2,
       "roe": 10.773244452758037,
-      "debtRatio": 64.83143222216079
+      "debtRatio": 64.83143222216079,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2537": {
       "pe": 34.53,
@@ -80853,7 +80962,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 8.89,
       "roe": 35.309012612927454,
-      "debtRatio": 61.5982059789052
+      "debtRatio": 61.5982059789052,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2547": {
       "pe": 76.07,
@@ -80880,7 +80990,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.81,
       "roe": 9.06604435920381,
-      "debtRatio": 61.37110455316167
+      "debtRatio": 61.37110455316167,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2597": {
       "pe": 14.61,
@@ -80984,7 +81095,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.08,
       "roe": 14.610044364087829,
-      "debtRatio": 73.05998509099048
+      "debtRatio": 73.05998509099048,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2611": {
       "pe": 10.65,
@@ -81088,7 +81200,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.12,
       "roe": 1.429165289117018,
-      "debtRatio": 41.160629428751186
+      "debtRatio": 41.160629428751186,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2633": {
       "pe": 21.15,
@@ -81104,7 +81217,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.67,
       "roe": 10.71807664184522,
-      "debtRatio": 81.84791847342412
+      "debtRatio": 81.84791847342412,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2634": {
       "pe": 77.13,
@@ -81285,7 +81399,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 9.86,
       "roe": 35.787109786359196,
-      "debtRatio": 74.83774287318022
+      "debtRatio": 74.83774287318022,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2731": {
       "pe": 8.48,
@@ -81759,7 +81874,8 @@
       "debtRatio": 83.10807492470904,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "貿易百貨"
+      "industry": "貿易百貨",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2913": {
       "pe": null,
@@ -81864,7 +81980,8 @@
       "debtRatio": 58.254852831296965,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "鋼鐵工業"
+      "industry": "鋼鐵工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3005": {
       "pe": 14.11,
@@ -81895,7 +82012,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-02T15:15:28.843686+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3008": {
       "pe": 23.32,
@@ -81911,7 +82029,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 82.35,
       "roe": 11.268883517567579,
-      "debtRatio": 14.4349120259779
+      "debtRatio": 14.4349120259779,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3010": {
       "pe": 12.85,
@@ -81949,7 +82068,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.78,
       "roe": 19.975937369279507,
-      "debtRatio": 43.410359460319455
+      "debtRatio": 43.410359460319455,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3014": {
       "pe": 13.64,
@@ -81965,7 +82085,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.88,
       "roe": 25.779862580684064,
-      "debtRatio": 33.51112363652621
+      "debtRatio": 33.51112363652621,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3015": {
       "pe": 21.57,
@@ -81981,7 +82102,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.08,
       "roe": 2.911453270684592,
-      "debtRatio": 29.02702929564256
+      "debtRatio": 29.02702929564256,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3016": {
       "pe": 81.67,
@@ -81997,7 +82119,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.0,
       "roe": 11.069288195040974,
-      "debtRatio": 31.09732169297879
+      "debtRatio": 31.09732169297879,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3017": {
       "pe": 45.76,
@@ -82035,7 +82158,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.98,
       "roe": 11.234668196652187,
-      "debtRatio": 40.75263825158913
+      "debtRatio": 40.75263825158913,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3021": {
       "pe": 35.69,
@@ -82074,7 +82198,8 @@
       "debtRatio": 52.869096293316574,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3024": {
       "pe": 141.11,
@@ -82112,7 +82237,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 6.73,
       "roe": 20.2738080366991,
-      "debtRatio": 40.546485068945096
+      "debtRatio": 40.546485068945096,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3027": {
       "pe": null,
@@ -82139,7 +82265,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.24,
       "roe": 34.282322036872905,
-      "debtRatio": 81.03540244574567
+      "debtRatio": 81.03540244574567,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3029": {
       "pe": 15.62,
@@ -82155,7 +82282,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.63,
       "roe": 23.43459204362068,
-      "debtRatio": 63.776364730011025
+      "debtRatio": 63.776364730011025,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3030": {
       "pe": 21.97,
@@ -82171,7 +82299,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 7.36,
       "roe": 35.72430692725979,
-      "debtRatio": 34.30085458823606
+      "debtRatio": 34.30085458823606,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3031": {
       "pe": 20.27,
@@ -82220,7 +82349,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 16.59,
       "roe": 29.27731099260945,
-      "debtRatio": 42.09248267770187
+      "debtRatio": 42.09248267770187,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3035": {
       "pe": 67.72,
@@ -82237,7 +82367,8 @@
       "debtRatio": 28.622667982670258,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "半導體業"
+      "industry": "半導體業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3036": {
       "pe": 15.0,
@@ -82265,7 +82396,8 @@
       "debtRatio": 59.22634162365821,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3038": {
       "pe": 22.13,
@@ -82377,7 +82509,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.31,
       "roe": -8.662714193741301,
-      "debtRatio": 51.5995301530931
+      "debtRatio": 51.5995301530931,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3048": {
       "pe": 20.68,
@@ -82449,7 +82582,8 @@
       "debtRatio": 11.468648764393157,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "半導體業"
+      "industry": "半導體業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3055": {
       "pe": null,
@@ -82509,7 +82643,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.64,
       "roe": 5.75475665631687,
-      "debtRatio": 35.86042609386604
+      "debtRatio": 35.86042609386604,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3060": {
       "pe": 43.28,
@@ -82525,7 +82660,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.68,
       "roe": 7.241576473766295,
-      "debtRatio": 40.81746016948662
+      "debtRatio": 40.81746016948662,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3062": {
       "pe": null,
@@ -82552,7 +82688,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.91,
       "roe": 15.147956401602952,
-      "debtRatio": 30.89560032444338
+      "debtRatio": 30.89560032444338,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3092": {
       "pe": null,
@@ -82579,7 +82716,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.39,
       "roe": 6.258406397533481,
-      "debtRatio": 11.910163474163342
+      "debtRatio": 11.910163474163342,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3130": {
       "pe": 13.49,
@@ -82639,7 +82777,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.03,
       "roe": 0.4585282699792764,
-      "debtRatio": 14.107173005606366
+      "debtRatio": 14.107173005606366,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3164": {
       "pe": 31.54,
@@ -82677,7 +82816,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.43,
       "roe": 11.311958633863583,
-      "debtRatio": 38.59462629669
+      "debtRatio": 38.59462629669,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3189": {
       "pe": 152.69,
@@ -82693,7 +82833,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.74,
       "roe": 9.660009776847293,
-      "debtRatio": 37.31978393010627
+      "debtRatio": 37.31978393010627,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3209": {
       "pe": 16.04,
@@ -82731,7 +82872,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 7.78,
       "roe": 30.12604947320343,
-      "debtRatio": 82.37451820891994
+      "debtRatio": 82.37451820891994,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3257": {
       "pe": 16.84,
@@ -82803,7 +82945,8 @@
       "debtRatio": 29.797646344882683,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "通信網路業"
+      "industry": "通信網路業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3312": {
       "pe": 28.74,
@@ -82831,7 +82974,8 @@
       "debtRatio": 67.31797030433168,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3338": {
       "pe": 43.84,
@@ -82847,7 +82991,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.46,
       "roe": 4.11021876098537,
-      "debtRatio": 47.67596355991591
+      "debtRatio": 47.67596355991591,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3346": {
       "pe": null,
@@ -82897,7 +83042,8 @@
       "debtRatio": 50.00579383468489,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3406": {
       "pe": 16.55,
@@ -82935,7 +83081,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.28,
       "roe": 19.28849432383206,
-      "debtRatio": 35.5601413625551
+      "debtRatio": 35.5601413625551,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3419": {
       "pe": null,
@@ -82988,7 +83135,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-03T12:41:12.453898+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3447": {
       "pe": 14.49,
@@ -83004,7 +83152,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.4,
       "roe": 4.974436453737837,
-      "debtRatio": 60.469168324369264
+      "debtRatio": 60.469168324369264,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3450": {
       "pe": 141.96,
@@ -83073,7 +83222,8 @@
       "debtRatio": 36.12557583310065,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3515": {
       "pe": 13.73,
@@ -83089,7 +83239,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 7.1,
       "roe": 21.86606556799492,
-      "debtRatio": 52.417279800010576
+      "debtRatio": 52.417279800010576,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3518": {
       "pe": 12.85,
@@ -83130,7 +83281,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:13.819471+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3532": {
       "pe": 240.38,
@@ -83146,7 +83298,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.05,
       "roe": -0.16690149280271271,
-      "debtRatio": 52.626966510484664
+      "debtRatio": 52.626966510484664,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3533": {
       "pe": 26.84,
@@ -83173,7 +83326,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.12,
       "roe": 15.736621239155301,
-      "debtRatio": 31.12983670104002
+      "debtRatio": 31.12983670104002,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3543": {
       "pe": null,
@@ -83242,7 +83396,8 @@
       "debtRatio": 28.211379186399604,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3576": {
       "pe": 40.36,
@@ -83291,7 +83446,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.16,
       "roe": 2.110150574292788,
-      "debtRatio": 34.3268366149569
+      "debtRatio": 34.3268366149569,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3592": {
       "pe": 14.36,
@@ -83310,7 +83466,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:15.264153+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3593": {
       "pe": null,
@@ -83337,7 +83494,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 6.5,
       "roe": 17.311760649738495,
-      "debtRatio": 69.48171084608268
+      "debtRatio": 69.48171084608268,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3605": {
       "pe": 28.29,
@@ -83353,7 +83511,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.89,
       "roe": 6.906554722141829,
-      "debtRatio": 44.578003974064764
+      "debtRatio": 44.578003974064764,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3607": {
       "pe": 36.67,
@@ -83413,7 +83572,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.12,
       "roe": 8.746843481644268,
-      "debtRatio": 29.431581910562137
+      "debtRatio": 29.431581910562137,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3653": {
       "pe": 121.16,
@@ -83462,7 +83622,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.4,
       "roe": 7.43144623369391,
-      "debtRatio": 28.061976429434743
+      "debtRatio": 28.061976429434743,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3673": {
       "pe": 16.59,
@@ -83489,7 +83650,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.18,
       "roe": 10.874972411450054,
-      "debtRatio": 48.94004700209686
+      "debtRatio": 48.94004700209686,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3686": {
       "pe": null,
@@ -83549,7 +83711,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.57,
       "roe": 3.4185463495653794,
-      "debtRatio": 70.54063249807633
+      "debtRatio": 70.54063249807633,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3704": {
       "pe": 13.73,
@@ -83565,7 +83728,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.55,
       "roe": 10.453473800196836,
-      "debtRatio": 57.3058162350521
+      "debtRatio": 57.3058162350521,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3705": {
       "pe": 18.01,
@@ -83603,7 +83767,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.87,
       "roe": -0.8735250278154303,
-      "debtRatio": 13.76503522567203
+      "debtRatio": 13.76503522567203,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3711": {
       "pe": 54.32,
@@ -83696,7 +83861,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.09,
       "roe": 8.717234340792478,
-      "debtRatio": 23.615595821830134
+      "debtRatio": 23.615595821830134,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4108": {
       "pe": null,
@@ -83712,7 +83878,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.11,
       "roe": -4.005085499103834,
-      "debtRatio": 2.4141868933951134
+      "debtRatio": 2.4141868933951134,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4119": {
       "pe": 103.2,
@@ -83728,7 +83895,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.06,
       "roe": 0.273539695174414,
-      "debtRatio": 23.320736310701147
+      "debtRatio": 23.320736310701147,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4133": {
       "pe": 706.67,
@@ -83799,7 +83967,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.45,
       "roe": 2.5415570082565884,
-      "debtRatio": 51.408927496166136
+      "debtRatio": 51.408927496166136,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4169": {
       "pe": 490.63,
@@ -83925,7 +84094,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 9.08,
       "roe": 18.020092347301315,
-      "debtRatio": 30.511526704458632
+      "debtRatio": 30.511526704458632,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4526": {
       "pe": 28.8,
@@ -83985,7 +84155,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.47,
       "roe": 3.7293085055994197,
-      "debtRatio": 41.95864733213944
+      "debtRatio": 41.95864733213944,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4551": {
       "pe": 25.11,
@@ -84023,7 +84194,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.69,
       "roe": 3.6443213026330787,
-      "debtRatio": 33.93176448622292
+      "debtRatio": 33.93176448622292,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4557": {
       "pe": null,
@@ -84116,7 +84288,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.86,
       "roe": 7.828600606746784,
-      "debtRatio": 39.80371171249882
+      "debtRatio": 39.80371171249882,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4576": {
       "pe": 85.83,
@@ -84166,7 +84339,8 @@
       "debtRatio": 10.758389546339389,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電機機械"
+      "industry": "電機機械",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4585": {
       "pe": 233.71,
@@ -84193,7 +84367,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.36,
       "roe": 13.648204107060721,
-      "debtRatio": 64.18214297779978
+      "debtRatio": 64.18214297779978,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4590": {
       "pe": 32.72,
@@ -84231,7 +84406,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.29,
       "roe": 7.612152347087051,
-      "debtRatio": 58.353049273742876
+      "debtRatio": 58.353049273742876,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4736": {
       "pe": 7.15,
@@ -84401,7 +84577,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.55,
       "roe": 11.56240189503824,
-      "debtRatio": 62.646301777489214
+      "debtRatio": 62.646301777489214,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4916": {
       "pe": 16.54,
@@ -84417,7 +84594,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.45,
       "roe": 36.93679484581719,
-      "debtRatio": 32.64488330957865
+      "debtRatio": 32.64488330957865,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4919": {
       "pe": null,
@@ -84433,7 +84611,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.57,
       "roe": -2.8921261361531134,
-      "debtRatio": 46.50087897566168
+      "debtRatio": 46.50087897566168,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4927": {
       "pe": null,
@@ -84540,7 +84719,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:19.169003+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4956": {
       "pe": null,
@@ -84578,7 +84758,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.6,
       "roe": -9.562569219995995,
-      "debtRatio": 44.96190107354419
+      "debtRatio": 44.96190107354419,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4961": {
       "pe": 19.38,
@@ -84597,7 +84778,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:19.599401+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4967": {
       "pe": 4.16,
@@ -84616,7 +84798,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:20.685735+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4968": {
       "pe": 25.73,
@@ -84636,7 +84819,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-03T12:41:20.997926+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4976": {
       "pe": null,
@@ -84685,7 +84869,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.69,
       "roe": 10.482532565136026,
-      "debtRatio": 40.98726525622304
+      "debtRatio": 40.98726525622304,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4999": {
       "pe": null,
@@ -84701,7 +84886,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -1.23,
       "roe": -5.792235637514775,
-      "debtRatio": 16.6836791351683
+      "debtRatio": 16.6836791351683,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5007": {
       "pe": 18.45,
@@ -84729,7 +84915,8 @@
       "debtRatio": 28.021451728434766,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "資訊服務業"
+      "industry": "資訊服務業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5215": {
       "pe": 15.45,
@@ -84759,7 +84946,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:23.006195+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5225": {
       "pe": 11.16,
@@ -84775,7 +84963,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.92,
       "roe": 9.546623659133715,
-      "debtRatio": 51.41585721408358
+      "debtRatio": 51.41585721408358,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5234": {
       "pe": 42.34,
@@ -84805,7 +84994,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:23.622601+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5243": {
       "pe": 17.89,
@@ -84898,7 +85088,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 8.03,
       "roe": 17.41695202867782,
-      "debtRatio": 26.26777017253187
+      "debtRatio": 26.26777017253187,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5292": {
       "pe": 17.01,
@@ -84947,7 +85138,8 @@
       "eps": 14.79,
       "roe": 25.871422270518845,
       "debtRatio": 53.86347001865611,
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5469": {
       "pe": 12.46,
@@ -85136,7 +85328,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.79,
       "roe": 17.34343481355436,
-      "debtRatio": 50.86892796152177
+      "debtRatio": 50.86892796152177,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5871": {
       "pe": 10.21,
@@ -85240,7 +85433,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.85,
       "roe": 13.678926599901187,
-      "debtRatio": 64.89842415802468
+      "debtRatio": 64.89842415802468,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6115": {
       "pe": 15.95,
@@ -85289,7 +85483,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.42,
       "roe": 17.20614789190532,
-      "debtRatio": 42.99716097275839
+      "debtRatio": 42.99716097275839,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6128": {
       "pe": null,
@@ -85371,7 +85566,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.27,
       "roe": 6.766759273493133,
-      "debtRatio": 62.48774596860126
+      "debtRatio": 62.48774596860126,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6153": {
       "pe": null,
@@ -85387,7 +85583,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.86,
       "roe": -12.866234783860394,
-      "debtRatio": 47.64029629034602
+      "debtRatio": 47.64029629034602,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6155": {
       "pe": 106.6,
@@ -85459,7 +85656,8 @@
       "debtRatio": 48.31635873936797,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6177": {
       "pe": 6.53,
@@ -85486,7 +85684,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.41,
       "roe": 26.946829554837027,
-      "debtRatio": 49.63652360773309
+      "debtRatio": 49.63652360773309,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6184": {
       "pe": 17.76,
@@ -85524,7 +85723,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.32,
       "roe": 6.229341461348708,
-      "debtRatio": 49.820685029660304
+      "debtRatio": 49.820685029660304,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6192": {
       "pe": 11.82,
@@ -85562,7 +85762,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 7.0,
       "roe": 30.068912794744058,
-      "debtRatio": 43.31542737637417
+      "debtRatio": 43.31542737637417,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6201": {
       "pe": 14.13,
@@ -85578,7 +85779,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.52,
       "roe": 10.066880972079247,
-      "debtRatio": 32.18431838084652
+      "debtRatio": 32.18431838084652,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6202": {
       "pe": 49.92,
@@ -85595,7 +85797,8 @@
       "debtRatio": 29.67722484201788,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "半導體業"
+      "industry": "半導體業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6205": {
       "pe": 26.27,
@@ -85611,7 +85814,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.16,
       "roe": 7.181490669879807,
-      "debtRatio": 33.298589756968894
+      "debtRatio": 33.298589756968894,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6206": {
       "pe": 15.91,
@@ -85627,7 +85831,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.93,
       "roe": 31.572325455740298,
-      "debtRatio": 29.60177813605373
+      "debtRatio": 29.60177813605373,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6209": {
       "pe": 42.95,
@@ -85654,7 +85859,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.39,
       "roe": 14.108907001948436,
-      "debtRatio": 47.8076931801639
+      "debtRatio": 47.8076931801639,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6214": {
       "pe": 15.36,
@@ -85692,7 +85898,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.14,
       "roe": -1.644731247585565,
-      "debtRatio": 13.835844353227673
+      "debtRatio": 13.835844353227673,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6224": {
       "pe": 63.22,
@@ -85763,7 +85970,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.5,
       "roe": 14.505671603720655,
-      "debtRatio": 44.86918657947203
+      "debtRatio": 44.86918657947203,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6243": {
       "pe": null,
@@ -85790,7 +85998,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.65,
       "roe": 17.546532561676365,
-      "debtRatio": 43.783776119274165
+      "debtRatio": 43.783776119274165,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6269": {
       "pe": null,
@@ -85818,7 +86027,8 @@
       "debtRatio": 24.15178406232816,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "半導體業"
+      "industry": "半導體業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6272": {
       "pe": 10.02,
@@ -85867,7 +86077,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.26,
       "roe": 16.073380065311873,
-      "debtRatio": 72.0649804146111
+      "debtRatio": 72.0649804146111,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6282": {
       "pe": 94.3,
@@ -85894,7 +86105,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.53,
       "roe": -9.00855754942759,
-      "debtRatio": 29.864464656666613
+      "debtRatio": 29.864464656666613,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6285": {
       "pe": 25.52,
@@ -85910,7 +86122,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.75,
       "roe": 15.427945197030816,
-      "debtRatio": 65.98122243220106
+      "debtRatio": 65.98122243220106,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6405": {
       "pe": null,
@@ -85948,7 +86161,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.04,
       "roe": 15.776486865604838,
-      "debtRatio": 55.907660745195834
+      "debtRatio": 55.907660745195834,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6414": {
       "pe": 22.03,
@@ -86093,7 +86307,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -3.76,
       "roe": -8.522940553366382,
-      "debtRatio": 47.73343045881212
+      "debtRatio": 47.73343045881212,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6464": {
       "pe": 19.16,
@@ -86164,7 +86379,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.32,
       "roe": 16.726322633419162,
-      "debtRatio": 16.60363107941074
+      "debtRatio": 16.60363107941074,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6515": {
       "pe": 138.52,
@@ -86229,7 +86445,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 8.33,
       "roe": 20.814875285153807,
-      "debtRatio": 24.470219349212215
+      "debtRatio": 24.470219349212215,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6533": {
       "pe": null,
@@ -86256,7 +86473,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.65,
       "roe": 43.86465273860865,
-      "debtRatio": 30.76822816071022
+      "debtRatio": 30.76822816071022,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6541": {
       "pe": null,
@@ -86294,7 +86512,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.9,
       "roe": -5.641021206651596,
-      "debtRatio": 31.64313339194486
+      "debtRatio": 31.64313339194486,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6558": {
       "pe": null,
@@ -86332,7 +86551,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 6.15,
       "roe": 14.779526473984703,
-      "debtRatio": 26.095675442033066
+      "debtRatio": 26.095675442033066,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6581": {
       "pe": 14.65,
@@ -86348,7 +86568,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.37,
       "roe": 22.179478258488935,
-      "debtRatio": 18.471612317260238
+      "debtRatio": 18.471612317260238,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6582": {
       "pe": 83.68,
@@ -86364,7 +86585,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.01,
       "roe": -0.03653663577126026,
-      "debtRatio": 4.587878873804038
+      "debtRatio": 4.587878873804038,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6585": {
       "pe": 14.88,
@@ -86380,7 +86602,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.81,
       "roe": 17.67023233241847,
-      "debtRatio": 26.52418515105887
+      "debtRatio": 26.52418515105887,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6589": {
       "pe": null,
@@ -86495,7 +86718,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -1.26,
       "roe": -36.22774095663978,
-      "debtRatio": 57.96292761899099
+      "debtRatio": 57.96292761899099,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6655": {
       "pe": 28.82,
@@ -86555,7 +86779,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.83,
       "roe": -7.950767853844952,
-      "debtRatio": 40.01082329479843
+      "debtRatio": 40.01082329479843,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6669": {
       "pe": 20.45,
@@ -86571,7 +86796,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 156.38,
       "roe": 42.37641288643333,
-      "debtRatio": 75.3534970099199
+      "debtRatio": 75.3534970099199,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6670": {
       "pe": 13.0,
@@ -86664,7 +86890,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -1.3,
       "roe": -15.775108714704237,
-      "debtRatio": 36.17718973949982
+      "debtRatio": 36.17718973949982,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6706": {
       "pe": null,
@@ -86702,7 +86929,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.2,
       "roe": 6.279730511644965,
-      "debtRatio": 18.569629349579653
+      "debtRatio": 18.569629349579653,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6722": {
       "pe": 13.3,
@@ -86828,7 +87056,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.45,
       "roe": 15.125330417108978,
-      "debtRatio": 76.53935858534773
+      "debtRatio": 76.53935858534773,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6781": {
       "pe": 29.26,
@@ -86855,7 +87084,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 8.45,
       "roe": 23.9333840813128,
-      "debtRatio": 35.02072759732571
+      "debtRatio": 35.02072759732571,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6789": {
       "pe": 79.58,
@@ -86871,7 +87101,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.95,
       "roe": 10.146042681145484,
-      "debtRatio": 18.542038419446964
+      "debtRatio": 18.542038419446964,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6790": {
       "pe": 12.49,
@@ -86932,7 +87163,8 @@
       "debtRatio": 15.243412763781402,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "半導體業"
+      "industry": "半導體業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6805": {
       "pe": 42.62,
@@ -86993,7 +87225,8 @@
       "debtRatio": 40.74594652718573,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6835": {
       "pe": 237.69,
@@ -87163,7 +87396,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.45,
       "roe": -2.0564820401706645,
-      "debtRatio": 42.27704219899342
+      "debtRatio": 42.27704219899342,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6909": {
       "pe": 50.25,
@@ -87333,7 +87567,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-06T10:15:45.726726+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6944": {
       "pe": 21.69,
@@ -87358,7 +87593,8 @@
       "debtRatio": 71.59296005733083,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "綠能環保"
+      "industry": "綠能環保",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6949": {
       "pe": null,
@@ -87374,7 +87610,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -2.54,
       "roe": -13.295950690063421,
-      "debtRatio": 10.57147058320219
+      "debtRatio": 10.57147058320219,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6951": {
       "pe": 11.44,
@@ -87390,7 +87627,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.83,
       "roe": 26.463292246956705,
-      "debtRatio": 34.90598976411616
+      "debtRatio": 34.90598976411616,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6952": {
       "pe": 49.81,
@@ -87546,7 +87784,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 17.44,
       "roe": 45.15348147285299,
-      "debtRatio": 66.04786822262075
+      "debtRatio": 66.04786822262075,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "7721": {
       "pe": 105.08,
@@ -87647,7 +87886,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 42.53,
       "roe": 44.171374868244236,
-      "debtRatio": 45.280294718061086
+      "debtRatio": 45.280294718061086,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "7760": {
       "pe": 56.1,
@@ -87675,7 +87915,8 @@
       "debtRatio": 38.2787800323087,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "數位雲端"
+      "industry": "數位雲端",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "7768": {
       "pe": 83.71,
@@ -87769,7 +88010,8 @@
       "debtRatio": 2.862983710167412,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "生技醫療業"
+      "industry": "生技醫療業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "7803": {
       "pe": null,
@@ -87915,7 +88157,8 @@
       "debtRatio": 32.382671008225756,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8045": {
       "pe": 76.43,
@@ -87942,7 +88185,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.53,
       "roe": 14.495920435386333,
-      "debtRatio": 24.031084262942244
+      "debtRatio": 24.031084262942244,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8070": {
       "pe": 28.02,
@@ -87958,7 +88202,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.3,
       "roe": 9.006205230448536,
-      "debtRatio": 39.00955669401962
+      "debtRatio": 39.00955669401962,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8072": {
       "pe": 25.59,
@@ -88007,7 +88252,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.75,
       "roe": 10.540089701105728,
-      "debtRatio": 41.34661163458625
+      "debtRatio": 41.34661163458625,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8104": {
       "pe": null,
@@ -88075,7 +88321,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 7.09,
       "roe": 18.31835253658456,
-      "debtRatio": 38.03705585315194
+      "debtRatio": 38.03705585315194,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8131": {
       "pe": 18.17,
@@ -88091,7 +88338,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.93,
       "roe": 11.10975092830312,
-      "debtRatio": 21.165876708827046
+      "debtRatio": 21.165876708827046,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8150": {
       "pe": 73.14,
@@ -88126,7 +88374,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.66,
       "roe": 6.314105926630479,
-      "debtRatio": 44.21117871824827
+      "debtRatio": 44.21117871824827,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8163": {
       "pe": 51.92,
@@ -88142,7 +88391,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.51,
       "roe": 1.3986203061535103,
-      "debtRatio": 61.95162896076173
+      "debtRatio": 61.95162896076173,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8201": {
       "pe": null,
@@ -88169,7 +88419,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 21.83,
       "roe": 43.562033956541704,
-      "debtRatio": 56.80640925565732
+      "debtRatio": 56.80640925565732,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8213": {
       "pe": 15.7,
@@ -88197,7 +88448,8 @@
       "debtRatio": 69.49907063443787,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8222": {
       "pe": 61.72,
@@ -88236,7 +88488,8 @@
       "debtRatio": 19.47124949837533,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "半導體業"
+      "industry": "半導體業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8271": {
       "pe": 5.86,
@@ -88253,7 +88506,8 @@
       "debtRatio": 55.84458804701582,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "半導體業"
+      "industry": "半導體業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8341": {
       "pe": 16.17,
@@ -88269,7 +88523,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.97,
       "roe": 15.453980078110757,
-      "debtRatio": 43.10217443084149
+      "debtRatio": 43.10217443084149,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8367": {
       "pe": 12.71,
@@ -88285,7 +88540,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.98,
       "roe": 6.581202899922915,
-      "debtRatio": 74.364128641584
+      "debtRatio": 74.364128641584,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8374": {
       "pe": null,
@@ -88301,7 +88557,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.89,
       "roe": 11.93446842696353,
-      "debtRatio": 49.12178810094562
+      "debtRatio": 49.12178810094562,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8404": {
       "pe": 14.86,
@@ -88361,7 +88618,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.16,
       "roe": 15.112137655154893,
-      "debtRatio": 39.90531517824564
+      "debtRatio": 39.90531517824564,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8442": {
       "pe": 24.75,
@@ -88400,7 +88658,8 @@
       "debtRatio": 70.80578989449864,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "數位雲端"
+      "industry": "數位雲端",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8462": {
       "pe": 18.16,
@@ -88504,7 +88763,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.58,
       "roe": 12.42237489491798,
-      "debtRatio": 17.979096030992338
+      "debtRatio": 17.979096030992338,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8482": {
       "pe": 20.68,
@@ -88575,7 +88835,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.95,
       "roe": 15.505009952723212,
-      "debtRatio": 56.20008001909827
+      "debtRatio": 56.20008001909827,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8996": {
       "pe": 74.54,
@@ -88613,7 +88874,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.01,
       "roe": 15.251357835140581,
-      "debtRatio": 6.015851313667699
+      "debtRatio": 6.015851313667699,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "9904": {
       "pe": 6.58,
@@ -88662,7 +88924,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.35,
       "roe": 4.709265808605044,
-      "debtRatio": 38.723569372425544
+      "debtRatio": 38.723569372425544,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "9908": {
       "pe": 16.47,
@@ -88700,7 +88963,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.26,
       "roe": 21.356037885992137,
-      "debtRatio": 37.145643540387994
+      "debtRatio": 37.145643540387994,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "9912": {
       "pe": null,
@@ -88782,7 +89046,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.11,
       "roe": 4.968837283173549,
-      "debtRatio": 23.431965443481552
+      "debtRatio": 23.431965443481552,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "9925": {
       "pe": 16.62,
@@ -88820,7 +89085,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.27,
       "roe": 10.250459852096549,
-      "debtRatio": 21.01814516129032
+      "debtRatio": 21.01814516129032,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "9928": {
       "pe": null,
@@ -88858,7 +89124,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.16,
       "roe": 17.089896029265027,
-      "debtRatio": 43.210301976230795
+      "debtRatio": 43.210301976230795,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "9931": {
       "pe": 14.16,
@@ -88918,7 +89185,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.3,
       "roe": 14.482375067488276,
-      "debtRatio": 57.20961657085945
+      "debtRatio": 57.20961657085945,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "9938": {
       "pe": 12.24,
@@ -88967,7 +89235,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.86,
       "roe": 11.303997431933428,
-      "debtRatio": 85.92890655679271
+      "debtRatio": 85.92890655679271,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "9942": {
       "pe": 14.07,
@@ -89071,7 +89340,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.02,
       "roe": 4.671652188748454,
-      "debtRatio": 60.81194166892311
+      "debtRatio": 60.81194166892311,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1264": {
       "pe": 12.33,
@@ -89098,7 +89368,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 9.21,
       "roe": 32.40034082475927,
-      "debtRatio": 68.00060447777305
+      "debtRatio": 68.00060447777305,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1294": {
       "pe": 11.57,
@@ -89155,7 +89426,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.0,
       "roe": 4.725249114811361,
-      "debtRatio": 17.040584837853473
+      "debtRatio": 17.040584837853473,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1569": {
       "pe": null,
@@ -89191,7 +89463,8 @@
       "debtRatio": 13.20326629401835,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電機機械"
+      "industry": "電機機械",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1580": {
       "pe": 8.93,
@@ -89219,7 +89492,8 @@
       "debtRatio": 38.407394298426894,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "其他"
+      "industry": "其他",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1586": {
       "pe": 151.67,
@@ -89287,7 +89561,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.09,
       "roe": -1.2365787456449697,
-      "debtRatio": 29.285782486149674
+      "debtRatio": 29.285782486149674,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1742": {
       "pe": null,
@@ -89314,7 +89589,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.64,
       "roe": 12.590324907729961,
-      "debtRatio": 18.573493278462262
+      "debtRatio": 18.573493278462262,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1780": {
       "pe": 13.7,
@@ -89331,7 +89607,8 @@
       "debtRatio": 40.72302197800049,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "食品工業"
+      "industry": "食品工業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1781": {
       "pe": null,
@@ -89399,7 +89676,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.11,
       "roe": -1.1276804735237465,
-      "debtRatio": 38.09039050968357
+      "debtRatio": 38.09039050968357,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1799": {
       "pe": null,
@@ -89500,7 +89778,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.27,
       "roe": 15.942451165132853,
-      "debtRatio": 48.945269970136586
+      "debtRatio": 48.945269970136586,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2066": {
       "pe": 50.72,
@@ -89626,7 +89905,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.79,
       "roe": 9.986180296262136,
-      "debtRatio": 38.572197578694926
+      "debtRatio": 38.572197578694926,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2718": {
       "pe": 2.38,
@@ -89851,7 +90131,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.48,
       "roe": 11.762926711057704,
-      "debtRatio": 64.02902664588154
+      "debtRatio": 64.02902664588154,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "2941": {
       "pe": 11.65,
@@ -90022,7 +90303,8 @@
       "debtRatio": 33.68861329722686,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3093": {
       "pe": 54.48,
@@ -90101,7 +90383,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.95,
       "roe": 11.416286741539716,
-      "debtRatio": 32.47459256116745
+      "debtRatio": 32.47459256116745,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3122": {
       "pe": null,
@@ -90120,7 +90403,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-02T15:52:25.670414+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3128": {
       "pe": 20.0,
@@ -90170,7 +90454,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-02T15:52:27.175863+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3147": {
       "pe": 24.97,
@@ -90197,7 +90482,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.21,
       "roe": 10.515595350880995,
-      "debtRatio": 17.412250547354517
+      "debtRatio": 17.412250547354517,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3158": {
       "pe": 12.46,
@@ -90235,7 +90521,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.12,
       "roe": 20.178015356099184,
-      "debtRatio": 25.122639632818228
+      "debtRatio": 25.122639632818228,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3169": {
       "pe": 26.9,
@@ -90255,7 +90542,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-02T15:52:27.108685+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3171": {
       "pe": 13.43,
@@ -90345,7 +90633,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 0.82,
-      "roe": 5.675440308266757
+      "roe": 5.675440308266757,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3207": {
       "pe": null,
@@ -90373,7 +90662,8 @@
       "debtRatio": 52.50192432473696,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3213": {
       "pe": 14.23,
@@ -90389,7 +90679,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.62,
       "roe": 17.495785431285793,
-      "debtRatio": 30.039950418123105
+      "debtRatio": 30.039950418123105,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3217": {
       "pe": 11.31,
@@ -90427,7 +90718,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.66,
       "roe": 21.11742561491261,
-      "debtRatio": 45.80117026439177
+      "debtRatio": 45.80117026439177,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3221": {
       "pe": 159.14,
@@ -90498,7 +90790,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-02T15:52:28.533037+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3230": {
       "pe": null,
@@ -90591,7 +90884,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-02T15:52:30.128665+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3264": {
       "pe": 27.09,
@@ -90611,7 +90905,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-02T15:52:30.146582+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3265": {
       "pe": 21.53,
@@ -90630,7 +90925,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-02T15:52:30.194476+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3268": {
       "pe": null,
@@ -90775,7 +91071,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.69,
       "roe": 8.200852851702235,
-      "debtRatio": 19.300181658490033
+      "debtRatio": 19.300181658490033,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3303": {
       "pe": 12.83,
@@ -90802,7 +91099,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.2,
       "roe": 0.4956736711990112,
-      "debtRatio": 9.97152696525257
+      "debtRatio": 9.97152696525257,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3310": {
       "pe": 44.16,
@@ -90843,7 +91141,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-02T15:52:31.556612+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3322": {
       "pe": null,
@@ -90881,7 +91180,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 23.01,
       "roe": 33.269239265302375,
-      "debtRatio": 59.13921353045384
+      "debtRatio": 59.13921353045384,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3325": {
       "pe": null,
@@ -90930,7 +91230,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.77,
       "roe": -23.300406929882097,
-      "debtRatio": 43.37864529730548
+      "debtRatio": 43.37864529730548,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3354": {
       "pe": null,
@@ -90947,7 +91248,8 @@
       "debtRatio": 11.255335621741246,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3357": {
       "pe": 21.3,
@@ -91011,7 +91313,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-02T15:52:31.481624+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3373": {
       "pe": null,
@@ -91041,7 +91344,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-02T15:52:32.657109+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3379": {
       "pe": 29.36,
@@ -91057,7 +91361,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.93,
       "roe": -11.67141953669012,
-      "debtRatio": 48.59837833387514
+      "debtRatio": 48.59837833387514,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3388": {
       "pe": 16.46,
@@ -91117,7 +91422,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.18,
       "roe": 2.721286925851153,
-      "debtRatio": 34.65412190902387
+      "debtRatio": 34.65412190902387,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3438": {
       "pe": 40.14,
@@ -91136,7 +91442,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-02T15:52:32.976919+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3441": {
       "pe": 74.04,
@@ -91163,7 +91470,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.05,
       "roe": 9.000535553306612,
-      "debtRatio": 36.97072277693956
+      "debtRatio": 36.97072277693956,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3455": {
       "pe": 106.74,
@@ -91353,7 +91661,8 @@
       "debtRatio": 30.233478871172707,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3512": {
       "pe": 11.32,
@@ -91403,7 +91712,8 @@
       "debtRatio": 2.115191946061672,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "建材營造"
+      "industry": "建材營造",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3522": {
       "pe": null,
@@ -91430,7 +91740,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.89,
       "roe": -30.329934270488202,
-      "debtRatio": 79.38493675293026
+      "debtRatio": 79.38493675293026,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3526": {
       "pe": 15.91,
@@ -91446,7 +91757,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 9.08,
-      "roe": 28.93537104369192
+      "roe": 28.93537104369192,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3527": {
       "pe": null,
@@ -91465,7 +91777,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-02T15:52:34.429760+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3529": {
       "pe": 91.41,
@@ -91485,7 +91798,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-02T15:52:34.608301+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3531": {
       "pe": 16.36,
@@ -91501,7 +91815,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.17,
       "roe": 0.9158186030160718,
-      "debtRatio": 17.46487921671496
+      "debtRatio": 17.46487921671496,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3537": {
       "pe": 11.2,
@@ -91517,7 +91832,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.13,
       "roe": 18.531444943724388,
-      "debtRatio": 39.1600962203009
+      "debtRatio": 39.1600962203009,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3540": {
       "pe": 71.38,
@@ -91603,7 +91919,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-02T15:52:35.901633+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3556": {
       "pe": 17.34,
@@ -91622,7 +91939,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-02T15:52:36.013489+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3558": {
       "pe": 59.81,
@@ -91638,7 +91956,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.81,
       "roe": 2.390896324953985,
-      "debtRatio": 56.65410499207491
+      "debtRatio": 56.65410499207491,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3564": {
       "pe": 128.61,
@@ -91654,7 +91973,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.04,
       "roe": 0.3690148994647765,
-      "debtRatio": 60.614085264551655
+      "debtRatio": 60.614085264551655,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3567": {
       "pe": 27.74,
@@ -91700,7 +92020,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.28,
       "roe": 28.501959123734917,
-      "debtRatio": 27.72286648708778
+      "debtRatio": 27.72286648708778,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3580": {
       "pe": 55.0,
@@ -91812,7 +92133,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.64,
       "roe": 9.916885133446423,
-      "debtRatio": 19.326220597761505
+      "debtRatio": 19.326220597761505,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3624": {
       "pe": 36.14,
@@ -91850,7 +92172,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.97,
       "roe": 5.4664626777531655,
-      "debtRatio": 57.47097203544924
+      "debtRatio": 57.47097203544924,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3629": {
       "pe": null,
@@ -91968,7 +92291,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:15.550580+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3680": {
       "pe": 44.84,
@@ -92003,7 +92327,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.78,
       "roe": 15.22896849052286,
-      "debtRatio": 51.52270081490104
+      "debtRatio": 51.52270081490104,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "3685": {
       "pe": null,
@@ -92137,7 +92462,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 3.42,
-      "roe": 23.168546268719126
+      "roe": 23.168546268719126,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4107": {
       "pe": 14.69,
@@ -92208,7 +92534,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.61,
       "roe": 13.706590627451101,
-      "debtRatio": 58.80494055183885
+      "debtRatio": 58.80494055183885,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4120": {
       "pe": null,
@@ -92235,7 +92562,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.32,
       "roe": -4.009537646068757,
-      "debtRatio": 52.28136141459891
+      "debtRatio": 52.28136141459891,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4123": {
       "pe": 2.77,
@@ -92262,7 +92590,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.97,
       "roe": 15.103225092736643,
-      "debtRatio": 31.8273083982827
+      "debtRatio": 31.8273083982827,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4127": {
       "pe": 637.86,
@@ -92311,7 +92640,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.06,
       "roe": -0.1538090551822572,
-      "debtRatio": 47.18466452794338
+      "debtRatio": 47.18466452794338,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4138": {
       "pe": 14.22,
@@ -92361,7 +92691,8 @@
       "debtRatio": 34.01947294927251,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "生技醫療業"
+      "industry": "生技醫療業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4154": {
       "pe": null,
@@ -92421,7 +92752,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.89,
       "roe": 11.049300655646151,
-      "debtRatio": 9.447544431872359
+      "debtRatio": 9.447544431872359,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4163": {
       "pe": 31.51,
@@ -92525,7 +92857,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.58,
       "roe": -10.290630259958855,
-      "debtRatio": 46.868975933543986
+      "debtRatio": 46.868975933543986,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4188": {
       "pe": null,
@@ -92541,7 +92874,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.45,
       "roe": -12.084170858544118,
-      "debtRatio": 4.7513994713108385
+      "debtRatio": 4.7513994713108385,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4192": {
       "pe": null,
@@ -92579,7 +92913,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.85,
       "roe": 16.661521316286766,
-      "debtRatio": 24.391091497733306
+      "debtRatio": 24.391091497733306,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4207": {
       "pe": 10.08,
@@ -92661,7 +92996,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.42,
       "roe": -7.250390195394048,
-      "debtRatio": 27.66486519961033
+      "debtRatio": 27.66486519961033,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4413": {
       "pe": 16.02,
@@ -92699,7 +93035,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.33,
       "roe": 11.849690457271025,
-      "debtRatio": 32.908814885583176
+      "debtRatio": 32.908814885583176,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4419": {
       "pe": null,
@@ -92726,7 +93063,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.94,
       "roe": 5.3399141407351465,
-      "debtRatio": 11.906013867375703
+      "debtRatio": 11.906013867375703,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4430": {
       "pe": 44.62,
@@ -92742,7 +93080,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.12,
       "roe": 0.790593658364045,
-      "debtRatio": 50.92018699418275
+      "debtRatio": 50.92018699418275,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4432": {
       "pe": 4.73,
@@ -92857,7 +93196,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.65,
       "roe": 14.033715124686813,
-      "debtRatio": 41.586718899816454
+      "debtRatio": 41.586718899816454,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4528": {
       "pe": null,
@@ -93170,7 +93510,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.14,
       "roe": 2.1677629500670403,
-      "debtRatio": 34.27327958806315
+      "debtRatio": 34.27327958806315,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4721": {
       "pe": 18.24,
@@ -93299,7 +93640,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:16.863060+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4754": {
       "pe": 13.63,
@@ -93326,7 +93668,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 5.26,
       "roe": 24.675847735773903,
-      "debtRatio": 52.92719195919965
+      "debtRatio": 52.92719195919965,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4767": {
       "pe": 18.79,
@@ -93364,7 +93707,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.83,
       "roe": 24.12290610840254,
-      "debtRatio": 45.88170660673896
+      "debtRatio": 45.88170660673896,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4806": {
       "pe": null,
@@ -93446,7 +93790,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.33,
       "roe": 5.194965209841866,
-      "debtRatio": 10.314523967872308
+      "debtRatio": 10.314523967872308,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4923": {
       "pe": null,
@@ -93465,7 +93810,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:17.749079+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4924": {
       "pe": 14.03,
@@ -93514,7 +93860,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.53,
       "roe": 6.906697107665701,
-      "debtRatio": 49.91379142443372
+      "debtRatio": 49.91379142443372,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4946": {
       "pe": 73.42,
@@ -93541,7 +93888,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.64,
       "roe": 14.833729951260114,
-      "debtRatio": 42.82768201000636
+      "debtRatio": 42.82768201000636,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4951": {
       "pe": 12.29,
@@ -93576,7 +93924,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.88,
       "roe": 17.20324066713411,
-      "debtRatio": 39.512532872587755
+      "debtRatio": 39.512532872587755,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4966": {
       "pe": 19.02,
@@ -93595,7 +93944,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:20.275292+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4971": {
       "pe": 90.47,
@@ -93631,7 +93981,8 @@
       "debtRatio": 21.556807729198393,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "光電業"
+      "industry": "光電業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4973": {
       "pe": 8.8,
@@ -93650,7 +94001,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-03T12:41:22.219544+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4974": {
       "pe": 14.1,
@@ -93666,7 +94018,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 2.49,
-      "roe": 11.012125425011286
+      "roe": 11.012125425011286,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "4979": {
       "pe": 88.25,
@@ -93713,7 +94066,8 @@
       "debtRatio": 46.39264393832225,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "光電業"
+      "industry": "光電業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5009": {
       "pe": 16.43,
@@ -93839,7 +94193,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 8.72,
       "roe": 47.97552716222426,
-      "debtRatio": 78.81883871284336
+      "debtRatio": 78.81883871284336,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5210": {
       "pe": 30.71,
@@ -93866,7 +94221,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.26,
       "roe": -3.63248106599852,
-      "debtRatio": 10.35412189307428
+      "debtRatio": 10.35412189307428,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5212": {
       "pe": 9.89,
@@ -93937,7 +94293,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.8,
       "roe": 23.61742231542206,
-      "debtRatio": 53.54461664176504
+      "debtRatio": 53.54461664176504,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5230": {
       "pe": null,
@@ -94001,7 +94358,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-03T12:41:25.105682+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5274": {
       "pe": 138.68,
@@ -94069,7 +94427,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 166.45,
       "roe": 135.10342838072503,
-      "debtRatio": 48.992818604349274
+      "debtRatio": 48.992818604349274,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5291": {
       "pe": 45.98,
@@ -94085,7 +94444,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.92,
       "roe": 7.126969332441075,
-      "debtRatio": 56.20883818568608
+      "debtRatio": 56.20883818568608,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5299": {
       "pe": 12.35,
@@ -94105,7 +94465,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-04T10:16:23.905049+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5301": {
       "pe": null,
@@ -94239,7 +94600,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.0,
       "roe": 16.483080654073376,
-      "debtRatio": 24.25494053922215
+      "debtRatio": 24.25494053922215,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5344": {
       "pe": null,
@@ -94259,7 +94621,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-04T10:16:23.721865+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5345": {
       "pe": null,
@@ -94320,7 +94683,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-04T10:16:25.655917+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5353": {
       "pe": 21.34,
@@ -94336,7 +94700,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.95,
       "roe": 9.77248163298811,
-      "debtRatio": 36.122705091097224
+      "debtRatio": 36.122705091097224,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5355": {
       "pe": null,
@@ -94386,7 +94751,8 @@
       "debtRatio": 44.47897331361169,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "光電業"
+      "industry": "光電業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5381": {
       "pe": 36.21,
@@ -94498,7 +94864,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 7.46,
       "roe": 59.50156003532737,
-      "debtRatio": 18.15294968071036
+      "debtRatio": 18.15294968071036,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5438": {
       "pe": 168.5,
@@ -94539,7 +94906,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-04T10:16:26.667328+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5450": {
       "pe": 75.26,
@@ -94566,7 +94934,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.39,
       "roe": 4.983443891958936,
-      "debtRatio": 47.59668798630934
+      "debtRatio": 47.59668798630934,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5455": {
       "pe": 8.7,
@@ -94689,7 +95058,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.23,
       "roe": -2.589425262252677,
-      "debtRatio": 22.00415347219496
+      "debtRatio": 22.00415347219496,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5483": {
       "pe": 23.93,
@@ -94727,7 +95097,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-04T10:16:28.300344+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5488": {
       "pe": 75.0,
@@ -94765,7 +95136,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.29,
       "roe": 17.851808197954774,
-      "debtRatio": 32.311682525059574
+      "debtRatio": 32.311682525059574,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5493": {
       "pe": 19.08,
@@ -94803,7 +95175,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.75,
       "roe": 13.941558103922905,
-      "debtRatio": 71.64214424700681
+      "debtRatio": 71.64214424700681,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5511": {
       "pe": 5.8,
@@ -94841,7 +95214,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 0.27,
-      "roe": 3.525265149745363
+      "roe": 3.525265149745363,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5516": {
       "pe": 9.36,
@@ -94880,7 +95254,8 @@
       "debtRatio": 51.3450296002574,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "建材營造"
+      "industry": "建材營造",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5529": {
       "pe": 7.23,
@@ -94973,7 +95348,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.06,
       "roe": 0.8318602154457374,
-      "debtRatio": 29.022368152531996
+      "debtRatio": 29.022368152531996,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5604": {
       "pe": 29.05,
@@ -94989,7 +95365,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 0.63,
-      "roe": 6.999162549371707
+      "roe": 6.999162549371707,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5609": {
       "pe": 9.99,
@@ -95038,7 +95415,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.27,
       "roe": -3.0773782802105862,
-      "debtRatio": 11.808875439889361
+      "debtRatio": 11.808875439889361,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5864": {
       "pe": 2.08,
@@ -95054,7 +95432,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 9.8,
       "roe": 76.65120775898775,
-      "debtRatio": 33.52896278368813
+      "debtRatio": 33.52896278368813,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5878": {
       "pe": 12.95,
@@ -95082,7 +95461,8 @@
       "debtRatio": 33.042772051071175,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "居家生活類"
+      "industry": "居家生活類",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5903": {
       "pe": 23.38,
@@ -95098,7 +95478,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.69,
       "roe": 17.323329951471596,
-      "debtRatio": 87.83678875529878
+      "debtRatio": 87.83678875529878,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "5905": {
       "pe": null,
@@ -95284,7 +95665,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.16,
       "roe": 6.35206883128351,
-      "debtRatio": 29.42266454012329
+      "debtRatio": 29.42266454012329,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6118": {
       "pe": 47.27,
@@ -95322,7 +95704,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 2.19,
-      "roe": 19.15961846726486
+      "roe": 19.15961846726486,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6123": {
       "pe": 15.09,
@@ -95371,7 +95754,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.54,
       "roe": 4.701754724309913,
-      "debtRatio": 43.28239871542557
+      "debtRatio": 43.28239871542557,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6127": {
       "pe": null,
@@ -95469,7 +95853,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.03,
       "roe": 17.306950852939906,
-      "debtRatio": 43.353169925162035
+      "debtRatio": 43.353169925162035,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6144": {
       "pe": null,
@@ -95496,7 +95881,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 6.04,
-      "roe": 21.62781366684225
+      "roe": 21.62781366684225,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6147": {
       "pe": 35.39,
@@ -95516,7 +95902,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-04T10:16:30.855419+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6148": {
       "pe": 22.26,
@@ -95576,7 +95963,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.08,
       "roe": 3.01491152162735,
-      "debtRatio": 55.140008897108196
+      "debtRatio": 55.140008897108196,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6158": {
       "pe": null,
@@ -95593,7 +95981,8 @@
       "debtRatio": 52.28326326988644,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6160": {
       "pe": null,
@@ -95620,7 +96009,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.56,
       "roe": 21.418515722408,
-      "debtRatio": 30.77285810615945
+      "debtRatio": 30.77285810615945,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6163": {
       "pe": 71.32,
@@ -95735,7 +96125,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": -0.26,
-      "roe": -1.6872642484460587
+      "roe": -1.6872642484460587,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6182": {
       "pe": 2525.0,
@@ -95770,7 +96161,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.02,
       "roe": -0.339557934896893,
-      "debtRatio": 14.594169580215882
+      "debtRatio": 14.594169580215882,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6186": {
       "pe": 4.47,
@@ -95816,7 +96208,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.99,
       "roe": 4.4946545122468535,
-      "debtRatio": 30.350877703065017
+      "debtRatio": 30.350877703065017,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6190": {
       "pe": 36.35,
@@ -95939,7 +96332,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.63,
       "roe": -12.891340054122825,
-      "debtRatio": 36.88837707830331
+      "debtRatio": 36.88837707830331,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6212": {
       "pe": 14.11,
@@ -96092,7 +96486,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.63,
       "roe": 30.638463979043163,
-      "debtRatio": 54.78510903478908
+      "debtRatio": 54.78510903478908,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6233": {
       "pe": 94.32,
@@ -96111,7 +96506,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-04T10:16:33.873281+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6234": {
       "pe": 378.33,
@@ -96151,7 +96547,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-04T10:16:34.424478+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6240": {
       "pe": null,
@@ -96233,7 +96630,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.59,
       "roe": 5.2458614100003755,
-      "debtRatio": 45.749145328441266
+      "debtRatio": 45.749145328441266,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6259": {
       "pe": 35.37,
@@ -96312,7 +96710,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.92,
       "roe": 11.530144274709492,
-      "debtRatio": 35.501019244322315
+      "debtRatio": 35.501019244322315,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6270": {
       "pe": 26.62,
@@ -96340,7 +96739,8 @@
       "debtRatio": 48.545651264849745,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6275": {
       "pe": 16.07,
@@ -96378,7 +96778,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.4,
       "roe": 11.566427012795742,
-      "debtRatio": 42.64684460437205
+      "debtRatio": 42.64684460437205,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6284": {
       "pe": 23.8,
@@ -96405,7 +96806,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.5,
       "roe": 18.882361065578003,
-      "debtRatio": 40.0872686045784
+      "debtRatio": 40.0872686045784,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6291": {
       "pe": 43.52,
@@ -96435,16 +96837,17 @@
       "revenueYoY": 20.236248366172752,
       "cumulativeRevenueYoY": 31.52253914927006,
       "revenuePeriod": "11506",
-      "eps": 5.52,
-      "financialPeriod": "2026-06-30",
-      "roe": 23.38,
-      "debtRatio": 39.27,
+      "eps": 3.52,
+      "financialPeriod": "115Q2",
+      "roe": 27.433298647765124,
+      "debtRatio": 39.267338592413175,
       "cashFlow": null,
-      "financialSource": "FinMind 授權基本面資料",
+      "financialSource": "TWSE/TPEx",
       "industry": "電子零組件業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-09T07:29:02.718697+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6294": {
       "pe": 10.21,
@@ -96490,7 +96893,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.62,
       "roe": 17.240507985497732,
-      "debtRatio": 42.21673239253006
+      "debtRatio": 42.21673239253006,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6418": {
       "pe": 57.23,
@@ -96589,7 +96993,8 @@
       "debtRatio": 42.3703462604492,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6461": {
       "pe": null,
@@ -96635,7 +97040,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.8,
       "roe": 29.244394131310376,
-      "debtRatio": 12.35917671025906
+      "debtRatio": 12.35917671025906,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6469": {
       "pe": 18.59,
@@ -96715,7 +97121,8 @@
       "debtRatio": 58.066779218032394,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "通信網路業"
+      "industry": "通信網路業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6488": {
       "pe": 42.33,
@@ -96734,7 +97141,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:20.251020+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6492": {
       "pe": null,
@@ -96764,7 +97172,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:21.921905+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6496": {
       "pe": null,
@@ -96780,7 +97189,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -2.41,
       "roe": -32.57047313007811,
-      "debtRatio": 51.40409060323632
+      "debtRatio": 51.40409060323632,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6498": {
       "pe": 11.24,
@@ -96807,7 +97217,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -2.54,
       "roe": -43.16097591723692,
-      "debtRatio": 18.187268138760594
+      "debtRatio": 18.187268138760594,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6506": {
       "pe": 11.17,
@@ -96823,7 +97234,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.94,
       "roe": 15.098266018876249,
-      "debtRatio": 51.47364937280068
+      "debtRatio": 51.47364937280068,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6508": {
       "pe": 121.36,
@@ -96865,7 +97277,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-05T10:12:22.239192+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6512": {
       "pe": null,
@@ -96881,7 +97294,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.91,
       "roe": -13.846153846153847,
-      "debtRatio": 6.914706914706915
+      "debtRatio": 6.914706914706915,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6516": {
       "pe": 33.94,
@@ -96930,7 +97344,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.01,
       "roe": 14.769669898808527,
-      "debtRatio": 23.90177427827719
+      "debtRatio": 23.90177427827719,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6530": {
       "pe": 35.05,
@@ -96960,7 +97375,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:26.249740+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6535": {
       "pe": null,
@@ -96998,7 +97414,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.28,
       "roe": 3.000284127467481,
-      "debtRatio": 16.60975278052844
+      "debtRatio": 16.60975278052844,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6546": {
       "pe": 22.67,
@@ -97039,7 +97456,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:25.379695+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6556": {
       "pe": 10.52,
@@ -97078,7 +97496,8 @@
       "debtRatio": 53.506110654467165,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "通信網路業"
+      "industry": "通信網路業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6568": {
       "pe": 27.45,
@@ -97097,7 +97516,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:27.190713+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6569": {
       "pe": 20.81,
@@ -97113,7 +97533,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.64,
       "roe": 13.289353559215378,
-      "debtRatio": 34.405724532259704
+      "debtRatio": 34.405724532259704,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6570": {
       "pe": 35.24,
@@ -97173,7 +97594,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.2,
       "roe": 2.9210617827750087,
-      "debtRatio": 9.938085495374034
+      "debtRatio": 9.938085495374034,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6584": {
       "pe": 71.99,
@@ -97211,7 +97633,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.5,
       "roe": 16.289208864790552,
-      "debtRatio": 32.00310508252983
+      "debtRatio": 32.00310508252983,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6593": {
       "pe": null,
@@ -97384,7 +97807,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:28.111389+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6642": {
       "pe": 21.35,
@@ -97400,7 +97824,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.28,
       "roe": 15.67275979858064,
-      "debtRatio": 39.55123794223845
+      "debtRatio": 39.55123794223845,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6643": {
       "pe": 460.0,
@@ -97419,7 +97844,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:28.509827+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6649": {
       "pe": 58.39,
@@ -97523,7 +97949,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:30.131556+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6680": {
       "pe": 61.49,
@@ -97539,7 +97966,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.08,
       "roe": 0.7150127133638065,
-      "debtRatio": 64.0433859852092
+      "debtRatio": 64.0433859852092,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6683": {
       "pe": 63.46,
@@ -97594,7 +98022,8 @@
       "debtRatio": 37.10072733590726,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "數位雲端類"
+      "industry": "數位雲端類",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6692": {
       "pe": null,
@@ -97624,7 +98053,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:31.973520+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6697": {
       "pe": 13.47,
@@ -97695,7 +98125,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:33.795169+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6720": {
       "pe": 50.37,
@@ -97774,7 +98205,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.89,
       "roe": 8.687858653995633,
-      "debtRatio": 36.624050211054694
+      "debtRatio": 36.624050211054694,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6732": {
       "pe": 22.77,
@@ -97793,7 +98225,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:38.479976+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6733": {
       "pe": null,
@@ -97809,7 +98242,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.31,
       "roe": -8.02131756559625,
-      "debtRatio": 4.061131568471338
+      "debtRatio": 4.061131568471338,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6735": {
       "pe": 117.32,
@@ -97858,7 +98292,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.34,
       "roe": 6.6278217687945995,
-      "debtRatio": 31.993143417992307
+      "debtRatio": 31.993143417992307,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6752": {
       "pe": 13.36,
@@ -97885,7 +98320,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 3.62,
-      "roe": 14.724211169648823
+      "roe": 14.724211169648823,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6762": {
       "pe": 338.0,
@@ -97902,7 +98338,8 @@
       "debtRatio": 52.578564822663864,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "生技醫療業"
+      "industry": "生技醫療業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6763": {
       "pe": 10.52,
@@ -97929,7 +98366,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.02,
       "roe": -0.2100829320726027,
-      "debtRatio": 17.829240269998564
+      "debtRatio": 17.829240269998564,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6785": {
       "pe": null,
@@ -98008,7 +98446,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 9.49,
       "roe": 33.847484652279725,
-      "debtRatio": 67.84006583580245
+      "debtRatio": 67.84006583580245,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6821": {
       "pe": 36.47,
@@ -98106,7 +98545,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.03,
       "roe": 4.8716507280781505,
-      "debtRatio": 38.472451658323955
+      "debtRatio": 38.472451658323955,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6846": {
       "pe": 12.47,
@@ -98221,7 +98661,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -1.09,
       "roe": -12.227205964210427,
-      "debtRatio": 27.84090123832163
+      "debtRatio": 27.84090123832163,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6881": {
       "pe": 9.65,
@@ -98248,7 +98689,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 0.88,
-      "roe": 10.096355519937891
+      "roe": 10.096355519937891,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6894": {
       "pe": 26.94,
@@ -98278,7 +98720,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-05T10:12:50.251430+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6899": {
       "pe": 14.11,
@@ -98331,7 +98774,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 3,
       "financialUpdatedAt": "2026-08-05T10:12:44.673104+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6910": {
       "pe": 14.03,
@@ -98380,7 +98824,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 1.08,
-      "roe": 11.103543809961938
+      "roe": 11.103543809961938,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6929": {
       "pe": null,
@@ -98517,7 +98962,8 @@
       "financialHistoryYears": 5,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-06T10:15:50.210589+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "6997": {
       "pe": 52.13,
@@ -98596,7 +99042,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.25,
       "roe": 7.951964808397537,
-      "debtRatio": 37.75385726925755
+      "debtRatio": 37.75385726925755,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "7703": {
       "pe": 22.7,
@@ -98853,7 +99300,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.24,
       "roe": 19.665930299124437,
-      "debtRatio": 39.44708683303613
+      "debtRatio": 39.44708683303613,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "7757": {
       "pe": 10.6,
@@ -98954,7 +99402,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.33,
       "roe": 15.006352995121155,
-      "debtRatio": 62.34930331016412
+      "debtRatio": 62.34930331016412,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "7805": {
       "pe": 14.92,
@@ -99022,7 +99471,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.47,
       "roe": 3.568301998390265,
-      "debtRatio": 23.070489643912964
+      "debtRatio": 23.070489643912964,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "7820": {
       "pe": 52.63,
@@ -99131,7 +99581,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.25,
       "roe": 4.122036651606681,
-      "debtRatio": 20.37789726586787
+      "debtRatio": 20.37789726586787,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8038": {
       "pe": 23.96,
@@ -99162,7 +99613,8 @@
       "industry": "半導體業",
       "financialHistoryYears": 6,
       "financialUpdatedAt": "2026-08-07T05:54:05.430512+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8042": {
       "pe": 37.22,
@@ -99189,7 +99641,8 @@
       "financialPeriod": "115Q2",
       "financialSource": "TWSE/TPEx",
       "eps": 1.7,
-      "roe": 9.572331119390896
+      "roe": 9.572331119390896,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8044": {
       "pe": null,
@@ -99238,7 +99691,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.97,
       "roe": 8.86694856126564,
-      "debtRatio": 17.24856003686408
+      "debtRatio": 17.24856003686408,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8050": {
       "pe": 69.0,
@@ -99254,7 +99708,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.69,
       "roe": 7.626258114447887,
-      "debtRatio": 44.75394525653375
+      "debtRatio": 44.75394525653375,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8054": {
       "pe": null,
@@ -99411,7 +99866,8 @@
       "debtRatio": 41.37950020634075,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "電機機械"
+      "industry": "電機機械",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8084": {
       "pe": null,
@@ -99452,7 +99908,8 @@
       "financialHistoryYears": 6,
       "financialSource": "TWSE/TPEx",
       "financialUpdatedAt": "2026-08-07T05:54:06.868092+00:00",
-      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8087": {
       "pe": null,
@@ -99498,7 +99955,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -1.47,
       "roe": -19.506364560842798,
-      "debtRatio": 30.808670051000707
+      "debtRatio": 30.808670051000707,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8091": {
       "pe": 32.14,
@@ -99618,7 +100076,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.84,
       "roe": 20.931866854065934,
-      "debtRatio": 22.90978022141822
+      "debtRatio": 22.90978022141822,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8111": {
       "pe": 174.71,
@@ -99758,7 +100217,13 @@
       "revenueYoY": 5.776797501832019,
       "cumulativeRevenueYoY": -4.931466455691175,
       "revenuePeriod": "11506",
-      "industry": "電機機械"
+      "industry": "電機機械",
+      "financialPeriod": "115Q2",
+      "financialSource": "TWSE/TPEx",
+      "eps": 3.14,
+      "roe": 4.627095959640489,
+      "roeBasis": "opendata_annualised_over_closing_equity",
+      "debtRatio": 34.88351318065085
     },
     "8272": {
       "pe": 13.42,
@@ -99805,7 +100270,8 @@
       "debtRatio": 25.92534000217682,
       "cashFlow": null,
       "financialSource": "TWSE/TPEx",
-      "industry": "生技醫療業"
+      "industry": "生技醫療業",
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8284": {
       "pe": 13.88,
@@ -99906,7 +100372,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 4.22,
       "roe": 22.894392749357756,
-      "debtRatio": 24.787019085593638
+      "debtRatio": 24.787019085593638,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8383": {
       "pe": 18.82,
@@ -100073,7 +100540,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.2,
       "roe": 11.722761746400915,
-      "debtRatio": 17.20956978420107
+      "debtRatio": 17.20956978420107,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8433": {
       "pe": 19.13,
@@ -100089,7 +100557,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.79,
       "roe": 12.83450897108521,
-      "debtRatio": 48.72500668706564
+      "debtRatio": 48.72500668706564,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8435": {
       "pe": 15.08,
@@ -100160,7 +100629,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 3.85,
       "roe": 20.17801970726488,
-      "debtRatio": 31.574974033206875
+      "debtRatio": 31.574974033206875,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8450": {
       "pe": null,
@@ -100308,7 +100778,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.58,
       "roe": -2.480892215103933,
-      "debtRatio": 27.91582713986055
+      "debtRatio": 27.91582713986055,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8927": {
       "pe": 41.27,
@@ -100335,7 +100806,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.82,
       "roe": 7.662762334694147,
-      "debtRatio": 63.586347054022085
+      "debtRatio": 63.586347054022085,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8929": {
       "pe": null,
@@ -100362,7 +100834,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.19,
       "roe": 13.849269460817522,
-      "debtRatio": 34.28303418589757
+      "debtRatio": 34.28303418589757,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8931": {
       "pe": 26.81,
@@ -100411,7 +100884,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": -0.18,
       "roe": -4.678466498801014,
-      "debtRatio": 39.91547899282022
+      "debtRatio": 39.91547899282022,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8936": {
       "pe": 12.14,
@@ -100449,7 +100923,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 1.34,
       "roe": 5.398877305575074,
-      "debtRatio": 40.37605461557309
+      "debtRatio": 40.37605461557309,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "8941": {
       "pe": 46.67,
@@ -100509,7 +100984,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 2.54,
       "roe": 9.671359654474344,
-      "debtRatio": 40.43525190650707
+      "debtRatio": 40.43525190650707,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "9960": {
       "pe": 16.31,
@@ -100536,7 +101012,8 @@
       "financialSource": "TWSE/TPEx",
       "eps": 0.23,
       "roe": 3.8752362948960304,
-      "debtRatio": 28.367311715028077
+      "debtRatio": 28.367311715028077,
+      "roeBasis": "opendata_annualised_over_closing_equity"
     },
     "1260": {
       "market": "emerging",
