@@ -20,11 +20,18 @@ def _dates(count):
     return [f"2026-{1 + index // 28:02d}-{1 + index % 28:02d}" for index in range(count)]
 
 
-def _state(horizon, excesses, field="poolExcessPct"):
-    """A shortlist is judged against its pool; autonomy against 0050."""
+def _state(horizon, excesses, versus_pool=None):
+    """Every stage needs both: beating 0050, and beating the pool.
+
+    0050 is what the user would otherwise hold, so losing to it makes the
+    shortlist worse than doing nothing. Beating the pool as well is what
+    separates a repeatable edge from a universe that happened to run hot.
+    """
+    pool = excesses if versus_pool is None else versus_pool
     return {"recommendations": [
-        {"date": day, "outcomes": {str(horizon): {"status": "complete", field: value}}}
-        for day, value in zip(_dates(len(excesses)), excesses)
+        {"date": day, "outcomes": {str(horizon): {
+            "status": "complete", "excessReturnPct": index, "poolExcessPct": against_pool}}}
+        for day, index, against_pool in zip(_dates(len(excesses)), excesses, pool)
     ]}
 
 
@@ -59,13 +66,28 @@ def test_same_day_picks_count_as_one_decision():
     assert report["versusEligiblePool"]["20"]["outcomes"] == 3
 
 
-def test_beating_only_the_index_does_not_earn_assisted_selection():
-    """Beating 0050 can be the pool's size tilt; the claim is about the pick."""
+def test_beating_only_the_index_is_not_enough():
+    """The pool may simply have run hot; that does not repeat."""
     steady = [2.0, 2.2, 1.9, 2.1, 2.3, 1.8] * 6
-    report = assess(_state(20, steady, field="excessReturnPct"), {})
+    flat = [0.1, -0.1] * 18
+    report = assess(_state(20, steady, versus_pool=flat), {})
 
     assert report["stage"] == "screening_assistant"
-    assert "對合格池" in report["blockers"]["assisted_selection"][0]
+    assert any("對合格池" in item for item in report["blockers"]["assisted_selection"])
+
+
+def test_beating_only_the_pool_is_not_enough_either():
+    """Ranking well inside a universe that loses to 0050 helps nobody.
+
+    The alternative to using the system is buying 0050, so a shortlist that
+    loses to it is worse than doing nothing however well it ranks.
+    """
+    steady = [2.0, 2.2, 1.9, 2.1, 2.3, 1.8] * 6
+    losing = [-2.0, -2.2, -1.9, -2.1, -2.3, -1.8] * 6
+    report = assess(_state(20, losing, versus_pool=steady), {})
+
+    assert report["stage"] == "screening_assistant"
+    assert any("對 0050" in item for item in report["blockers"]["assisted_selection"])
 
 
 def test_a_large_but_noisy_sample_is_still_blocked():
@@ -85,9 +107,9 @@ def test_a_consistent_edge_over_enough_outcomes_promotes():
 
 def test_autonomy_also_requires_the_advice_gate():
     steady = [1.8, 2.2, 2.0, 1.9, 2.1, 2.3] * 12
-    # Autonomy is judged against 0050; the 20-day pool evidence carries the
-    # assisted stage beneath it.
-    state = _state(60, steady, field="excessReturnPct")
+    # Sixty decision dates at the long horizon, and the twenty-day evidence
+    # that carries the assisted stage beneath it.
+    state = _state(60, steady)
     state["recommendations"] += _state(20, steady)["recommendations"]
 
     closed = assess(state, {"adviceEnabled": False})
