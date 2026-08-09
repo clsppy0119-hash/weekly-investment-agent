@@ -141,7 +141,13 @@ jobs:
                 net_income = income.get(code, {}).get("netIncome"); season = income.get(code, {}).get("season")
                 roe = net_income / equity * 100 * 4 / season if net_income is not None and equity and season else None
                 debt_ratio = liabilities / assets * 100 if liabilities is not None and assets else None
-                if roe is not None: fundamentals[code]["roe"] = roe
+                # Annualised year-to-date profit over closing equity. It is the
+                # weaker of the two definitions in use and finmind_fundamentals
+                # overwrites it where it can; labelled so a score can always be
+                # read back to the definition behind it.
+                if roe is not None:
+                    fundamentals[code]["roe"] = roe
+                    fundamentals[code]["roeBasis"] = "opendata_annualised_over_closing_equity"
                 if debt_ratio is not None: fundamentals[code]["debtRatio"] = debt_ratio
 
           tz = timezone(timedelta(hours=8))

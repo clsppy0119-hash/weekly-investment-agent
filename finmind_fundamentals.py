@@ -14,10 +14,22 @@ from pathlib import Path
 from point_in_time_fundamentals import period_end, quarter_publication
 from provenance import record, utc_now
 
-# Fields both the open-data feed and FinMind report, where a disagreement means
-# the score depended on which source happened to write last.
-CONFLICT_FIELDS = ("eps", "roe", "debtRatio", "revenueYoY")
+# Figures both sources take straight off the statements, so they should match;
+# a difference means one of them is wrong and the score depended on whichever
+# wrote last. `roe` is deliberately absent: the two compute it from different
+# definitions, so it disagrees by design and would block every candidate for
+# ever. Its source is pinned below instead.
+CONFLICT_FIELDS = ("eps", "debtRatio", "revenueYoY")
 CONFLICT_TOLERANCE = 0.02
+
+# The open-data feed annualises the year-to-date profit -- latest period times
+# 4/quarters -- over closing equity. That assumes every remaining quarter
+# repeats the last one, which overstates any business with a season, and it
+# divides a year of profit by a single day's equity. FinMind sums four actual
+# quarters over average equity, the standard trailing definition. Where both
+# exist the standard one wins, and the choice is recorded so a score can be
+# read back to the definition behind it.
+ROE_SOURCE = "finmind_ttm_over_average_equity"
 
 
 def _numeric(value) -> bool:
@@ -182,7 +194,10 @@ def main() -> None:
                     if _numeric(before) and _numeric(after) and before and \
                             abs(after - before) / abs(before) > CONFLICT_TOLERANCE:
                         conflicts.setdefault(code, {})[key] = {"openData": before, "finmind": after}
-                fundamentals.setdefault(code, {}).update({key: value for key, value in values.items() if value is not None})
+                record_for_code = fundamentals.setdefault(code, {})
+                record_for_code.update({key: value for key, value in values.items() if value is not None})
+                if values.get("roe") is not None:
+                    record_for_code["roeBasis"] = ROE_SOURCE
 
     total_codes = sorted(metadata)
     complete_codes = [code for code in total_codes if all(key in fundamentals.get(code, {}) for key in CORE)]
