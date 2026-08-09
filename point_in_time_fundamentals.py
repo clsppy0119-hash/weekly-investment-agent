@@ -44,6 +44,34 @@ def iso(value: Any) -> str:
     return str(value or "")[:10]
 
 
+QUARTER_END = {1: "03-31", 2: "06-30", 3: "09-30", 4: "12-31"}
+
+
+def period_end(value: Any) -> str | None:
+    """Normalise a reported financial period to the date it closed.
+
+    The pipeline carries three forms for the same thing -- ``2026-06-30``,
+    ``2026Q2`` and the ROC ``115Q2`` -- and the filing deadline can only be
+    derived from the period's end.
+    """
+    text = str(value or "").strip()
+    if not text:
+        return None
+    if len(text) >= 10 and text[4] == "-":
+        try:
+            return date.fromisoformat(text[:10]).isoformat()
+        except ValueError:
+            return None
+    head, _, quarter = text.partition("Q")
+    if not (head.isdigit() and quarter[:1].isdigit()):
+        return None
+    year = int(head)
+    if year < 1911:  # ROC year
+        year += 1911
+    end = QUARTER_END.get(int(quarter[:1]))
+    return f"{year}-{end}" if end else None
+
+
 def quarter_publication(period_end: str) -> str:
     """Date a quarterly statement becomes public, per TWSE filing deadlines."""
     end = date.fromisoformat(period_end)

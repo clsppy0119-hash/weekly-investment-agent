@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from point_in_time_fundamentals import (
-    PointInTimeFundamentals, build_stock, quarter_publication, revenue_publication,
+    PointInTimeFundamentals, build_stock, period_end, quarter_publication, revenue_publication,
 )
 
 
@@ -48,6 +48,24 @@ def test_filing_deadlines_follow_the_statutory_calendar():
     assert quarter_publication("2025-12-31") == "2026-03-31"
     assert revenue_publication(2025, 6) == "2025-07-10"
     assert revenue_publication(2025, 12) == "2026-01-10"
+
+
+def test_the_three_period_forms_all_resolve_to_the_same_close():
+    """The pipeline carries ISO, AD-quarter and ROC-quarter for one period."""
+    assert period_end("2026-06-30") == "2026-06-30"
+    assert period_end("2026Q2") == "2026-06-30"
+    assert period_end("115Q2") == "2026-06-30"
+    assert period_end("2026-06-30T00:00:00") == "2026-06-30"
+
+
+def test_unusable_period_values_resolve_to_nothing():
+    for value in ("", None, "Q2", "2026", "2026Q9", "nonsense"):
+        assert period_end(value) is None
+
+
+def test_a_reported_period_maps_to_its_filing_deadline():
+    assert quarter_publication(period_end("115Q2")) == "2026-08-14"
+    assert quarter_publication(period_end("2025Q4")) == "2026-03-31"
 
 
 def test_a_quarter_is_invisible_until_it_is_filed():

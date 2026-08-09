@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from point_in_time_fundamentals import period_end, quarter_publication
 from provenance import record, utc_now
 
 ROOT = Path(__file__).resolve().parent
@@ -194,14 +195,32 @@ def main() -> None:
         "fiveYearHistory": sum(1 for code in total_codes if fundamentals.get(code, {}).get("financialHistoryYears", 0) >= 5),
     }
     retrieved_at = utc_now()
+    reported_period = max((str(value.get("financialPeriod", "")) for value in results.values()), default="") or None
+    closed = period_end(reported_period)
+    # The statutory date is the latest a filing may appear, and companies often
+    # file early. Holding the rows from a public feed is itself evidence they
+    # were public by the time they were fetched, so availability is the earlier
+    # of the two -- "public no later than this". That is not the same as
+    # treating the fetch time as publication time, which would be unfounded
+    # whenever the deadline has not yet passed.
+    deadline = quarter_publication(closed) if closed else None
+    filed_at = min(deadline, retrieved_at[:10]) if deadline else None
     market.setdefault("provenance", {})["fundamentals"] = record(
         provider="FinMind authorized API",
         dataset="TaiwanStockFinancialStatements,TaiwanStockBalanceSheet,TaiwanStockInfo",
         endpoint=API, scope={"codes": selected, "start": start}, retrieved_at=retrieved_at,
-        effective_date=max((str(value.get("financialPeriod", "")) for value in results.values()), default=None) or None,
-        # Source rows lack an authoritative filing/publication timestamp.
-        available_at=None, content=results, visibility="private_cache",
+        effective_date=reported_period,
+        # The rows carry no filing timestamp, but the deadline is statutory: a
+        # quarterly statement is public by 15 May, 14 Aug, 14 Nov or 31 Mar for
+        # the annual. Availability follows that calendar rather than anything
+        # the provider asserts, the same basis used for the quote snapshot.
+        available_at=filed_at, content=results, visibility="private_cache",
     )
+    if filed_at:
+        market["provenance"]["fundamentals"]["availableAtBasis"] = (
+            "public no later than this: the earlier of the statutory TWSE filing "
+            "deadline for the reported period and the date the rows were held")
+        market["provenance"]["fundamentals"]["statutoryDeadline"] = deadline
     save(args.quotes, market)
     save(args.progress, progress_payload)
     save(args.coverage, coverage)
