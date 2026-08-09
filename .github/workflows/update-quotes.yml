@@ -46,6 +46,9 @@ jobs:
           # Kept per exchange so provenance can verify the two returned disjoint
           # code sets rather than assuming it.
           market_codes = {"twse": set(), "tpex": set()}
+          # Both feeds date their rows in ROC years; that is the session date,
+          # which the run date is not.
+          row_dates = set()
           for url, market in [("https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL", "twse"), ("https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes", "tpex")]:
             rows = fetch_json(url)
             for row in rows:
@@ -57,6 +60,7 @@ jobs:
               try:
                 quotes[str(code).strip()] = {"name": str(name).strip(), "price": float(str(price).replace(",", "")), "volume": float(str(volume).replace(",", "")), "change": float(str(change).replace(",", "").replace("+", ""))}
                 market_codes[market].add(str(code).strip())
+                if row.get("Date"): row_dates.add(row["Date"])
               except (TypeError, ValueError): pass
           def number(value):
             try: return float(str(value).replace(",", ""))
@@ -139,10 +143,16 @@ jobs:
 
           tz = timezone(timedelta(hours=8))
           today = datetime.now(tz).strftime("%Y-%m-%d")
+          import quote_provenance
+          # The rows carry the session they belong to. The run date does not:
+          # the weekday schedule fires on holidays and a push triggers this on
+          # any day, and in both cases the feeds return the previous session.
+          session_date = quote_provenance.trading_date(row_dates, today)
+          if session_date != today: print(f"session date {session_date} differs from run date {today}")
           for code, quote in quotes.items():
             series = history.setdefault(code, [])
-            point = {"date": today, "close": quote["price"], "volume": quote["volume"]}
-            if series and series[-1].get("date") == today: series[-1] = point
+            point = {"date": session_date, "close": quote["price"], "volume": quote["volume"]}
+            if series and series[-1].get("date") == session_date: series[-1] = point
             else: series.append(point)
             history[code] = series[-120:]
             closes = [item["close"] for item in history[code]]
@@ -150,14 +160,6 @@ jobs:
             quote["ma20"] = sum(closes[-20:]) / 20 if len(closes) >= 20 else None
           # Without this the evidence contract reads the source as unknown and
           # discards every candidate the screener ranked.
-          import quote_provenance
-          # A holiday still fires the weekday schedule and returns the previous
-          # session, so the run date is not necessarily the session date.
-          session_date = quote_provenance.trading_date(
-            today, quotes, existing.get("quotes", {}),
-            existing.get("provenance", {}).get("quote", {}).get("effectiveDate"),
-          )
-          if session_date != today: print(f"no price moved; keeping session date {session_date}")
           provenance = quote_provenance.build(
             trading_date=session_date,
             retrieved_at=datetime.now(timezone.utc).isoformat(),
