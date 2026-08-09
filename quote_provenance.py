@@ -44,23 +44,29 @@ def available_at(trading_date: str) -> str:
     return datetime.combine(day, SESSION_CLOSE, tzinfo=TAIPEI).isoformat()
 
 
-def trading_date(today: str, quotes: dict[str, Any], previous: dict[str, Any],
-                 previous_date: str | None) -> str:
-    """The date the prices belong to, which is not always the date of the run.
+def roc_date(value: Any) -> str | None:
+    """``1150807`` -> ``2026-08-07``; the exchanges date rows in ROC years."""
+    text = str(value or "").strip()
+    if len(text) != 7 or not text.isdigit():
+        return None
+    try:
+        return datetime(int(text[:3]) + 1911, int(text[3:5]), int(text[5:7])).date().isoformat()
+    except ValueError:
+        return None
 
-    The schedule is weekday-only, but a public holiday still fires it and the
-    exchanges return the previous session unchanged. Stamping that with the
-    run's date would backdate the next session's close onto a day the market
-    never opened -- the exact mislabelling this module exists to prevent. When
-    no price has moved, the previous trading date is kept.
+
+def trading_date(row_dates: Any, fallback: str) -> str:
+    """The session the prices belong to, taken from the rows themselves.
+
+    The run date is not the session date. The weekday schedule still fires on
+    public holidays, and a push to the default branch triggers the update on any
+    day at all; in both cases the exchanges return the previous session, and
+    stamping it with the run date backdates a close onto a day the market never
+    opened. Both feeds carry the session date, so it is read rather than
+    inferred, and ``fallback`` applies only if every row lacks one.
     """
-    if not previous or not previous_date:
-        return today
-    moved = any(
-        isinstance(values, dict) and previous.get(code, {}).get("price") != values.get("price")
-        for code, values in quotes.items()
-    )
-    return today if moved else previous_date
+    parsed = {day for day in (roc_date(value) for value in row_dates) if day}
+    return max(parsed) if parsed else fallback
 
 
 def conflict_status(code_sets: dict[str, Iterable[str]]) -> tuple[str, list[str]]:

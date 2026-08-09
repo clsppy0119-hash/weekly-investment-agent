@@ -1,4 +1,4 @@
-"""Quote provenance must be labelled honestly, not merely present.
+﻿"""Quote provenance must be labelled honestly, not merely present.
 
 The contract gate discarded every ranked candidate because quotes.json carried
 no source. Filling that in is only correct if the values are defensible: fetch
@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from data_contract import build_contract
-from quote_provenance import available_at, build, conflict_status, trading_date
+from quote_provenance import available_at, build, conflict_status, roc_date, trading_date
 
 RETRIEVED = "2026-08-07T09:30:00+00:00"
 
@@ -65,22 +65,28 @@ def test_an_overlap_keeps_the_snapshot_out_of_verified():
     assert provenance["quote"]["quality"] != "verified"
 
 
-def test_a_holiday_run_keeps_the_previous_session_date():
-    """The weekday schedule fires on holidays; the exchanges do not open."""
-    unchanged = {"2330": {"price": 1000.0}, "6488": {"price": 500.0}}
-
-    assert trading_date("2026-10-10", unchanged, unchanged, "2026-10-09") == "2026-10-09"
+def test_roc_dates_are_converted():
+    assert roc_date("1150807") == "2026-08-07"
+    assert roc_date("1140101") == "2025-01-01"
 
 
-def test_a_moved_price_means_a_new_session():
-    previous = {"2330": {"price": 1000.0}}
-    today = {"2330": {"price": 1015.0}}
-
-    assert trading_date("2026-10-12", today, previous, "2026-10-09") == "2026-10-12"
+def test_unusable_roc_values_are_refused():
+    for value in ("", None, "2026-08-07", "115080", "1159999"):
+        assert roc_date(value) is None
 
 
-def test_a_first_ever_run_uses_the_run_date():
-    assert trading_date("2026-08-07", {"2330": {"price": 1000.0}}, {}, None) == "2026-08-07"
+def test_the_session_comes_from_the_rows_not_the_run_date():
+    """A Sunday push must be stamped with Friday's session, not Sunday."""
+    assert trading_date(["1150807", "1150807"], "2026-08-09") == "2026-08-07"
+
+
+def test_the_latest_session_wins_when_feeds_disagree():
+    assert trading_date(["1150806", "1150807"], "2026-08-09") == "2026-08-07"
+
+
+def test_the_run_date_is_only_a_last_resort():
+    assert trading_date([], "2026-08-07") == "2026-08-07"
+    assert trading_date(["nonsense"], "2026-08-07") == "2026-08-07"
 
 
 def test_the_modelled_assumption_is_recorded_in_the_record():
@@ -94,3 +100,4 @@ if __name__ == "__main__":
         if name.startswith("test_"):
             case()
             print(f"PASS  {name}")
+
