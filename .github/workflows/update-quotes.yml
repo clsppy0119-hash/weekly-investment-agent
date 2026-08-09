@@ -23,7 +23,7 @@ jobs:
       - name: Download official closing prices
         run: |
           python - <<'PY'
-          import json, time, urllib.error, urllib.request
+          import http.client, json, time, urllib.error, urllib.request
           from datetime import datetime, timezone, timedelta
           quotes = {}
           try:
@@ -36,7 +36,10 @@ jobs:
               try:
                 request = urllib.request.Request(url, headers={"User-Agent": "weekly-investment-agent"})
                 with urllib.request.urlopen(request, timeout=30) as response: return json.load(response)
-              except (OSError, TimeoutError, urllib.error.URLError, json.JSONDecodeError) as error:
+              # A truncated response raises http.client.IncompleteRead, which is
+              # an HTTPException and not an OSError, so it used to escape and
+              # abort the whole update instead of retrying this one feed.
+              except (OSError, TimeoutError, urllib.error.URLError, http.client.HTTPException, json.JSONDecodeError) as error:
                 if attempt == attempts:
                   print(f"warning: {url} unavailable after {attempts} attempts: {error}")
                   return []
@@ -147,7 +150,11 @@ jobs:
           # The rows carry the session they belong to. The run date does not:
           # the weekday schedule fires on holidays and a push triggers this on
           # any day, and in both cases the feeds return the previous session.
-          session_date = quote_provenance.trading_date(row_dates, today)
+          # If every feed failed there are no row dates, and the quotes are the
+          # previous snapshot's; the last known session describes them, the run
+          # date does not.
+          previous_session = existing.get("provenance", {}).get("quote", {}).get("effectiveDate")
+          session_date = quote_provenance.trading_date(row_dates, previous_session or today)
           if session_date != today: print(f"session date {session_date} differs from run date {today}")
           # A run stamped with its own date once appended bars for days the
           # market never opened. Nothing can be dated past the latest session,
