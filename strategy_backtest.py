@@ -137,7 +137,7 @@ def fundamental_records(quotes: dict[str, dict], published: dict[str, dict]) -> 
 def run_range(history: list[dict], dates: list[str], start: int, end: int, style: str, picks: int,
               holding: int, min_volume: float, weights: dict | None = None,
               minimum_coverage: int | None = None, pit: object | None = None,
-              continuous_trend: bool = False) -> dict:
+              continuous_trend: bool = False, reversal_aware: bool = False) -> dict:
     """Signals inside ``[start, end)``, exits kept inside it too.
 
     Moving averages read days before ``start`` on purpose: that is past data at
@@ -162,7 +162,7 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
         # recommend, the rest is the pool it was chosen from.
         eligible = candidates(style, quotes, fundamental_records(quotes, published), None,
                               weights=weights, minimum_coverage=minimum_coverage,
-                              continuous_trend=continuous_trend)
+                              continuous_trend=continuous_trend, reversal_aware=reversal_aware)
         selected = eligible[:picks]
         window = history[index + 1:index + holding + 2]
         trade_returns: list[float] = []
@@ -226,7 +226,7 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
 
 def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
              min_volume: float, drop: tuple[str, ...] = (), pit: object | None = None,
-             continuous_trend: bool = False) -> dict:
+             continuous_trend: bool = False, reversal_aware: bool = False) -> dict:
     dates, history = load_history(data)
     if len(history) < 120:
         raise SystemExit(f"歷史資料只有 {len(history)} 個交易日，不足 120，無法切出樣本外測試。")
@@ -248,7 +248,7 @@ def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
     result = {}
     for name, (start, end) in parts.items():
         run = run_range(history, dates, start, end, style, picks, holding, min_volume,
-                        weights, coverage_floor, pit, continuous_trend)
+                        weights, coverage_floor, pit, continuous_trend, reversal_aware)
         run["benchmark"] = benchmark_total_return(benchmark, dates[start:end])
         run["excess"] = None if run["benchmark"] is None else run["return"] - run["benchmark"]
         per_rebalance = []
