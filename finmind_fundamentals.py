@@ -14,6 +14,15 @@ from pathlib import Path
 from point_in_time_fundamentals import period_end, quarter_publication
 from provenance import record, utc_now
 
+# Fields both the open-data feed and FinMind report, where a disagreement means
+# the score depended on which source happened to write last.
+CONFLICT_FIELDS = ("eps", "roe", "debtRatio", "revenueYoY")
+CONFLICT_TOLERANCE = 0.02
+
+
+def _numeric(value) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
 ROOT = Path(__file__).resolve().parent
 API = "https://api.finmindtrade.com/api/v4/data"
 STRATEGY = "industry-queue-v3"
@@ -153,7 +162,7 @@ def main() -> None:
     selected = list(dict.fromkeys(priority + pending))[: max(1, args.batch_size)]
 
     start = f"{date.today().year - 5}-01-01"
-    results, failures = {}, {}
+    results, failures, conflicts = {}, {}, {}
     with ThreadPoolExecutor(max_workers=3) as pool:
         futures = [pool.submit(enrich, code, start, metadata[code]["industry"]) for code in selected]
         for future in as_completed(futures):
@@ -163,6 +172,16 @@ def main() -> None:
                 failures[code] = error
             else:
                 results[code] = values
+                # The open-data feed already wrote these fields; FinMind is
+                # about to overwrite them. Where the two disagree materially
+                # the scoring silently used whichever wrote last, so the
+                # disagreement is recorded instead of being overwritten away.
+                previous = fundamentals.get(code, {})
+                for key in CONFLICT_FIELDS:
+                    before, after = previous.get(key), values.get(key)
+                    if _numeric(before) and _numeric(after) and before and \
+                            abs(after - before) / abs(before) > CONFLICT_TOLERANCE:
+                        conflicts.setdefault(code, {})[key] = {"openData": before, "finmind": after}
                 fundamentals.setdefault(code, {}).update({key: value for key, value in values.items() if value is not None})
 
     total_codes = sorted(metadata)
@@ -191,6 +210,7 @@ def main() -> None:
         "remainingCodes": max(0, len(total_codes) - len(complete_codes)),
         "stageCoverage": stage_counts,
         "failures": failures,
+        "sourceDisagreements": conflicts,
         "metrics": {key: sum(1 for code in total_codes if fundamentals.get(code, {}).get(key) is not None) for key in CORE},
         "fiveYearHistory": sum(1 for code in total_codes if fundamentals.get(code, {}).get("financialHistoryYears", 0) >= 5),
     }
@@ -215,7 +235,9 @@ def main() -> None:
         # the annual. Availability follows that calendar rather than anything
         # the provider asserts, the same basis used for the quote snapshot.
         available_at=filed_at, content=results, visibility="private_cache",
+        conflict_status="no_conflict" if not conflicts else "conflict_unresolved",
     )
+    market["provenance"]["fundamentals"]["sourceDisagreements"] = conflicts
     if filed_at:
         market["provenance"]["fundamentals"]["availableAtBasis"] = (
             "public no later than this: the earlier of the statutory TWSE filing "
