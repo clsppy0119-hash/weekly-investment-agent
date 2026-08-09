@@ -142,7 +142,7 @@ report = "\n".join([
 
 if report_phase == "final":
     tracking_state = record_recommendations(today, report_mode, ranked_by_style, data,
-                                            pools=eligible_pool_by_style)
+                                            pools=eligible_pool_by_style, actions=actions)
     report += "\n\n" + review_summary(tracking_state)
 
 report_output = Path(os.environ.get("REPORT_OUTPUT", "daily-report.txt"))

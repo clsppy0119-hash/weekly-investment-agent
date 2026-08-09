@@ -86,7 +86,34 @@ def _extend_pool_trail(trail, history, pool_prices, entry_date):
     return trail
 
 
-def _settle(outcomes, trail, entry_price, benchmark_trail, benchmark_entry, pool_trail=None):
+def _extend_dividend_factors(factors, events, code, entry_date):
+    """Accumulate ex-rights adjustment factors for one holding.
+
+    A stock going ex-dividend drops by the distribution, which the raw close
+    records as a loss the holder never took. ``before_close / reference_price``
+    is the exchange's own statement of that drop, so it restores what the
+    holder actually received.
+    """
+    for event in events:
+        if str(event.get("code")) != str(code):
+            continue
+        day = str(event.get("date", ""))[:10]
+        before, reference = event.get("before_close"), event.get("reference_price")
+        if day > entry_date and day not in factors and number(before) and number(reference) and reference > 0:
+            factors[day] = before / reference
+    return factors
+
+
+def _dividend_factor(factors, day):
+    product = 1.0
+    for event_day, factor in factors.items():
+        if event_day <= day:
+            product *= factor
+    return product
+
+
+def _settle(outcomes, trail, entry_price, benchmark_trail, benchmark_entry, pool_trail=None,
+            dividend_factors=None):
     """Fill in horizons the trail can now support; never revise a settled one."""
     days = sorted(trail)
     for horizon in HORIZONS:
@@ -102,21 +129,31 @@ def _settle(outcomes, trail, entry_price, benchmark_trail, benchmark_entry, pool
             continue
         day = days[horizon - 1]
         gross = trail[day] / entry_price - 1
+        # Two figures, because the two comparisons need different ones. 0050 is
+        # a total-return index, so the holding has to include its distributions
+        # to be comparable. The pool is an equal-weighted price series with no
+        # dividend data of its own, so that comparison stays price-only on both
+        # sides rather than crediting one and not the other.
+        factor = _dividend_factor(dividend_factors or {}, day)
+        total_gross = (trail[day] * factor) / entry_price - 1
         record = {
             "status": "complete",
             "date": day,
             "price": trail[day],
             "grossReturnPct": round(gross * 100, 2),
             "netReturnPct": round(_net(gross) * 100, 2),
-            # Cash and stock dividends are not reconstructed here, so a holding
-            # that goes ex-dividend inside the window reads as a loss it did not
-            # take.  Flagged rather than silently folded into the number.
-            "priceReturnOnly": True,
+            "totalReturnNetPct": round(_net(total_gross) * 100, 2),
+            "exRightsFactor": round(factor, 6),
+            # True while no ex-rights event is known for this holding: either
+            # none occurred, or none was fetched. The distinction matters, so
+            # the factor above is reported rather than folded in silently.
+            "priceReturnOnly": factor == 1.0,
         }
         if number(benchmark_entry) and benchmark_entry > 0 and day in benchmark_trail:
             benchmark_net = _net(benchmark_trail[day] / benchmark_entry - 1, ETF_SELL_TAX)
             record["benchmarkNetReturnPct"] = round(benchmark_net * 100, 2)
-            record["excessReturnPct"] = round((_net(gross) - benchmark_net) * 100, 2)
+            # Total return on both sides: 0050 is a total-return index.
+            record["excessReturnPct"] = round((_net(total_gross) - benchmark_net) * 100, 2)
         else:
             record["benchmarkAvailable"] = False
         if pool_trail and day in pool_trail:
@@ -205,7 +242,8 @@ def _decision_snapshot(report_date, score, coverage, quote, fund):
     }
 
 
-def record_recommendations(report_date, report_mode, ranked, quote_data, path=DEFAULT_PATH, pools=None):
+def record_recommendations(report_date, report_mode, ranked, quote_data, path=DEFAULT_PATH,
+                           pools=None, actions=None):
     state = load_state(path)
     recommendations = state.setdefault("recommendations", [])
     stored_pools = state.setdefault("pools", {})
@@ -213,6 +251,7 @@ def record_recommendations(report_date, report_mode, ranked, quote_data, path=DE
     history = quote_data.get("history", {})
     benchmark_history = history.get(BENCHMARK_CODE, [])
     benchmark_price = quote_data.get("quotes", {}).get(BENCHMARK_CODE, {}).get("price")
+    action_events = (actions or {}).get("events", []) if isinstance(actions, dict) else (actions or [])
     for style, items in ranked.items():
         pool_key = f"{report_date}:{report_mode}:{style}"
         # Which names were eligible depends on that day's scores and coverage,
@@ -240,8 +279,11 @@ def record_recommendations(report_date, report_mode, ranked, quote_data, path=DE
             pool = stored_pools.get(item.get("poolKey"), {})
             pool_trail = _extend_pool_trail(item.setdefault("poolTrail", {}), history,
                                             pool.get("prices", {}), entry_date) if pool else {}
+            factors = _extend_dividend_factors(item.setdefault("exRightsFactors", {}),
+                                               action_events, item.get("code"), entry_date)
             item["outcomes"] = _settle(item.get("outcomes") or {}, trail, price,
-                                       benchmark_trail, item.get("benchmarkEntryPrice"), pool_trail)
+                                       benchmark_trail, item.get("benchmarkEntryPrice"),
+                                       pool_trail, factors)
         if "decisionRecord" not in item:
             # 舊紀錄沒有原始快照；明確標示為補建，不把今天資料偽裝成當日資料。
             quote = {**quote_data.get("quotes", {}).get(item.get("code"), {}), "updatedAt": quote_data.get("updatedAt")}
@@ -309,7 +351,8 @@ def review_summary(state):
         lines.append(line + "。")
     if all(not review[str(horizon)]["settled"] for horizon in HORIZONS):
         return "策略追蹤：已開始保存候選紀錄，尚無任何期間結算。"
-    return "策略追蹤（各期間分開統計，報酬已扣手續費、證交稅與滑價；未還原股利）：\n" + "\n".join(lines)
+    return ("策略追蹤（各期間分開統計，報酬已扣手續費、證交稅與滑價）：\n"
+            "　對 0050 為總報酬對總報酬；對合格池雙方皆為價格報酬。\n" + "\n".join(lines))
 
 
 def main():

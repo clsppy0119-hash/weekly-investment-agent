@@ -57,8 +57,11 @@ def backfill(state: dict, by_code: dict[str, list[dict]]) -> list[dict]:
         benchmark_trail = _extend_trail(item.setdefault("benchmarkTrail", {}), benchmark_rows, entry_date)
         if item.get("benchmarkEntryPrice") is None:
             item["benchmarkEntryPrice"] = entry_reference(benchmark_rows, entry_date)
+        # Reuse whatever the daily run has already recorded, so a backfilled
+        # settlement cannot disagree with one the report would have produced.
         item["outcomes"] = _settle(item.get("outcomes") or {}, trail, price,
-                                   benchmark_trail, item.get("benchmarkEntryPrice"))
+                                   benchmark_trail, item.get("benchmarkEntryPrice"),
+                                   item.get("poolTrail") or {}, item.get("exRightsFactors") or {})
         settled = [str(h) for h in HORIZONS if item["outcomes"].get(str(h), {}).get("status") == "complete"]
         changes.append({"id": item["id"], "added": len(trail) - before, "trail": len(trail), "settled": settled})
     return changes
