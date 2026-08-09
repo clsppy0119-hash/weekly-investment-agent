@@ -17,6 +17,7 @@ ACTIONS_PATH = Path(os.environ.get("CANDIDATE_ACTIONS", "backtest_data/candidate
 NEWS_PATH = Path(os.environ.get("MARKET_NEWS", "market-news.json"))
 PIT_STATUS_PATH = Path(os.environ.get("PIT_STATUS_PATH", "data/point-in-time-universe-status.json"))
 CONTRACT_PATH = Path(os.environ.get("DATA_CONTRACT_PATH", "data/evidence-contract.json"))
+DATA_ACCESS_STATUS_PATH = Path(os.environ.get("DATA_ACCESS_STATUS", "data/data-access-status.json"))
 
 
 def advice_enabled():
@@ -125,6 +126,15 @@ for key, title in styles:
 
 if not strategy_advice_enabled:
     sections.extend(["", "\u7b56\u7565\u5c1a\u672a\u901a\u904e\u6a23\u672c\u5916\u9a57\u8b49\uff1b\u76ee\u524d\u50c5\u63d0\u4f9b\u7814\u7a76\u8cc7\u6599\uff0c\u4e0d\u63d0\u4f9b\u8cb7\u9032\u3001\u8ce3\u51fa\u6216\u52a0\u78bc\u5efa\u8b70\u3002"])
+
+# A provider outage no longer stops the report, so it has to say so. Silence
+# would read as "nothing qualified today" when the truth is "nothing was
+# checked today".
+data_access = load_json(DATA_ACCESS_STATUS_PATH)
+if data_access and data_access.get("ready") is not True:
+    unavailable = "\u3001".join(sorted(data_access.get("errors", {}))) or "\u8cc7\u6599\u4f9b\u61c9\u5546"
+    sections.extend(["", f"\u26a0 \u672c\u6b21\u7121\u6cd5\u53d6\u5f97 {unavailable} \u6388\u6b0a\u8cc7\u6599\uff0c\u57fa\u672c\u9762\u8207\u9664\u6b0a\u606f\u672a\u66f4\u65b0\uff1b"
+                         "\u5019\u9078\u6e05\u55ae\u50c5\u53cd\u6620\u53ef\u53d6\u5f97\u7684\u8cc7\u6599\uff0c\u7f3a\u6f0f\u4e0d\u4ee3\u8868\u8a72\u80a1\u4e0d\u7b26\u5408\u689d\u4ef6\u3002"])
 
 report = "\n".join([
     f"台股{report_title}｜{today}",

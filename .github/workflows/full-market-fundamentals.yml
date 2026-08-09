@@ -3,7 +3,9 @@ name: Cache current full-market fundamentals
 on:
   schedule:
     # Run every half hour at :00 and :30.
-    - cron: "*/30 * * * *"
+    # Skips 00:00-01:00 UTC so the daily report has the hourly FinMind
+    # allowance to itself; see backtest-data.yml.
+    - cron: "0,30 1-23 * * *"
   workflow_dispatch:
     inputs:
       batch_size:
