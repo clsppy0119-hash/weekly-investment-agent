@@ -149,6 +149,13 @@ jobs:
           # any day, and in both cases the feeds return the previous session.
           session_date = quote_provenance.trading_date(row_dates, today)
           if session_date != today: print(f"session date {session_date} differs from run date {today}")
+          # A run stamped with its own date once appended bars for days the
+          # market never opened. Nothing can be dated past the latest session,
+          # so those are dropped rather than left for the tracker to read.
+          for code, series in list(history.items()):
+            kept = [point for point in series if str(point.get("date", "")) <= session_date]
+            if len(kept) != len(series): print(f"{code}: dropped {len(series) - len(kept)} bar(s) after {session_date}")
+            history[code] = kept
           for code, quote in quotes.items():
             series = history.setdefault(code, [])
             point = {"date": session_date, "close": quote["price"], "volume": quote["volume"]}
