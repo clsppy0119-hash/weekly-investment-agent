@@ -15,10 +15,16 @@ from promotion_status import assess
 OPEN_GATE = {"adviceEnabled": True}
 
 
-def _state(horizon, excesses):
+def _dates(count):
+    """Distinct decision dates: same-day picks are one decision, not several."""
+    return [f"2026-{1 + index // 28:02d}-{1 + index % 28:02d}" for index in range(count)]
+
+
+def _state(horizon, excesses, field="poolExcessPct"):
+    """A shortlist is judged against its pool; autonomy against 0050."""
     return {"recommendations": [
-        {"outcomes": {str(horizon): {"status": "complete", "excessReturnPct": value}}}
-        for value in excesses
+        {"date": day, "outcomes": {str(horizon): {"status": "complete", field: value}}}
+        for day, value in zip(_dates(len(excesses)), excesses)
     ]}
 
 
@@ -38,7 +44,28 @@ def test_a_thin_sample_cannot_reach_assisted_selection():
     report = assess(_state(20, [3.0] * 10), {})
 
     assert report["stage"] == "screening_assistant"
-    assert "20 日已結算 10/30 筆" in report["blockers"]["assisted_selection"][0]
+    assert "已結算 10/30 個決策日" in report["blockers"]["assisted_selection"][0]
+
+
+def test_same_day_picks_count_as_one_decision():
+    """Three picks share the day's market move; they are not three draws."""
+    state = {"recommendations": [
+        {"date": "2026-01-05", "outcomes": {"20": {"status": "complete", "poolExcessPct": value}}}
+        for value in (2.0, 2.1, 1.9)
+    ]}
+    report = assess(state, {})
+
+    assert report["versusEligiblePool"]["20"]["settled"] == 1
+    assert report["versusEligiblePool"]["20"]["outcomes"] == 3
+
+
+def test_beating_only_the_index_does_not_earn_assisted_selection():
+    """Beating 0050 can be the pool's size tilt; the claim is about the pick."""
+    steady = [2.0, 2.2, 1.9, 2.1, 2.3, 1.8] * 6
+    report = assess(_state(20, steady, field="excessReturnPct"), {})
+
+    assert report["stage"] == "screening_assistant"
+    assert "對合格池" in report["blockers"]["assisted_selection"][0]
 
 
 def test_a_large_but_noisy_sample_is_still_blocked():
@@ -58,7 +85,9 @@ def test_a_consistent_edge_over_enough_outcomes_promotes():
 
 def test_autonomy_also_requires_the_advice_gate():
     steady = [1.8, 2.2, 2.0, 1.9, 2.1, 2.3] * 12
-    state = _state(60, steady)
+    # Autonomy is judged against 0050; the 20-day pool evidence carries the
+    # assisted stage beneath it.
+    state = _state(60, steady, field="excessReturnPct")
     state["recommendations"] += _state(20, steady)["recommendations"]
 
     closed = assess(state, {"adviceEnabled": False})

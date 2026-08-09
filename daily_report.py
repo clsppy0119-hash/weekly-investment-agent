@@ -6,7 +6,7 @@ from pathlib import Path
 from candidate_manifest import atomic_write_json, build_manifest, load_json
 # The ranking rule lives in `scoring` so the backtest can score candidates with
 # the identical code path; see that module for why.
-from scoring import candidates, number, score_metric, stock_score  # noqa: F401
+from scoring import DEFAULT_PICKS, candidates, number, score_metric, stock_score  # noqa: F401
 from strategy_tracker import record_recommendations, review_summary
 
 
@@ -81,9 +81,15 @@ styles = [("comprehensive", "綜合投資研究")]
 report_title = "綜合投資研究日報"
 sections = []
 ranked_by_style = {}
-preview_ranked_by_style = {
-    key: candidates(key, quotes, fundamentals)
+# The whole eligible pool, ranked once; the head is what gets recommended and
+# the rest is what the recommendation has to be judged against. Beating 0050
+# also rewards whatever the pool's size tilt did; beating the pool does not.
+eligible_pool_by_style = {
+    key: candidates(key, quotes, fundamentals, None)
     for key, _title in styles
+}
+preview_ranked_by_style = {
+    key: items[:DEFAULT_PICKS] for key, items in eligible_pool_by_style.items()
 }
 advice_gate = load_json(ADVICE_GATE_PATH)
 actions = load_json(ACTIONS_PATH)
@@ -135,7 +141,8 @@ report = "\n".join([
 ])
 
 if report_phase == "final":
-    tracking_state = record_recommendations(today, report_mode, ranked_by_style, data)
+    tracking_state = record_recommendations(today, report_mode, ranked_by_style, data,
+                                            pools=eligible_pool_by_style, actions=actions)
     report += "\n\n" + review_summary(tracking_state)
 
 report_output = Path(os.environ.get("REPORT_OUTPUT", "daily-report.txt"))

@@ -63,7 +63,57 @@ def _extend_trail(trail, history, entry_date):
     return trail
 
 
-def _settle(outcomes, trail, entry_price, benchmark_trail, benchmark_entry):
+def _extend_pool_trail(trail, history, pool_prices, entry_date):
+    """Equal-weighted index of everything that was eligible on the entry date.
+
+    Beating 0050 answers two questions at once: did the ranking pick well, and
+    did the eligible universe happen to beat a large-cap index. A shortlist is
+    only claiming the first, so it has to be judged against the pool it was
+    drawn from. The pool is fixed at decision time and cannot be reconstructed
+    afterwards, which is why it is recorded rather than recomputed.
+    """
+    ratios: dict[str, list[float]] = {}
+    for code, entry_price in pool_prices.items():
+        if not (number(entry_price) and entry_price > 0):
+            continue
+        for row in history.get(code, []):
+            day = row.get("date", "")
+            close = row.get("close")
+            if day > entry_date and number(close) and day not in trail:
+                ratios.setdefault(day, []).append(close / entry_price)
+    for day, values in ratios.items():
+        trail[day] = sum(values) / len(values)
+    return trail
+
+
+def _extend_dividend_factors(factors, events, code, entry_date):
+    """Accumulate ex-rights adjustment factors for one holding.
+
+    A stock going ex-dividend drops by the distribution, which the raw close
+    records as a loss the holder never took. ``before_close / reference_price``
+    is the exchange's own statement of that drop, so it restores what the
+    holder actually received.
+    """
+    for event in events:
+        if str(event.get("code")) != str(code):
+            continue
+        day = str(event.get("date", ""))[:10]
+        before, reference = event.get("before_close"), event.get("reference_price")
+        if day > entry_date and day not in factors and number(before) and number(reference) and reference > 0:
+            factors[day] = before / reference
+    return factors
+
+
+def _dividend_factor(factors, day):
+    product = 1.0
+    for event_day, factor in factors.items():
+        if event_day <= day:
+            product *= factor
+    return product
+
+
+def _settle(outcomes, trail, entry_price, benchmark_trail, benchmark_entry, pool_trail=None,
+            dividend_factors=None):
     """Fill in horizons the trail can now support; never revise a settled one."""
     days = sorted(trail)
     for horizon in HORIZONS:
@@ -79,23 +129,41 @@ def _settle(outcomes, trail, entry_price, benchmark_trail, benchmark_entry):
             continue
         day = days[horizon - 1]
         gross = trail[day] / entry_price - 1
+        # Two figures, because the two comparisons need different ones. 0050 is
+        # a total-return index, so the holding has to include its distributions
+        # to be comparable. The pool is an equal-weighted price series with no
+        # dividend data of its own, so that comparison stays price-only on both
+        # sides rather than crediting one and not the other.
+        factor = _dividend_factor(dividend_factors or {}, day)
+        total_gross = (trail[day] * factor) / entry_price - 1
         record = {
             "status": "complete",
             "date": day,
             "price": trail[day],
             "grossReturnPct": round(gross * 100, 2),
             "netReturnPct": round(_net(gross) * 100, 2),
-            # Cash and stock dividends are not reconstructed here, so a holding
-            # that goes ex-dividend inside the window reads as a loss it did not
-            # take.  Flagged rather than silently folded into the number.
-            "priceReturnOnly": True,
+            "totalReturnNetPct": round(_net(total_gross) * 100, 2),
+            "exRightsFactor": round(factor, 6),
+            # True while no ex-rights event is known for this holding: either
+            # none occurred, or none was fetched. The distinction matters, so
+            # the factor above is reported rather than folded in silently.
+            "priceReturnOnly": factor == 1.0,
         }
         if number(benchmark_entry) and benchmark_entry > 0 and day in benchmark_trail:
             benchmark_net = _net(benchmark_trail[day] / benchmark_entry - 1, ETF_SELL_TAX)
             record["benchmarkNetReturnPct"] = round(benchmark_net * 100, 2)
-            record["excessReturnPct"] = round((_net(gross) - benchmark_net) * 100, 2)
+            # Total return on both sides: 0050 is a total-return index.
+            record["excessReturnPct"] = round((_net(total_gross) - benchmark_net) * 100, 2)
         else:
             record["benchmarkAvailable"] = False
+        if pool_trail and day in pool_trail:
+            # The pool is charged the same round trip, so this compares
+            # selection skill rather than a costs artefact.
+            pool_net = _net(pool_trail[day] - 1)
+            record["poolNetReturnPct"] = round(pool_net * 100, 2)
+            record["poolExcessPct"] = round((_net(gross) - pool_net) * 100, 2)
+        else:
+            record["poolAvailable"] = False
         outcomes[key] = record
     return outcomes
 
@@ -174,21 +242,33 @@ def _decision_snapshot(report_date, score, coverage, quote, fund):
     }
 
 
-def record_recommendations(report_date, report_mode, ranked, quote_data, path=DEFAULT_PATH):
+def record_recommendations(report_date, report_mode, ranked, quote_data, path=DEFAULT_PATH,
+                           pools=None, actions=None):
     state = load_state(path)
     recommendations = state.setdefault("recommendations", [])
+    stored_pools = state.setdefault("pools", {})
     existing = {item.get("id") for item in recommendations}
     history = quote_data.get("history", {})
     benchmark_history = history.get(BENCHMARK_CODE, [])
     benchmark_price = quote_data.get("quotes", {}).get(BENCHMARK_CODE, {}).get("price")
+    action_events = (actions or {}).get("events", []) if isinstance(actions, dict) else (actions or [])
     for style, items in ranked.items():
+        pool_key = f"{report_date}:{report_mode}:{style}"
+        # Which names were eligible depends on that day's scores and coverage,
+        # so it cannot be rebuilt later; record it once per report.
+        if pools and style in pools and pool_key not in stored_pools:
+            stored_pools[pool_key] = {
+                "entryDate": report_date,
+                "prices": {entry[2]: entry[3].get("price") for entry in pools[style]
+                           if number(entry[3].get("price"))},
+            }
         for rank, item in enumerate(items, 1):
             score, coverage, code, quote, fund = item
             record_id = f"{report_date}:{report_mode}:{style}:{code}"
             if record_id in existing:
                 continue
             snapshot_quote = {**quote, "updatedAt": quote_data.get("updatedAt")}
-            recommendations.append({"id": record_id, "date": report_date, "mode": report_mode, "style": style, "rank": rank, "code": code, "name": quote.get("name", code), "entryPrice": quote.get("price"), "benchmarkEntryPrice": benchmark_price, "score": score, "coverage": coverage, "strategyVersion": STRATEGY_VERSION, "quoteUpdatedAt": quote_data.get("updatedAt"), "decisionRecord": _decision_snapshot(report_date, score, coverage, snapshot_quote, fund), "outcomes": {}, "priceTrail": {}})
+            recommendations.append({"id": record_id, "date": report_date, "mode": report_mode, "style": style, "rank": rank, "code": code, "name": quote.get("name", code), "entryPrice": quote.get("price"), "benchmarkEntryPrice": benchmark_price, "poolKey": pool_key, "score": score, "coverage": coverage, "strategyVersion": STRATEGY_VERSION, "quoteUpdatedAt": quote_data.get("updatedAt"), "decisionRecord": _decision_snapshot(report_date, score, coverage, snapshot_quote, fund), "outcomes": {}, "priceTrail": {}})
             existing.add(record_id)
     for item in recommendations:
         price = item.get("entryPrice")
@@ -196,8 +276,14 @@ def record_recommendations(report_date, report_mode, ranked, quote_data, path=DE
             entry_date = item.get("date", "")
             trail = _extend_trail(item.setdefault("priceTrail", {}), history.get(item.get("code"), []), entry_date)
             benchmark_trail = _extend_trail(item.setdefault("benchmarkTrail", {}), benchmark_history, entry_date)
+            pool = stored_pools.get(item.get("poolKey"), {})
+            pool_trail = _extend_pool_trail(item.setdefault("poolTrail", {}), history,
+                                            pool.get("prices", {}), entry_date) if pool else {}
+            factors = _extend_dividend_factors(item.setdefault("exRightsFactors", {}),
+                                               action_events, item.get("code"), entry_date)
             item["outcomes"] = _settle(item.get("outcomes") or {}, trail, price,
-                                       benchmark_trail, item.get("benchmarkEntryPrice"))
+                                       benchmark_trail, item.get("benchmarkEntryPrice"),
+                                       pool_trail, factors)
         if "decisionRecord" not in item:
             # 舊紀錄沒有原始快照；明確標示為補建，不把今天資料偽裝成當日資料。
             quote = {**quote_data.get("quotes", {}).get(item.get("code"), {}), "updatedAt": quote_data.get("updatedAt")}
@@ -223,6 +309,7 @@ def horizon_review(state):
     for horizon in HORIZONS:
         net = []
         excess = []
+        pool_excess = []
         for item in state.get("recommendations", []):
             result = item.get("outcomes", {}).get(str(horizon), {})
             if result.get("status") != "complete":
@@ -230,7 +317,13 @@ def horizon_review(state):
             net.append(result["netReturnPct"])
             if "excessReturnPct" in result:
                 excess.append(result["excessReturnPct"])
+            if "poolExcessPct" in result:
+                pool_excess.append(result["poolExcessPct"])
         entry = {"settled": len(net)}
+        if pool_excess:
+            entry["versusPool"] = len(pool_excess)
+            entry["meanPoolExcessPct"] = round(sum(pool_excess) / len(pool_excess), 2)
+            entry["beatPoolPct"] = round(sum(1 for value in pool_excess if value > 0) / len(pool_excess) * 100)
         if net:
             entry["winRatePct"] = round(sum(1 for value in net if value > 0) / len(net) * 100)
             entry["meanNetReturnPct"] = round(sum(net) / len(net), 2)
@@ -253,10 +346,13 @@ def review_summary(state):
         line = f"　{horizon:>2} 日：{entry['settled']} 筆，勝率 {entry['winRatePct']}%，扣成本平均 {entry['meanNetReturnPct']:+.2f}%"
         if "meanExcessReturnPct" in entry:
             line += f"，對 0050 超額 {entry['meanExcessReturnPct']:+.2f}%（{entry['beatBenchmarkPct']}% 跑贏）"
+        if "meanPoolExcessPct" in entry:
+            line += f"，對合格池超額 {entry['meanPoolExcessPct']:+.2f}%（{entry['beatPoolPct']}% 跑贏）"
         lines.append(line + "。")
     if all(not review[str(horizon)]["settled"] for horizon in HORIZONS):
         return "策略追蹤：已開始保存候選紀錄，尚無任何期間結算。"
-    return "策略追蹤（各期間分開統計，報酬已扣手續費、證交稅與滑價；未還原股利）：\n" + "\n".join(lines)
+    return ("策略追蹤（各期間分開統計，報酬已扣手續費、證交稅與滑價）：\n"
+            "　對 0050 為總報酬對總報酬；對合格池雙方皆為價格報酬。\n" + "\n".join(lines))
 
 
 def main():

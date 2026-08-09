@@ -33,35 +33,54 @@ LABELS = {
 }
 
 
-def settled(state: dict, horizon: int) -> list[float]:
-    """Excess over 0050 for every settled outcome at ``horizon``."""
-    values = []
+def settled(state: dict, horizon: int, field: str = "excessReturnPct") -> tuple[list[float], int]:
+    """One observation per decision date, plus the raw outcome count.
+
+    Three picks made on the same day are one decision held three ways, not
+    three independent draws: they share the day's market move, so counting them
+    separately narrows the interval as if each were new evidence. Averaging
+    within a date removes that. Holds started on consecutive days still overlap,
+    which the interval cannot see, so a short run of dates stays weak evidence
+    however tight it looks.
+    """
+    by_date: dict[str, list[float]] = {}
+    outcomes = 0
     for item in state.get("recommendations", []):
         outcome = item.get("outcomes", {}).get(str(horizon), {})
-        if outcome.get("status") == "complete" and "excessReturnPct" in outcome:
-            values.append(outcome["excessReturnPct"] / 100)
-    return values
+        if outcome.get("status") == "complete" and field in outcome:
+            by_date.setdefault(item.get("date", ""), []).append(outcome[field] / 100)
+            outcomes += 1
+    return [sum(values) / len(values) for values in by_date.values()], outcomes
 
 
 def assess(state: dict, advice_gate: dict) -> dict:
     horizons = {}
+    pools = {}
     for horizon in HORIZONS:
-        excess = settled(state, horizon)
-        horizons[str(horizon)] = {"settled": len(excess), **significance(excess)}
+        for store, field in ((horizons, "excessReturnPct"), (pools, "poolExcessPct")):
+            values, outcomes = settled(state, horizon, field)
+            # `settled` counts decision dates, which is what the thresholds and
+            # the interval are both stated in.
+            store[str(horizon)] = {"settled": len(values), "outcomes": outcomes,
+                                   **significance(values)}
 
     reached = "screening_assistant" if state.get("recommendations") else "research_only"
     blockers: dict[str, list[str]] = {}
 
     for stage in ("assisted_selection", "autonomous_selection"):
         horizon, needed = REQUIRED_SETTLED[stage]
-        stats = horizons[str(horizon)]
+        # A shortlist earns trust by beating the pool it was drawn from -- that
+        # is the claim it makes. Replacing stock picking is a different claim:
+        # it has to beat the passive alternative the user would otherwise hold.
+        stats = pools[str(horizon)] if stage == "assisted_selection" else horizons[str(horizon)]
+        against = "對合格池" if stage == "assisted_selection" else "對 0050 "
         missing = []
         if stats["settled"] < needed:
-            missing.append(f"{horizon} 日已結算 {stats['settled']}/{needed} 筆")
+            missing.append(f"{horizon} 日{against}已結算 {stats['settled']}/{needed} 個決策日")
         elif not stats.get("conclusive"):
-            missing.append(f"{horizon} 日超額報酬信賴區間仍橫跨 0")
+            missing.append(f"{horizon} 日{against}超額報酬信賴區間仍橫跨 0")
         elif stats.get("meanExcessPerRebalance", 0) <= 0:
-            missing.append(f"{horizon} 日超額報酬顯著為負")
+            missing.append(f"{horizon} 日{against}超額報酬顯著為負")
         if stage == "autonomous_selection" and not advice_gate.get("adviceEnabled"):
             missing.append("investment-advice-gate 尚未開啟")
         if missing:
@@ -76,24 +95,29 @@ def assess(state: dict, advice_gate: dict) -> dict:
         "stageLabel": LABELS[reached],
         "recommendations": len(state.get("recommendations", [])),
         "horizons": horizons,
+        "versusEligiblePool": pools,
         "blockers": blockers,
-        "note": "前瞻結果以 0050 總報酬為基準；追蹤層尚未記錄合格池，"
-                "因此無法在此檢驗『優於同池』，該項目目前僅能由回測評估。",
+        "note": "輔助選股以『對合格池超額』判定，因為那才是清單本身的主張；"
+                "自主選股以『對 0050 超額』判定，因為那是使用者原本就能持有的替代方案。",
     }
 
 
 def render(report: dict) -> str:
     lines = [f"目前階段：{report['stageLabel']}", f"累積推薦 {report['recommendations']} 筆", ""]
-    for horizon in HORIZONS:
-        stats = report["horizons"][str(horizon)]
-        if stats["settled"] < 3:
-            lines.append(f"　{horizon:>2} 日：已結算 {stats['settled']} 筆，樣本不足。")
-            continue
-        low, high = (value * 100 for value in stats["ci95"])
-        lines.append(
-            f"　{horizon:>2} 日：{stats['settled']} 筆，平均超額 "
-            f"{stats['meanExcessPerRebalance'] * 100:+.2f}%　95%CI [{low:+.2f}, {high:+.2f}]"
-            + ("　顯著" if stats["conclusive"] else "　尚無結論"))
+    for label, key in (("對 0050", "horizons"), ("對合格池", "versusEligiblePool")):
+        lines.append(f"【{label}】")
+        for horizon in HORIZONS:
+            stats = report[key][str(horizon)]
+            if stats["settled"] < 3:
+                lines.append(f"　{horizon:>2} 日：{stats['settled']} 個決策日"
+                             f"（{stats['outcomes']} 筆結果），樣本不足。")
+                continue
+            low, high = (value * 100 for value in stats["ci95"])
+            lines.append(
+                f"　{horizon:>2} 日：{stats['settled']} 個決策日（{stats['outcomes']} 筆結果），平均超額 "
+                f"{stats['meanExcessPerRebalance'] * 100:+.2f}%　95%CI [{low:+.2f}, {high:+.2f}]"
+                + ("　顯著" if stats["conclusive"] else "　尚無結論"))
+        lines.append("")
     for stage in ("assisted_selection", "autonomous_selection"):
         if stage in report["blockers"]:
             lines.append("")
