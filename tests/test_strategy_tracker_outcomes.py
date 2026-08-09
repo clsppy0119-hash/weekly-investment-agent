@@ -109,6 +109,50 @@ def test_a_settled_outcome_is_never_revised():
         assert load_state(path)["recommendations"][0]["outcomes"]["5"] == settled
 
 
+def _pool():
+    """Everything eligible that day, including the name that got picked."""
+    quote = {"name": "測試", "price": 100.0}
+    other = {"name": "其他", "price": 50.0}
+    fund = {"revenueYoY": 10.0, "eps": 5.0, "roe": 15.0, "debtRatio": 30.0, "financialHistoryYears": 6}
+    return {"comprehensive": [(90, 85, "1111", quote, fund), (70, 85, "2222", other, fund)]}
+
+
+def test_the_pick_is_measured_against_the_pool_it_came_from():
+    """Which names were eligible depends on that day's scores; it must be stored."""
+    with TemporaryDirectory() as folder:
+        path = Path(folder) / "recommendations.json"
+        data = _quote_data(
+            _rows([("2026-01-02", 101.0), ("2026-01-03", 102.0), ("2026-01-05", 103.0)]),
+            _rows([("2026-01-02", 100.5), ("2026-01-03", 101.0), ("2026-01-05", 101.5)]),
+        )
+        # The other pool member falls while the pick rises.
+        data["history"]["2222"] = _rows([("2026-01-02", 49.0), ("2026-01-03", 48.0), ("2026-01-05", 47.0)])
+        data["quotes"]["2222"] = {"name": "其他", "price": 50.0}
+        record_recommendations("2026-01-01", "comprehensive", _ranked(), data, path, pools=_pool())
+
+        later = _quote_data(
+            _rows([("2026-01-06", 104.0), ("2026-01-07", 110.0), ("2026-01-08", 115.0)]),
+            _rows([("2026-01-06", 102.0), ("2026-01-07", 105.0), ("2026-01-08", 106.0)]),
+        )
+        later["history"]["2222"] = _rows([("2026-01-06", 46.0), ("2026-01-07", 45.0), ("2026-01-08", 44.0)])
+        state = record_recommendations("2026-01-08", "comprehensive", _ranked(), later, path, pools=_pool())
+
+        item = state["recommendations"][0]
+        assert state["pools"], "the eligible pool must be recorded, it cannot be rebuilt later"
+        five = item["outcomes"]["5"]
+        assert "poolExcessPct" in five
+        # The pick gained 10% while the pool average fell; the excess is large.
+        assert five["poolExcessPct"] > five["excessReturnPct"], "the pool fell further than 0050"
+
+
+def test_without_a_recorded_pool_the_comparison_is_marked_unavailable():
+    with TemporaryDirectory() as folder:
+        path = Path(folder) / "recommendations.json"
+        item = _outcome_after_window_slide(path)
+
+        assert item["outcomes"]["5"]["poolAvailable"] is False
+
+
 def test_summary_reports_each_horizon_separately():
     with TemporaryDirectory() as folder:
         path = Path(folder) / "recommendations.json"
