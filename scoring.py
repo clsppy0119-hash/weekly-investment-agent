@@ -36,22 +36,64 @@ def score_metric(value, thresholds, default=None):
 
 TREND_SLOPE = 2.5
 
+# Every strength factor rewarded more strength without limit, so the top of the
+# ranking was whatever had moved furthest that day. The Taiwan daily limit is
+# 10%, and the picks averaged +9.10% while the index heavyweights that actually
+# drive 0050 averaged +2.48% and were never selected once in 92 signal days.
+# The rule was buying the day's limit-up names, which is short-term reversal --
+# the peak of a speculative spike, not evidence of strength.
+#
+# These give each factor a single peak: moderate strength scores best, and both
+# weakness and over-extension score worse.
+#
+# TESTED AND REJECTED, 2026-08-09, two years of official data. The reasoning
+# above is sound in general and wrong here: penalising the extreme made results
+# worse, not better. Against 0050 the train window went from +0.98% per
+# rebalance to -1.58%, conclusively negative, and no split improved. Against the
+# eligible pool it fell from +1.83% to -0.63%. Whatever drives the daily limit
+# names in this sample continued rather than reversed.
+#
+# Kept opt-in and unused so the negative result is not re-discovered by someone
+# reasoning their way to the same idea. Do not enable without new evidence.
+CHANGE_PEAK_PCT = 2.5
+CHANGE_DECAY = 8.0
+TREND_PEAK_PCT = 8.0
+TREND_DECAY = 4.0
 
-def trend_score(price, average, continuous: bool):
+
+def trend_score(price, average, continuous: bool, reversal_aware: bool = False):
     """Position relative to a moving average.
 
     The shipped form is binary, which discards how far above the average a
     stock sits and makes scores tie in large blocks.  The continuous form keeps
-    the distance; it is opt-in until a backtest shows it is worth shipping.
+    the distance.  The reversal-aware form also stops treating an extended
+    stock as a strong one.
     """
     if not (number(price) and number(average)) or average <= 0:
         return None
     if not continuous:
         return 75 if price >= average else 35
-    return max(0.0, min(100.0, 50 + (price / average - 1) * 100 * TREND_SLOPE))
+    premium = (price / average - 1) * 100
+    if reversal_aware:
+        return max(0.0, min(100.0, 100 - TREND_DECAY * abs(premium - TREND_PEAK_PCT)))
+    return max(0.0, min(100.0, 50 + premium * TREND_SLOPE))
 
 
-def metrics(quote: dict, fund: dict, continuous_trend: bool = False) -> dict:
+def change_score(change, reversal_aware: bool = False):
+    """Today's move, as evidence about tomorrow.
+
+    The shipped form rises with the move and caps at 90, so anything near the
+    daily limit is indistinguishable from the best possible candidate.
+    """
+    if not number(change):
+        return None
+    if reversal_aware:
+        return max(15.0, min(90.0, 90 - CHANGE_DECAY * abs(change - CHANGE_PEAK_PCT)))
+    return min(90, 65 + change * 3) if change > 0 else max(15, 50 + change * 3)
+
+
+def metrics(quote: dict, fund: dict, continuous_trend: bool = False,
+            reversal_aware: bool = False) -> dict:
     """Per-factor scores, or ``None`` where the input is missing."""
     return {
         "revenue": score_metric(fund.get("revenueYoY"), [(20, 90), (10, 80), (0, 65), (-10, 45), (-999999, 20)]),
@@ -61,34 +103,35 @@ def metrics(quote: dict, fund: dict, continuous_trend: bool = False) -> dict:
         "pe": score_metric(-fund["pe"], [(-12, 85), (-20, 75), (-30, 60), (-45, 40), (-999999, 20)]) if number(fund.get("pe")) and fund["pe"] > 0 else None,
         "pb": score_metric(-fund["pb"], [(-1.5, 85), (-3, 70), (-6, 50), (-999999, 30)]) if number(fund.get("pb")) and fund["pb"] > 0 else None,
         "dividend": (85 if 3 <= fund["dividendYield"] <= 8 else 45 if fund["dividendYield"] > 10 else 65 if fund["dividendYield"] >= 2 else 35) if number(fund.get("dividendYield")) else None,
-        "trend20": trend_score(quote.get("price"), quote.get("ma20"), continuous_trend),
-        "trend5": trend_score(quote.get("price"), quote.get("ma5"), continuous_trend),
-        "change": min(90, 65 + quote["change"] * 3) if number(quote.get("change")) and quote["change"] > 0 else max(15, 50 + quote["change"] * 3) if number(quote.get("change")) else None,
+        "trend20": trend_score(quote.get("price"), quote.get("ma20"), continuous_trend, reversal_aware),
+        "trend5": trend_score(quote.get("price"), quote.get("ma5"), continuous_trend, reversal_aware),
+        "change": change_score(quote.get("change"), reversal_aware),
     }
 
 
 def score_quote(quote: dict, fund: dict, style: str, weights: dict | None = None,
-                continuous_trend: bool = False) -> tuple[int, int]:
+                continuous_trend: bool = False, reversal_aware: bool = False) -> tuple[int, int]:
     """Weighted score and the weight actually backed by present data.
 
     ``weights`` overrides the style's table, which lets research measure one
     factor's contribution without editing the shipped weights.
     """
     weights = WEIGHTS[style] if weights is None else weights
-    metric = metrics(quote, fund, continuous_trend)
+    metric = metrics(quote, fund, continuous_trend, reversal_aware)
     available_weight = sum(weight for key, weight in weights.items() if number(metric[key]))
     weighted = sum(metric[key] * weight for key, weight in weights.items() if number(metric[key]))
     return (round(weighted / available_weight) if available_weight else 0), available_weight
 
 
 def stock_score(code, style, quotes, fundamentals, weights: dict | None = None,
-                continuous_trend: bool = False):
-    return score_quote(quotes.get(code, {}), fundamentals.get(code, {}), style, weights, continuous_trend)
+                continuous_trend: bool = False, reversal_aware: bool = False):
+    return score_quote(quotes.get(code, {}), fundamentals.get(code, {}), style, weights,
+                       continuous_trend, reversal_aware)
 
 
 def candidates(style, quotes, fundamentals, picks: int | None = DEFAULT_PICKS,
                weights: dict | None = None, minimum_coverage: int | None = None,
-               continuous_trend: bool = False):
+               continuous_trend: bool = False, reversal_aware: bool = False):
     """Ranked eligible candidates; ``picks=None`` returns the whole pool."""
     ranked = []
     if minimum_coverage is None:
@@ -97,7 +140,8 @@ def candidates(style, quotes, fundamentals, picks: int | None = DEFAULT_PICKS,
         quote = quotes.get(code, {})
         if not (code.isdigit() and len(code) == 4 and number(quote.get("price"))):
             continue
-        score, coverage = stock_score(code, style, quotes, fundamentals, weights, continuous_trend)
+        score, coverage = stock_score(code, style, quotes, fundamentals, weights,
+                                      continuous_trend, reversal_aware)
         if score >= MINIMUM_SCORE and coverage >= minimum_coverage:
             ranked.append((score, coverage, code, quote, fund))
     # Scores tie constantly -- the trend factors are binary and `change` is

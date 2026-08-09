@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from scoring import metrics, trend_score
+from scoring import change_score, metrics, trend_score
 
 
 def test_binary_form_is_unchanged():
@@ -42,6 +42,27 @@ def test_missing_or_invalid_inputs_score_nothing():
         assert trend_score(None, 100, continuous) is None
         assert trend_score(100, None, continuous) is None
         assert trend_score(100, 0, continuous) is None
+
+
+def test_the_shipped_change_factor_treats_a_limit_move_as_the_best_case():
+    """Why the pool never contained an index heavyweight.
+
+    The Taiwan daily limit is 10%. The shipped factor rises with the move and
+    caps at 90, so anything past +8.3% is indistinguishable from the best
+    possible candidate, and the heavyweights that drive 0050 -- which do not
+    move that far in a day -- can never reach the top of the ranking.
+    """
+    assert change_score(9.9) == change_score(8.4) == 90
+    assert change_score(4.0) < change_score(9.9), "more is always better, without limit"
+
+
+def test_the_reversal_form_is_available_but_not_the_default():
+    """Tested on two years and rejected; see the note in scoring.py."""
+    assert change_score(9.9, reversal_aware=True) < change_score(2.5, reversal_aware=True)
+    assert trend_score(1.30, 1.0, True, reversal_aware=True) < trend_score(1.08, 1.0, True, reversal_aware=True)
+    # The default path must be untouched by it.
+    assert change_score(9.9) == 90
+    assert metrics({"price": 130.0, "ma20": 100.0, "ma5": 100.0}, {})["trend20"] == 75
 
 
 def test_metrics_defaults_to_the_shipped_binary_form():
