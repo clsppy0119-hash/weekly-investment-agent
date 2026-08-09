@@ -37,7 +37,9 @@ on:
           - mops-fundamentals
           - full-market-fundamentals
   schedule:
-    - cron: "*/30 * * * *"
+    # Skips 00:00-01:00 UTC so the daily report has the hourly FinMind
+    # allowance to itself; see backtest-data.yml.
+    - cron: "0,30 1-23 * * *"
 
 concurrency:
   group: data-access-market-cache

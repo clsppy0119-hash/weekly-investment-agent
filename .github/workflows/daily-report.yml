@@ -26,7 +26,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      # A provider outage or an exhausted quota used to abort the job at this
+      # first step, so the parts that need no provider at all -- prices, volume,
+      # news, and healing the recommendation trails -- were lost with it. The
+      # status file records the failure and the report states it; the evidence
+      # contract already refuses candidates whose fundamentals are unlabelled,
+      # so degrading here cannot produce a recommendation it should not.
       - name: Verify licensed FinMind data access
+        continue-on-error: true
         run: python data_access.py --provider finmind
       - name: Build private evidence-cache key
         id: evidence-cache-key
@@ -44,8 +51,10 @@ jobs:
       - name: Build non-persistent candidate preview
         run: REPORT_MODE=comprehensive REPORT_PHASE=preview REPORT_OUTPUT=data/candidate-preview.txt CANDIDATE_MANIFEST=data/candidate-manifest.json python daily_report.py
       - name: Enrich semiconductor fundamentals
+        continue-on-error: true
         run: python finmind_fundamentals.py --candidate-manifest data/candidate-manifest.json
       - name: Verify candidate-pool corporate actions
+        continue-on-error: true
         run: python finmind_actions.py --candidate-manifest data/candidate-manifest.json --output backtest_data/candidate_actions.json
       # quotes.json only carries a few days, so a run that fails for longer than
       # that leaves a permanent hole in every open recommendation's trail.

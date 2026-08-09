@@ -5,7 +5,9 @@ on:
     # One bounded batch per hour.  Fifty companies need three FinMind
     # requests each, which remains below the documented 300-request hourly
     # limit while allowing the backfill to finish in a few cycles.
-    - cron: "7 * * * *"
+    # Skips 00:00-01:00 UTC so the daily report has the hourly FinMind
+    # allowance to itself; see backtest-data.yml.
+    - cron: "7 1-23 * * *"
   workflow_dispatch:
 
 permissions:

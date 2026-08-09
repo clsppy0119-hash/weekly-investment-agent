@@ -2,7 +2,10 @@ name: Cache total-return backtest data
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    # Skips 00:00-01:00 UTC. A single run may spend the whole 300-request
+    # hourly FinMind allowance, and the daily report needs about 185 of it;
+    # sharing the hour is what makes that report fail outright.
+    - cron: "0,30 1-23 * * *"
   workflow_dispatch:
     inputs:
       codes:
