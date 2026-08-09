@@ -2,6 +2,13 @@ name: Daily report and Telegram
 
 on:
   workflow_dispatch:
+    inputs:
+      record:
+        description: >-
+          記錄推薦到追蹤紀錄。手動執行預設關閉：在非交易日試跑會寫入一筆
+          市場沒有開盤的決策日，污染前瞻紀錄。要正式補跑才開啟。
+        type: boolean
+        default: false
   schedule:
     # 00:00 UTC = 台北時間平日 08:00
     - cron: "0 0 * * 1-5"
@@ -68,8 +75,13 @@ jobs:
       - name: Certify the point-in-time universe
         continue-on-error: true
         run: python point_in_time_universe.py --candidate-manifest data/candidate-manifest.json
+      # A scheduled run always records. A manual run only does so on request,
+      # so trying the pipeline on a non-trading day cannot enter a decision
+      # dated to a session that never happened.
       - name: Build one verified report and decision snapshot
-        run: REPORT_MODE=comprehensive REPORT_PHASE=final CANDIDATE_MANIFEST=data/candidate-manifest.json python daily_report.py
+        env:
+          REPORT_PHASE: ${{ (github.event_name == 'schedule' || inputs.record) && 'final' || 'preview' }}
+        run: REPORT_MODE=comprehensive CANDIDATE_MANIFEST=data/candidate-manifest.json python daily_report.py
       - name: Save private market-evidence cache
         if: steps.restore-market-evidence.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
