@@ -31,19 +31,21 @@
       "sourceDataset": "TaiwanStockFinancialStatements,TaiwanStockBalanceSheet,TaiwanStockInfo",
       "dataset": "TaiwanStockFinancialStatements,TaiwanStockBalanceSheet,TaiwanStockInfo",
       "endpoint": "https://api.finmindtrade.com/api/v4/data",
-      "scopeHash": "f2b4591f93979cb4af4a02bad2051dc9d1d1b370a5052a72a4c5b7c17a544a80",
+      "scopeHash": "1e4a8f715ee4ec7bc72d65ae2b87726581df0bdd3958252c58e27addbc6f9709",
       "observationTime": null,
       "effectiveDate": "2026-06-30",
-      "availableAt": null,
-      "retrievedAt": "2026-08-09T07:29:23.591710+00:00",
-      "ingestedAt": "2026-08-09T07:29:23.591710+00:00",
+      "availableAt": "2026-08-09",
+      "retrievedAt": "2026-08-09T07:37:13.097228+00:00",
+      "ingestedAt": "2026-08-09T07:37:13.097228+00:00",
       "timezone": "UTC",
-      "contentHash": "75bd9bf3a6a7c30c727267a50c456647976101070a3b167ffb3c8f83e8f60abb",
-      "schemaHash": "a7db3662dbc2ce2b859adbdd38602f9fc771f7e1d900066763f5beb4d3479c4d",
+      "contentHash": "99a3ab0a812f294fdfdf837e43a4b136011db0a3649005e81b8ceca9b0f4f7ec",
+      "schemaHash": "632df5dbb13a2ab10ad3fcbb78a3a902f78d841e4c07781618a03596859f81dd",
       "status": "success",
-      "quality": "as_of_missing",
+      "quality": "conflict_unresolved",
       "conflictStatus": "unknown",
-      "visibility": "private_cache"
+      "visibility": "private_cache",
+      "availableAtBasis": "public no later than this: the earlier of the statutory TWSE filing deadline for the reported period and the date the rows were held",
+      "statutoryDeadline": "2026-08-14"
     }
   },
   "quotes": {
@@ -78828,7 +78830,15 @@
       "revenueYoY": 19.391396155029195,
       "cumulativeRevenueYoY": 9.865895481159578,
       "revenuePeriod": "11506",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "eps": -0.68,
+      "roe": -2.7,
+      "debtRatio": 31.0,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:36:52.409405+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2337": {
       "pe": 28.79,
@@ -78839,15 +78849,15 @@
       "revenueYoY": 216.09461825395996,
       "cumulativeRevenueYoY": 128.75502117306723,
       "revenuePeriod": "11506",
-      "eps": 4.82,
-      "financialPeriod": "115Q2",
-      "roe": 30.72158164859887,
-      "debtRatio": 35.77321276616327,
+      "eps": 4.19,
+      "financialPeriod": "2026-06-30",
+      "roe": 16.01,
+      "debtRatio": 35.77,
       "cashFlow": null,
-      "financialSource": "TWSE/TPEx",
-      "industry": "半導體業",
+      "financialSource": "FinMind 授權基本面資料",
+      "industry": "電子工業",
       "financialHistoryYears": 6,
-      "financialUpdatedAt": "2026-08-02T15:15:31.622663+00:00",
+      "financialUpdatedAt": "2026-08-09T07:36:52.413731+00:00",
       "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2338": {
@@ -78859,14 +78869,14 @@
       "revenueYoY": 0.08416664208528755,
       "cumulativeRevenueYoY": -5.14144361677994,
       "revenuePeriod": "11506",
-      "industry": "半導體業",
+      "industry": "電子工業",
       "eps": -3.27,
       "roe": -19.78,
       "debtRatio": 66.11,
       "financialPeriod": "2026-03-31",
       "financialHistoryYears": 6,
-      "financialSource": "FinMind 公開基本面資料",
-      "financialUpdatedAt": "2026-08-02T15:15:31.725575+00:00",
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:36:52.581415+00:00",
       "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2340": {
@@ -78878,14 +78888,14 @@
       "revenueYoY": 16.342094806930515,
       "cumulativeRevenueYoY": 2.167343922289935,
       "revenuePeriod": "11506",
-      "industry": "半導體業",
-      "eps": -0.93,
-      "roe": -13.69720910190731,
-      "debtRatio": 54.93421651690521,
-      "financialPeriod": "115Q2",
+      "industry": "電子工業",
+      "eps": -2.16,
+      "roe": -15.07,
+      "debtRatio": 54.93,
+      "financialPeriod": "2026-06-30",
       "financialHistoryYears": 6,
-      "financialSource": "TWSE/TPEx",
-      "financialUpdatedAt": "2026-08-02T15:15:33.136454+00:00",
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:36:54.598885+00:00",
       "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2342": {
@@ -78916,14 +78926,14 @@
       "revenueYoY": 189.87676071204797,
       "cumulativeRevenueYoY": 139.19764936720955,
       "revenuePeriod": "11506",
-      "industry": "半導體業",
-      "eps": 7.65,
-      "roe": 39.54832232841247,
-      "debtRatio": 40.77740873757521,
-      "financialPeriod": "115Q2",
+      "industry": "電子工業",
+      "eps": 9.06,
+      "roe": 29.95,
+      "debtRatio": 40.78,
+      "financialPeriod": "2026-06-30",
       "financialHistoryYears": 6,
-      "financialSource": "TWSE/TPEx",
-      "financialUpdatedAt": "2026-08-02T15:52:22.732551+00:00",
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:36:54.615151+00:00",
       "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2345": {
@@ -78936,11 +78946,14 @@
       "cumulativeRevenueYoY": 60.28045047959245,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "115Q2",
-      "financialSource": "TWSE/TPEx",
-      "eps": 34.7,
-      "roe": 56.07464932124716,
-      "debtRatio": 65.32427085715298
+      "financialPeriod": "2026-06-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 63.65,
+      "roe": 65.58,
+      "debtRatio": 65.32,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-09T07:36:54.868660+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2347": {
       "pe": 12.78,
@@ -78952,11 +78965,14 @@
       "cumulativeRevenueYoY": 77.39100370968649,
       "revenuePeriod": "11506",
       "industry": "電子通路業",
-      "financialPeriod": "115Q2",
-      "financialSource": "TWSE/TPEx",
-      "eps": 4.12,
-      "roe": 15.976964196617354,
-      "debtRatio": 70.32763422723868
+      "financialPeriod": "2026-06-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 7.31,
+      "roe": 16.46,
+      "debtRatio": 70.33,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-09T07:36:56.812611+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2348": {
       "pe": 17.2,
@@ -78978,7 +78994,15 @@
       "revenueYoY": -15.785439111981717,
       "cumulativeRevenueYoY": -5.463504269739285,
       "revenuePeriod": "11506",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "eps": -0.35,
+      "roe": -2.02,
+      "debtRatio": 46.32,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:36:56.780562+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2351": {
       "pe": 75.22,
@@ -79009,11 +79033,14 @@
       "cumulativeRevenueYoY": 1.027010066226975,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "115Q2",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.58,
-      "roe": 3.9887457204265204,
-      "debtRatio": 69.10887126631071
+      "financialPeriod": "2026-06-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 0.78,
+      "roe": 2.88,
+      "debtRatio": 69.11,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-09T07:36:57.175437+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2353": {
       "pe": 18.01,
@@ -79025,11 +79052,14 @@
       "cumulativeRevenueYoY": 23.349259169842632,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "115Q2",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.96,
-      "roe": 8.287283489124855,
-      "debtRatio": 67.67077971851492
+      "financialPeriod": "2026-06-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 1.68,
+      "roe": 9.0,
+      "debtRatio": 67.67,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-09T07:36:58.989005+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2354": {
       "pe": 26.19,
@@ -79040,12 +79070,15 @@
       "revenueYoY": 10.657353496661475,
       "cumulativeRevenueYoY": -21.902523102560878,
       "revenuePeriod": "11506",
-      "industry": "其他電子業",
-      "financialPeriod": "115Q2",
-      "financialSource": "TWSE/TPEx",
-      "eps": 1.1,
-      "roe": 2.691411452450782,
-      "debtRatio": 36.28717073777652
+      "industry": "電子工業",
+      "financialPeriod": "2026-06-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 2.36,
+      "roe": 3.04,
+      "debtRatio": 36.29,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-09T07:36:59.001398+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2355": {
       "pe": 23.93,
@@ -79056,7 +79089,15 @@
       "revenueYoY": 4.437254678551956,
       "cumulativeRevenueYoY": 4.612874779763816,
       "revenuePeriod": "11506",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "eps": 1.7,
+      "roe": 3.8,
+      "debtRatio": 27.67,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:36:59.262370+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2356": {
       "pe": 24.33,
@@ -79067,7 +79108,15 @@
       "revenueYoY": 61.617467920607254,
       "cumulativeRevenueYoY": 36.83107001078034,
       "revenuePeriod": "11506",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "eps": 2.62,
+      "roe": 14.12,
+      "debtRatio": 80.71,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:01.078999+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2357": {
       "pe": 14.6,
@@ -79078,7 +79127,15 @@
       "revenueYoY": 55.634298936990604,
       "cumulativeRevenueYoY": 38.84510089773063,
       "revenuePeriod": "11506",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "eps": 55.96,
+      "roe": 14.57,
+      "debtRatio": 52.83,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:01.250664+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2359": {
       "pe": 73.97,
@@ -79089,7 +79146,15 @@
       "revenueYoY": 35.56207073774704,
       "cumulativeRevenueYoY": 4.117504050425805,
       "revenuePeriod": "11506",
-      "industry": "電子工業"
+      "industry": "電子工業",
+      "eps": 1.93,
+      "roe": 5.98,
+      "debtRatio": 40.72,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:01.585531+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2360": {
       "pe": 51.79,
@@ -79101,11 +79166,14 @@
       "cumulativeRevenueYoY": 90.60268702714609,
       "revenuePeriod": "11506",
       "industry": "電子工業",
-      "financialPeriod": "115Q2",
-      "financialSource": "TWSE/TPEx",
-      "eps": 21.27,
-      "roe": 54.451913824869536,
-      "debtRatio": 47.08150733733756
+      "financialPeriod": "2026-06-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 39.29,
+      "roe": 58.22,
+      "debtRatio": 47.08,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-09T07:37:03.330532+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2362": {
       "pe": 8.31,
@@ -79117,11 +79185,14 @@
       "cumulativeRevenueYoY": 17.640110908914885,
       "revenuePeriod": "11506",
       "industry": "電腦及週邊設備業",
-      "financialPeriod": "115Q2",
-      "financialSource": "TWSE/TPEx",
-      "eps": 4.05,
-      "roe": 9.97525339878152,
-      "debtRatio": 57.37123192715693
+      "financialPeriod": "2026-06-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 6.07,
+      "roe": 8.24,
+      "debtRatio": 57.37,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-09T07:37:03.472222+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2363": {
       "pe": 31.59,
@@ -79132,7 +79203,15 @@
       "revenueYoY": 74.79882516895688,
       "cumulativeRevenueYoY": 99.90714739063372,
       "revenuePeriod": "11506",
-      "industry": "半導體業"
+      "industry": "電子工業",
+      "eps": 1.7,
+      "roe": 4.63,
+      "debtRatio": 9.18,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:03.680531+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2364": {
       "pe": 18.41,
@@ -79143,7 +79222,15 @@
       "revenueYoY": 60.06049712857832,
       "cumulativeRevenueYoY": 11.96401904781796,
       "revenuePeriod": "11506",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "eps": 3.98,
+      "roe": 29.02,
+      "debtRatio": 57.17,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:05.339238+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2365": {
       "pe": 77.56,
@@ -79154,7 +79241,15 @@
       "revenueYoY": -17.28499244673647,
       "cumulativeRevenueYoY": 4.568898518640635,
       "revenuePeriod": "11506",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "eps": 0.4,
+      "roe": 2.69,
+      "debtRatio": 12.1,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:05.650420+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2367": {
       "pe": null,
@@ -79165,7 +79260,15 @@
       "revenueYoY": -4.141127598921051,
       "cumulativeRevenueYoY": -7.367706595073344,
       "revenuePeriod": "11506",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "eps": -0.33,
+      "roe": -1.8,
+      "debtRatio": 50.74,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:05.694223+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2368": {
       "pe": 44.33,
@@ -79176,7 +79279,15 @@
       "revenueYoY": 78.22292794927401,
       "cumulativeRevenueYoY": 68.740667371717,
       "revenuePeriod": "11506",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "eps": 22.7,
+      "roe": 41.06,
+      "debtRatio": 58.63,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:07.414564+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2369": {
       "pe": null,
@@ -79187,7 +79298,15 @@
       "revenueYoY": 36.51642739564834,
       "cumulativeRevenueYoY": 37.29941838463464,
       "revenuePeriod": "11506",
-      "industry": "半導體業"
+      "industry": "電子工業",
+      "eps": -0.65,
+      "roe": -5.09,
+      "debtRatio": 34.01,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:07.689082+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2371": {
       "pe": null,
@@ -79209,7 +79328,15 @@
       "revenueYoY": 4.909013714356194,
       "cumulativeRevenueYoY": -2.4699432202650837,
       "revenuePeriod": "11506",
-      "industry": "其他電子業"
+      "industry": "其他電子業",
+      "eps": 3.87,
+      "roe": 11.12,
+      "debtRatio": 52.68,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:08.868038+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2374": {
       "pe": 25.18,
@@ -79220,12 +79347,15 @@
       "revenueYoY": 18.967126777593894,
       "cumulativeRevenueYoY": 51.372858958918776,
       "revenuePeriod": "11506",
-      "industry": "光電業",
-      "financialPeriod": "115Q2",
-      "financialSource": "TWSE/TPEx",
-      "eps": 1.55,
-      "roe": 11.181725969403235,
-      "debtRatio": 37.88859911565547
+      "industry": "電子工業",
+      "financialPeriod": "2026-06-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 3.36,
+      "roe": 13.54,
+      "debtRatio": 37.89,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-08-09T07:37:09.589771+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2375": {
       "pe": 35.71,
@@ -79236,7 +79366,15 @@
       "revenueYoY": 18.38623963798617,
       "cumulativeRevenueYoY": 8.615718988948071,
       "revenuePeriod": "11506",
-      "industry": "電子零組件業"
+      "industry": "電子零組件業",
+      "eps": 3.28,
+      "roe": 3.61,
+      "debtRatio": 33.33,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:09.894989+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2376": {
       "pe": 16.07,
@@ -79247,7 +79385,15 @@
       "revenueYoY": 68.55140790315762,
       "cumulativeRevenueYoY": 48.361520425756964,
       "revenuePeriod": "11506",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "eps": 21.4,
+      "roe": 24.72,
+      "debtRatio": 72.95,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:11.026787+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2377": {
       "pe": 15.99,
@@ -79258,7 +79404,15 @@
       "revenueYoY": -9.227831503970776,
       "cumulativeRevenueYoY": -7.563687334218828,
       "revenuePeriod": "11506",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "eps": 9.57,
+      "roe": 15.4,
+      "debtRatio": 53.89,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:11.585245+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2379": {
       "pe": 27.0,
@@ -79269,7 +79423,15 @@
       "revenueYoY": 20.600599623892947,
       "cumulativeRevenueYoY": 10.515910995929755,
       "revenuePeriod": "11506",
-      "industry": "半導體業"
+      "industry": "電子工業",
+      "eps": 27.93,
+      "roe": 31.62,
+      "debtRatio": 68.4,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:12.035565+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2380": {
       "pe": 18.1,
@@ -79280,7 +79442,15 @@
       "revenueYoY": -8.505316080112092,
       "cumulativeRevenueYoY": 8.339582875633488,
       "revenuePeriod": "11506",
-      "industry": "電腦及週邊設備業"
+      "industry": "電腦及週邊設備業",
+      "eps": 1.1,
+      "roe": 12.63,
+      "debtRatio": 75.31,
+      "financialPeriod": "2026-03-31",
+      "financialHistoryYears": 6,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-08-09T07:37:13.092704+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "2382": {
       "pe": 14.98,
