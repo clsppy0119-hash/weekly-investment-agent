@@ -69,18 +69,20 @@ def assess(state: dict, advice_gate: dict) -> dict:
 
     for stage in ("assisted_selection", "autonomous_selection"):
         horizon, needed = REQUIRED_SETTLED[stage]
-        # A shortlist earns trust by beating the pool it was drawn from -- that
-        # is the claim it makes. Replacing stock picking is a different claim:
-        # it has to beat the passive alternative the user would otherwise hold.
-        stats = pools[str(horizon)] if stage == "assisted_selection" else horizons[str(horizon)]
-        against = "對合格池" if stage == "assisted_selection" else "對 0050 "
         missing = []
-        if stats["settled"] < needed:
-            missing.append(f"{horizon} 日{against}已結算 {stats['settled']}/{needed} 個決策日")
-        elif not stats.get("conclusive"):
-            missing.append(f"{horizon} 日{against}超額報酬信賴區間仍橫跨 0")
-        elif stats.get("meanExcessPerRebalance", 0) <= 0:
-            missing.append(f"{horizon} 日{against}超額報酬顯著為負")
+        # 0050 is the binding one: it is what the user would otherwise hold, so
+        # a shortlist that loses to it is worse than doing nothing however well
+        # it ranks. The pool comes second and stops a win being credited to
+        # skill when it was the universe's tilt -- that kind of win does not
+        # repeat. Both have to hold.
+        for stats, against in ((horizons[str(horizon)], "對 0050 "),
+                               (pools[str(horizon)], "對合格池")):
+            if stats["settled"] < needed:
+                missing.append(f"{horizon} 日{against}已結算 {stats['settled']}/{needed} 個決策日")
+            elif not stats.get("conclusive"):
+                missing.append(f"{horizon} 日{against}超額報酬信賴區間仍橫跨 0")
+            elif stats.get("meanExcessPerRebalance", 0) <= 0:
+                missing.append(f"{horizon} 日{against}超額報酬顯著為負")
         if stage == "autonomous_selection" and not advice_gate.get("adviceEnabled"):
             missing.append("investment-advice-gate 尚未開啟")
         if missing:
@@ -97,8 +99,9 @@ def assess(state: dict, advice_gate: dict) -> dict:
         "horizons": horizons,
         "versusEligiblePool": pools,
         "blockers": blockers,
-        "note": "輔助選股以『對合格池超額』判定，因為那才是清單本身的主張；"
-                "自主選股以『對 0050 超額』判定，因為那是使用者原本就能持有的替代方案。",
+        "note": "每一階都要同時跑贏 0050 與合格池。跑贏 0050 決定這套系統值不值得用——"
+                "不用它的替代方案就是直接買 0050；跑贏合格池則確認贏的原因是選股能力，"
+                "而不是候選池剛好偏向當時的強勢族群，後者不會重複。",
     }
 
 
