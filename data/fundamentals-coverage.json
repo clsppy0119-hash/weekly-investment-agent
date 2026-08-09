@@ -2,47 +2,59 @@
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
   "credentialMode": "authenticated",
-  "updatedAt": "2026-08-07T05:54:11.884041+00:00",
-  "activeStage": "半導體",
-  "universeCodes": 2778,
-  "currentStageCodes": 161,
+  "updatedAt": "2026-08-09T07:29:23.590448+00:00",
+  "activeStage": "電子其他",
+  "universeCodes": 2779,
+  "currentStageCodes": 924,
   "queriedCodes": [
-    "7887",
-    "7894",
-    "7898",
-    "7899",
-    "7909",
-    "7913",
-    "7918",
-    "8024",
-    "8040",
-    "8054",
-    "8086",
-    "8088",
-    "8091",
-    "8098",
-    "8102",
-    "8110",
-    "8150",
-    "8227",
-    "8277",
-    "8299",
-    "8383"
+    "2451",
+    "6292",
+    "1336",
+    "1471",
+    "1569",
+    "1582",
+    "1785",
+    "1815",
+    "2059",
+    "2252",
+    "2255",
+    "2256",
+    "2301",
+    "2302",
+    "2303",
+    "2305",
+    "2308",
+    "2312",
+    "2313",
+    "2314",
+    "2316",
+    "2317",
+    "2321",
+    "2323",
+    "2324",
+    "2327",
+    "2328",
+    "2329",
+    "2330",
+    "2331"
   ],
-  "priorityCodes": [],
-  "successfulCodes": 21,
-  "enrichedCodes": 347,
-  "remainingCodes": 2431,
+  "priorityCodes": [
+    "2451",
+    "6292"
+  ],
+  "successfulCodes": 30,
+  "enrichedCodes": 591,
+  "remainingCodes": 2188,
   "stageCoverage": {
     "半導體": {
-      "total": 161,
+      "total": 163,
       "reviewed": 171,
       "remaining": 0
     },
     "電子其他": {
-      "total": 926,
-      "reviewed": 0,
-      "remaining": 926
+      "total": 924,
+      "reviewed": 30,
+      "remaining": 894
     },
     "金融": {
       "total": 63,
@@ -50,9 +62,9 @@
       "remaining": 63
     },
     "傳產與其他": {
-      "total": 1414,
+      "total": 1415,
       "reviewed": 0,
-      "remaining": 1414
+      "remaining": 1415
     },
     "興櫃": {
       "total": 214,
@@ -62,9 +74,9 @@
   },
   "failures": {},
   "metrics": {
-    "eps": 350,
-    "roe": 347,
-    "debtRatio": 367
+    "eps": 594,
+    "roe": 591,
+    "debtRatio": 611
   },
-  "fiveYearHistory": 150
+  "fiveYearHistory": 175
 }
