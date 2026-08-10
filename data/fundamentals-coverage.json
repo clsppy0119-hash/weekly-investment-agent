@@ -2,46 +2,46 @@
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
   "credentialMode": "authenticated",
-  "updatedAt": "2026-08-09T07:37:13.095924+00:00",
+  "updatedAt": "2026-08-10T05:11:37.807803+00:00",
   "activeStage": "電子其他",
   "universeCodes": 2779,
   "currentStageCodes": 924,
   "queriedCodes": [
-    "2332",
-    "2337",
-    "2338",
-    "2340",
-    "2344",
-    "2345",
-    "2347",
-    "2349",
-    "2352",
-    "2353",
-    "2354",
-    "2355",
-    "2356",
-    "2357",
-    "2359",
-    "2360",
-    "2362",
-    "2363",
-    "2364",
-    "2365",
-    "2367",
-    "2368",
-    "2369",
-    "2373",
-    "2374",
-    "2375",
-    "2376",
-    "2377",
-    "2379",
-    "2380"
+    "2382",
+    "2383",
+    "2385",
+    "2387",
+    "2388",
+    "2390",
+    "2392",
+    "2393",
+    "2395",
+    "2397",
+    "2399",
+    "2401",
+    "2402",
+    "2404",
+    "2405",
+    "2406",
+    "2408",
+    "2409",
+    "2412",
+    "2413",
+    "2414",
+    "2415",
+    "2417",
+    "2419",
+    "2420",
+    "2421",
+    "2423",
+    "2424",
+    "2425",
+    "2426"
   ],
   "priorityCodes": [],
   "successfulCodes": 30,
-  "enrichedCodes": 609,
-  "remainingCodes": 2170,
+  "enrichedCodes": 631,
+  "remainingCodes": 2148,
   "stageCoverage": {
     "半導體": {
       "total": 163,
@@ -50,8 +50,8 @@
     },
     "電子其他": {
       "total": 924,
-      "reviewed": 60,
-      "remaining": 864
+      "reviewed": 90,
+      "remaining": 834
     },
     "金融": {
       "total": 63,
@@ -70,10 +70,66 @@
     }
   },
   "failures": {},
-  "metrics": {
-    "eps": 612,
-    "roe": 609,
-    "debtRatio": 629
+  "sourceDisagreements": {
+    "2383": {
+      "eps": {
+        "openData": 42.46,
+        "finmind": 64.08
+      }
+    },
+    "2385": {
+      "eps": {
+        "openData": 5.06,
+        "finmind": 8.97
+      }
+    },
+    "2387": {
+      "eps": {
+        "openData": 0.66,
+        "finmind": 2.95
+      }
+    },
+    "2395": {
+      "eps": {
+        "openData": 9.05,
+        "finmind": 15.83
+      }
+    },
+    "2397": {
+      "eps": {
+        "openData": 2.05,
+        "finmind": 2.72
+      }
+    },
+    "2408": {
+      "eps": {
+        "openData": 23.38,
+        "finmind": 27.15
+      }
+    },
+    "2414": {
+      "eps": {
+        "openData": 2.53,
+        "finmind": 4.1
+      }
+    },
+    "2419": {
+      "eps": {
+        "openData": 0.14,
+        "finmind": 0.04
+      }
+    },
+    "2421": {
+      "eps": {
+        "openData": 4.78,
+        "finmind": 9.62
+      }
+    }
   },
-  "fiveYearHistory": 201
+  "metrics": {
+    "eps": 634,
+    "roe": 631,
+    "debtRatio": 651
+  },
+  "fiveYearHistory": 231
 }
