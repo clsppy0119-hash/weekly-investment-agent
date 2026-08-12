@@ -34,6 +34,30 @@ class DecisionOutcomeMembershipProbeTests(unittest.TestCase):
             self.assertIn(revoke, sql)
             self.assertLess(sql.index(revoke), catalog)
 
+    def test_probe_uses_sql_coalesce_and_explicit_option_allowlist(self):
+        sql = probe.build(enabled=True)["sql"]
+        lowered = sql.lower()
+        self.assertIn("select coalesce(", lowered)
+        self.assertNotIn("pg_catalog.coalesce", lowered)
+        self.assertNotIn("to_jsonb(m)", lowered)
+        expected = (
+            ("adminOption", "admin_option"),
+            ("inheritOption", "inherit_option"),
+            ("setOption", "set_option"),
+        )
+        for key, source in expected:
+            self.assertEqual(sql.count(f"'{key}', m.{source}"), 1)
+        for forbidden_key in ("'oid'", "'roleid'", "'member'", "'grantor'"):
+            self.assertNotIn(forbidden_key, lowered)
+
+    def test_empty_membership_has_deterministic_empty_json_array(self):
+        sql = probe.build(enabled=True)["sql"].lower()
+        self.assertIn("), '[]'::jsonb", sql)
+        self.assertIn(
+            "order by granted_role.rolname, member_role.rolname, grantor_role.rolname",
+            sql,
+        )
+
     def test_probe_has_no_migration_rpc_schema_table_or_data_access(self):
         sql = probe.build(enabled=True)["sql"].lower()
         for forbidden in ("create schema", "create table", "create function", "insert into",
@@ -47,6 +71,18 @@ class DecisionOutcomeMembershipProbeTests(unittest.TestCase):
             sql.replace("rollback;", "commit;"),
             sql.replace("revoke decision_outcome_owner from postgres;", ""),
             sql.replace("from pg_catalog.pg_auth_members", "from public.secret_rows"),
+            sql.replace("select coalesce(", "select pg_catalog.coalesce("),
+            sql.replace("'adminOption', m.admin_option", "'oid', m.admin_option"),
+            sql.replace("'inheritOption', m.inherit_option", "'inheritOption', null"),
+            sql.replace("'setOption', m.set_option", "'set_option', m.set_option"),
+            sql.replace(
+                "'options', pg_catalog.jsonb_build_object(\n"
+                "          'adminOption', m.admin_option,\n"
+                "          'inheritOption', m.inherit_option,\n"
+                "          'setOption', m.set_option\n"
+                "        )",
+                "'options', pg_catalog.to_jsonb(m)",
+            ),
             sql + "\ncreate table x(y int);",
         ):
             self.assertFalse(probe.validate(changed, enabled=True)["valid"])
