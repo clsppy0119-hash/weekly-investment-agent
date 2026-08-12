@@ -5,6 +5,8 @@ on:
     paths:
       - "candidate_manifest.py"
       - "daily_report.py"
+      - "data_contract.py"
+      - "scoring.py"
       - "finmind_actions.py"
       - "finmind_fundamentals.py"
       - "strategy_tracker.py"
@@ -31,7 +33,12 @@ on:
       - "walk_forward.py"
       - "weekly_walk_forward.py"
       - "market_membership_snapshots.py"
+      - "freeze_lineage_summary.py"
+      - "lineage_replay.py"
+      - "point_in_time_fundamentals.py"
+      - "strategy_backtest.py"
       - "investment_advice_gate.py"
+      - "production_strategy_validation_preflight.py"
       - "decision_outcome_export.py"
       - "staging_preflight_result.py"
       - "supabase-decision-outcome-shadow-v1.sql"
@@ -58,7 +65,7 @@ jobs:
           lookup-only: "true"
       - name: Compile changed Python modules
         run: >-
-          python -m py_compile candidate_manifest.py daily_report.py strategy_tracker.py
+          python -m py_compile candidate_manifest.py daily_report.py data_contract.py scoring.py strategy_tracker.py
           finmind_fundamentals.py finmind_actions.py investment_agent/cloud_report.py
           investment_agent/research_team.py pit_availability_evidence.py
           official_availability_capability.py
@@ -77,7 +84,10 @@ jobs:
           decision_outcome_revoke_semantics_probe.py
           execution_accounting.py backtest.py total_return_backtest.py
           walk_forward.py weekly_walk_forward.py market_membership_snapshots.py
+          freeze_lineage_summary.py lineage_replay.py point_in_time_fundamentals.py
+          strategy_backtest.py
           investment_advice_gate.py
+          production_strategy_validation_preflight.py
           decision_outcome_export.py
           staging_preflight_result.py
       - name: Run deterministic safety tests
