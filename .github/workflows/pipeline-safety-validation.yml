@@ -11,6 +11,7 @@ on:
       - "investment_agent/cloud_report.py"
       - "investment_agent/research_team.py"
       - "pit_availability_evidence.py"
+      - "official_availability_capability.py"
       - "tests/**"
       - ".github/workflows/**"
 
@@ -34,5 +35,6 @@ jobs:
           python -m py_compile candidate_manifest.py daily_report.py strategy_tracker.py
           finmind_fundamentals.py finmind_actions.py investment_agent/cloud_report.py
           investment_agent/research_team.py pit_availability_evidence.py
+          official_availability_capability.py
       - name: Run deterministic safety tests
         run: python -m unittest discover -s tests -v
