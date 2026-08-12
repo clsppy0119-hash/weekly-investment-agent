@@ -17,6 +17,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from execution_accounting import (
+    aggregate_periods,
+    daily_equity_curve,
+    max_drawdown_from_equity,
+    max_drawdown_from_period_returns,
+    rebalance_schedule,
+    settle_equal_weight_period,
+    unconfigured_risk_policy,
+)
 from market_membership_snapshots import SNAPSHOT_DIR_NAME, load_membership
 
 
@@ -170,11 +179,17 @@ def run_period(series: dict[str, Series], dates: list[str], is_etf: bool = False
                lookback: int = LOOKBACK, holding: int = HOLDING, picks_count: int = PICKS,
                ranking_mode: str = "momentum",
                membership_by_date: dict[str, set[str]] | None = None) -> dict[str, Any]:
-    returns: list[float] = []
-    trades = 0
-    for index in range(lookback, len(dates) - holding, holding):
-        signal, entry, exit_ = dates[index], dates[index + 1], dates[index + holding]
-        window = dates[index + 1:index + holding + 1]
+    periods: list[dict[str, Any]] = []
+    schedule = rebalance_schedule(
+        len(dates), lookback, holding, convention="signal_plus_holding"
+    )
+    sell_tax = ETF_SELL_TAX if is_etf else STOCK_SELL_TAX
+    buy_cost = BUY_FEE + SLIPPAGE_BPS / 10_000
+    sell_cost = SELL_FEE + sell_tax + SLIPPAGE_BPS / 10_000
+    for point in schedule:
+        index = point.signal_index
+        signal, entry, exit_ = dates[index], dates[point.entry_index], dates[point.exit_index]
+        path_days = dates[point.entry_index:point.exit_index + 1]
         ranked = []
         for code, item in series.items():
             if membership_by_date is not None and code not in membership_by_date.get(signal, set()):
@@ -196,31 +211,126 @@ def run_period(series: dict[str, Series], dates: list[str], is_etf: bool = False
                 daily = [trail[pos] / trail[pos - 1] - 1 for pos in range(1, len(trail))]
                 momentum /= max(pstdev(daily), 0.01)
             ranked.append((momentum, code))
-        realised: list[float] = []
-        for _, code in sorted(ranked, reverse=True)[:picks_count]:
+        ranked_order = sorted(ranked, reverse=True)
+        selected = ranked_order[:picks_count]
+        tie_dependent = 0
+        if len(ranked_order) > picks_count and selected and ranked_order[picks_count][0] == selected[-1][0]:
+            cutoff = selected[-1][0]
+            tie_dependent = sum(1 for score, _ in selected if score == cutoff)
+        outcomes: list[dict[str, Any]] = []
+        for _, code in selected:
             item = series[code]
             limit = item.exit_date
             if limit and entry >= limit:
-                continue  # already gone by the fill; the slot stays in cash
-            if entry not in item.values:
-                continue  # no tradable price on the entry day
-            # Exit on the last day that is both observed and still inside the
-            # listing interval.  Holding to the nominal exit would price the
-            # position after delisting; skipping the trade would instead hand
-            # the engine future knowledge that the position was doomed.
-            tradable = [day for day in window if day in item.values and (not limit or day < limit)]
-            if not tradable:
+                outcomes.append({"status": "cash_unfilled", "pathLength": len(path_days)})
                 continue
-            realised.append(item.values[tradable[-1]] / item.values[entry] - 1)
-        if not realised:
-            continue
-        gross = sum(realised) / len(realised)
-        sell_tax = ETF_SELL_TAX if is_etf else STOCK_SELL_TAX
-        net = (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - sell_tax - SLIPPAGE_BPS / 10_000) - 1
-        returns.append(net)
-        trades += len(realised)
-    total = math.prod(1 + item for item in returns) - 1 if returns else 0.0
-    return {"totalReturn": total, "annualizedReturn": annualized(total, len(dates)), "mdd": max_drawdown(returns), "periods": len(returns), "trades": trades}
+            if entry not in item.values:
+                outcomes.append({"status": "cash_unfilled", "pathLength": len(path_days)})
+                continue
+            missing = [day for day in path_days if day not in item.values]
+            reason = None
+            if limit and exit_ >= limit:
+                reason = "official_terminal_value_missing"
+            elif exit_ not in item.values:
+                reason = "nominal_exit_missing"
+            elif missing:
+                reason = "daily_mark_missing"
+            if reason:
+                outcomes.append({"status": "unresolved_exit", "reason": reason, "pathLength": len(path_days)})
+                continue
+            entry_value = item.values[entry]
+            factors = [item.values[day] / entry_value for day in path_days]
+            outcomes.append({
+                "status": "closed",
+                "grossReturn": factors[-1] - 1,
+                "dailyGrossFactors": factors,
+            })
+        period = settle_equal_weight_period(
+            outcomes,
+            picks_count,
+            buy_cost=buy_cost,
+            sell_cost=sell_cost,
+        )
+        period["tieBreakDependentSlots"] = tie_dependent
+        if tie_dependent:
+            period["blockers"] = sorted(set(period["blockers"]) | {"cutoff_tie_dependent"})
+        period.update({"signalDate": signal, "entryDate": entry, "exitDate": exit_})
+        periods.append(period)
+
+    comparison_from = dates[schedule[0].entry_index] if schedule else None
+    comparison_to = dates[schedule[-1].exit_index] if schedule else None
+    accounting = aggregate_periods(periods, comparison_from=comparison_from, comparison_to=comparison_to)
+    comparison_days = (
+        dates.index(comparison_to) - dates.index(comparison_from) + 1
+        if comparison_from and comparison_to else 0
+    )
+    accounting["comparisonTradingDays"] = comparison_days
+    selection_certified = accounting["tieBreakDependentSlots"] == 0
+    certified_returns = [period["return"] for period in periods] if accounting["complete"] else None
+    total = math.prod(1 + value for value in certified_returns) - 1 if certified_returns is not None else None
+    curve = daily_equity_curve(periods)
+    mdd = max_drawdown_from_equity(curve)
+    result = {
+        "totalReturn": total,
+        "annualizedReturn": annualized(total, comparison_days) if total is not None else None,
+        "mdd": mdd,
+        "mddBasis": "daily_mark_to_market_including_costs",
+        "selectionMdd": max_drawdown_from_period_returns(certified_returns),
+        "selectionCertified": selection_certified,
+        "periods": accounting["investedPeriods"],
+        "scheduledPeriods": accounting["scheduledPeriods"],
+        "trades": accounting["closedSlots"],
+        "executionComplete": accounting["complete"],
+        "executionAccounting": accounting,
+    }
+    result.update(unconfigured_risk_policy())
+    return result
+
+
+def buy_and_hold_metrics(series: Series, dates: list[str], comparison_from: str | None,
+                         comparison_to: str | None, *, is_etf: bool = True) -> dict[str, Any]:
+    """One exact-boundary round trip for the benchmark comparison."""
+    sell_tax = ETF_SELL_TAX if is_etf else STOCK_SELL_TAX
+    buy_cost = BUY_FEE + SLIPPAGE_BPS / 10_000
+    sell_cost = SELL_FEE + sell_tax + SLIPPAGE_BPS / 10_000
+    if not comparison_from or not comparison_to or comparison_from not in dates or comparison_to not in dates:
+        path_days: list[str] = []
+    else:
+        start, end = dates.index(comparison_from), dates.index(comparison_to)
+        path_days = dates[start:end + 1] if start < end else []
+    missing = [day for day in path_days if day not in series.values]
+    if len(path_days) < 2 or missing:
+        period = settle_equal_weight_period(
+            [{"status": "unresolved_exit", "reason": "benchmark_exact_path_missing", "pathLength": max(2, len(path_days))}],
+            1,
+            buy_cost=buy_cost,
+            sell_cost=sell_cost,
+        )
+    else:
+        entry_value = series.values[comparison_from]
+        factors = [series.values[day] / entry_value for day in path_days]
+        period = settle_equal_weight_period(
+            [{"status": "closed", "grossReturn": factors[-1] - 1, "dailyGrossFactors": factors}],
+            1,
+            buy_cost=buy_cost,
+            sell_cost=sell_cost,
+        )
+    accounting = aggregate_periods([period], comparison_from=comparison_from, comparison_to=comparison_to)
+    accounting["comparisonTradingDays"] = len(path_days)
+    total = period["return"] if accounting["complete"] else None
+    result = {
+        "totalReturn": total,
+        "annualizedReturn": annualized(total, len(path_days)) if total is not None else None,
+        "mdd": max_drawdown_from_equity(daily_equity_curve([period])),
+        "mddBasis": "daily_mark_to_market_including_costs",
+        "periods": 1 if accounting["complete"] else 0,
+        "scheduledPeriods": 1,
+        "trades": accounting["closedSlots"],
+        "executionComplete": accounting["complete"],
+        "executionAccounting": accounting,
+    }
+    result.update(unconfigured_risk_policy())
+    return result
 
 
 def research_universe_codes(payload_codes: set[str], evidence: dict[str, Any],
@@ -285,9 +395,27 @@ def main() -> None:
     train_end, validation_end = int(len(calendar) * 0.6), int(len(calendar) * 0.8)
     splits = {"train": calendar[:train_end], "validation": calendar[train_end:validation_end], "test": calendar[validation_end:]}
     results = {name: run_period(universe, days, membership_by_date=membership_by_date) for name, days in splits.items()}
-    benchmark_results = {name: run_period({benchmark.code: benchmark}, days, is_etf=True) for name, days in splits.items()}
+    benchmark_results = {
+        name: buy_and_hold_metrics(
+            benchmark,
+            days,
+            results[name]["executionAccounting"]["comparisonFrom"],
+            results[name]["executionAccounting"]["comparisonTo"],
+            is_etf=True,
+        )
+        for name, days in splits.items()
+    }
+    execution_complete = all(
+        results[name]["executionComplete"] and benchmark_results[name]["executionComplete"]
+        for name in ("validation", "test")
+    )
+    selection_certified = all(results[name]["selectionCertified"] for name in ("validation", "test"))
+    risk_gate_passed = all(results[name]["dailyMddGatePassed"] for name in ("validation", "test"))
     performance_passed = (
-        results["validation"]["periods"] >= 5
+        execution_complete
+        and selection_certified
+        and risk_gate_passed
+        and results["validation"]["periods"] >= 5
         and results["test"]["periods"] >= 5
         and results["validation"]["totalReturn"] > benchmark_results["validation"]["totalReturn"]
         and results["test"]["totalReturn"] > benchmark_results["test"]["totalReturn"]
@@ -309,24 +437,30 @@ def main() -> None:
     # price history or today's membership must never open this gate.
     point_in_time_universe = bool(snapshot_status.get("certified", False))
     promotion_blocked = (
-        not stock_adjustment_validated
+        not execution_complete
+        or not selection_certified
+        or not risk_gate_passed
+        or not stock_adjustment_validated
         or not point_in_time_universe
         or len(calendar) < 500
         or bool(fixed_codes)
     )
     output = {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
-        "status": "research_only" if performance_passed and promotion_blocked else ("candidate" if performance_passed else "rejected"),
+        "status": "research_only" if (not execution_complete or promotion_blocked) else ("candidate" if performance_passed else "rejected"),
         "universe": {"stocks": len(universe), "benchmark": "0050", "benchmarkTradingDays": len(calendar), "pointInTimeMembership": point_in_time_universe, "inclusionRule": "explicit fixed basket" if fixed_codes else "official TWSE/TPEx daily membership snapshots"},
         "strategy": {"name": "60-day total-return momentum", "lookbackDays": LOOKBACK, "holdingDays": HOLDING, "picks": PICKS},
         "costs": {"buyFee": BUY_FEE, "sellFee": SELL_FEE, "stockSellTax": STOCK_SELL_TAX, "etfSellTax": ETF_SELL_TAX, "oneWaySlippageBps": SLIPPAGE_BPS},
         "dividends": {"cash": "reinvested at ex-dividend date close", "stockDividendEvents": stock_events, "stockDividendMatchedEvents": stock_matches, "stockDividendReferencePriceError": stock_error, "stock": "share count adjusted using validated ex-right reference-price mapping"},
         "splits": {name: {"strategy": results[name], "benchmark0050": benchmark_results[name]} for name in splits},
-        "promotionRule": "Both validation and untouched test must beat 0050 after costs, with at least 5 holding periods each.",
+        "promotionRule": "Both validation and untouched test must have certified execution, beat one exact-boundary 0050 buy-and-hold round trip after costs, and contain at least 5 invested holding periods each.",
         "promotionBlocked": promotion_blocked,
         "promotionBlockers": [
             blocker for blocker, active in {
+                "execution_accounting_incomplete": not execution_complete,
+                "cutoff_tie_dependent": not selection_certified,
+                "daily_mdd_limit_unconfigured": not risk_gate_passed,
                 "stock_dividend_adjustment": not stock_adjustment_validated,
                 "survivorship_bias": not point_in_time_universe,
                 "fixed_universe_only": bool(fixed_codes),

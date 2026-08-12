@@ -21,13 +21,44 @@ def evaluate(history_path: Path, benchmark_path: Path, train_days: int = 120, va
         train = history[start:train_end]
         validation = history[train_end:validation_end]
         test = history[validation_end:test_end]
-        chosen, _ = select_parameters(train)
-        validation_result = run_slice(validation, chosen["lookback"], chosen["count"], chosen["holding"])
-        test_result = run_slice(test, chosen["lookback"], chosen["count"], chosen["holding"])
-        validation_benchmark = benchmark_total_return(benchmark_path, dates[train_end:validation_end])
-        test_benchmark = benchmark_total_return(benchmark_path, dates[validation_end:test_end])
+        train_dates = dates[start:train_end]
+        validation_dates = dates[train_end:validation_end]
+        test_dates = dates[validation_end:test_end]
+        try:
+            chosen, _ = select_parameters(train, train_dates)
+        except ValueError as exc:
+            if str(exc) != "execution_accounting_incomplete":
+                raise
+            windows.append({
+                "from": dates[start], "to": dates[test_end - 1],
+                "parameters": None,
+                "validation": None,
+                "test": None,
+                "passed": False,
+                "blockers": ["execution_accounting_incomplete"],
+            })
+            start += step
+            continue
+        validation_result = run_slice(validation, chosen["lookback"], chosen["count"], chosen["holding"], validation_dates)
+        test_result = run_slice(test, chosen["lookback"], chosen["count"], chosen["holding"], test_dates)
+        validation_bounds = [validation_result["executionAccounting"]["comparisonFrom"], validation_result["executionAccounting"]["comparisonTo"]]
+        test_bounds = [test_result["executionAccounting"]["comparisonFrom"], test_result["executionAccounting"]["comparisonTo"]]
+        validation_path = validation_dates[
+            validation_dates.index(validation_bounds[0]):validation_dates.index(validation_bounds[1]) + 1
+        ] if all(day in validation_dates for day in validation_bounds) else []
+        test_path = test_dates[
+            test_dates.index(test_bounds[0]):test_dates.index(test_bounds[1]) + 1
+        ] if all(day in test_dates for day in test_bounds) else []
+        validation_benchmark = benchmark_total_return(benchmark_path, validation_path)
+        test_benchmark = benchmark_total_return(benchmark_path, test_path)
         passed = (
-            validation_benchmark is not None
+            validation_result["executionComplete"]
+            and test_result["executionComplete"]
+            and validation_result["selectionCertified"]
+            and test_result["selectionCertified"]
+            and validation_result["dailyMddGatePassed"]
+            and test_result["dailyMddGatePassed"]
+            and validation_benchmark is not None
             and test_benchmark is not None
             and validation_result["trades"] >= 5
             and test_result["trades"] >= 5
@@ -37,9 +68,23 @@ def evaluate(history_path: Path, benchmark_path: Path, train_days: int = 120, va
         windows.append({
             "from": dates[start], "to": dates[test_end - 1],
             "parameters": {key: chosen[key] for key in ("lookback", "count", "holding")},
-            "validation": {"strategy": validation_result["return"], "benchmark": validation_benchmark, "trades": validation_result["trades"]},
-            "test": {"strategy": test_result["return"], "benchmark": test_benchmark, "trades": test_result["trades"]},
+            "validation": {"strategy": validation_result["return"], "benchmark": validation_benchmark, "benchmarkAccounting": {key: validation_result["executionAccounting"][key] for key in ("comparisonFrom", "comparisonTo", "comparisonTradingDays")}, "benchmarkCostModel": "one exact-boundary buy-and-hold round trip per split", "trades": validation_result["trades"], "mdd": validation_result["mdd"], "mddBasis": validation_result["mddBasis"], "executionComplete": validation_result["executionComplete"], "selectionCertified": validation_result["selectionCertified"], "riskPolicyVersion": validation_result["riskPolicyVersion"], "dailyMddLimitConfigured": validation_result["dailyMddLimitConfigured"], "dailyMddGatePassed": validation_result["dailyMddGatePassed"], "riskGateEligible": validation_result["riskGateEligible"], "executionAccounting": validation_result["executionAccounting"]},
+            "test": {"strategy": test_result["return"], "benchmark": test_benchmark, "benchmarkAccounting": {key: test_result["executionAccounting"][key] for key in ("comparisonFrom", "comparisonTo", "comparisonTradingDays")}, "benchmarkCostModel": "one exact-boundary buy-and-hold round trip per split", "trades": test_result["trades"], "mdd": test_result["mdd"], "mddBasis": test_result["mddBasis"], "executionComplete": test_result["executionComplete"], "selectionCertified": test_result["selectionCertified"], "riskPolicyVersion": test_result["riskPolicyVersion"], "dailyMddLimitConfigured": test_result["dailyMddLimitConfigured"], "dailyMddGatePassed": test_result["dailyMddGatePassed"], "riskGateEligible": test_result["riskGateEligible"], "executionAccounting": test_result["executionAccounting"]},
             "passed": passed,
+            "blockers": [
+                blocker for blocker, active in {
+                    "execution_accounting_incomplete": not (
+                        validation_result["executionComplete"] and test_result["executionComplete"]
+                    ),
+                    "cutoff_tie_dependent": not (
+                        validation_result["selectionCertified"] and test_result["selectionCertified"]
+                    ),
+                    "daily_mdd_limit_unconfigured": not (
+                        validation_result["dailyMddGatePassed"] and test_result["dailyMddGatePassed"]
+                    ),
+                    "benchmark_exact_bounds_missing": validation_benchmark is None or test_benchmark is None,
+                }.items() if active
+            ],
         })
         start += step
     blockers = []
@@ -47,8 +92,14 @@ def evaluate(history_path: Path, benchmark_path: Path, train_days: int = 120, va
         blockers.append("fewer_than_three_rolling_windows")
     if any(not window["passed"] for window in windows):
         blockers.append("one_or_more_rolling_windows_failed")
+    if any("execution_accounting_incomplete" in window.get("blockers", []) for window in windows):
+        blockers.append("execution_accounting_incomplete")
+    if any("cutoff_tie_dependent" in window.get("blockers", []) for window in windows):
+        blockers.append("cutoff_tie_dependent")
+    if any("daily_mdd_limit_unconfigured" in window.get("blockers", []) for window in windows):
+        blockers.append("daily_mdd_limit_unconfigured")
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "status": "candidate" if windows and not blockers else "research_only",
         "promotionPassed": bool(windows) and not blockers,

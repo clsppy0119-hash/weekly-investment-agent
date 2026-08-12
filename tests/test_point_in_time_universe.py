@@ -30,8 +30,13 @@ class PointInTimeUniverseTests(unittest.TestCase):
         values = {day: float(index + 1) for index, day in enumerate(dates)}
         stock = Series("1111", values, 0, "2026-01-04", "2026-01-09")
         result = run_period({"1111": stock}, dates, lookback=2, holding=2, picks_count=1)
-        self.assertEqual(result["periods"], 2)
-        self.assertEqual(result["trades"], 2)
+        accounting = result["executionAccounting"]
+        self.assertEqual(accounting["selectedSlots"], 2)
+        self.assertEqual(accounting["filledSlots"], 2)
+        self.assertEqual(accounting["closedSlots"], 1)
+        self.assertEqual(accounting["unresolvedExitSlots"], 1)
+        self.assertFalse(result["executionComplete"])
+        self.assertIsNone(result["totalReturn"])
 
     def test_signal_before_listing_is_still_refused(self):
         """Entry-side point-in-time integrity must stay intact."""
@@ -40,6 +45,7 @@ class PointInTimeUniverseTests(unittest.TestCase):
         stock = Series("1111", values, 0, "2026-01-08", None)
         result = run_period({"1111": stock}, dates, lookback=2, holding=2, picks_count=1)
         self.assertEqual(result["periods"], 0)
+        self.assertGreater(result["scheduledPeriods"], 0)
 
 
 if __name__ == "__main__":
