@@ -13,6 +13,7 @@ on:
       - "pit_availability_evidence.py"
       - "official_availability_capability.py"
       - "official_metadata_smoke.py"
+      - "official_announcement_availability.py"
       - "tests/**"
       - ".github/workflows/**"
 
@@ -38,5 +39,6 @@ jobs:
           investment_agent/research_team.py pit_availability_evidence.py
           official_availability_capability.py
           official_metadata_smoke.py
+          official_announcement_availability.py
       - name: Run deterministic safety tests
         run: python -m unittest discover -s tests -v
