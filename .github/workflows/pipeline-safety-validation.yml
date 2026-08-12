@@ -43,6 +43,7 @@ on:
       - "trusted_pit_bundle_registry_v1.json"
       - "official_full_market_population.py"
       - "market_population_contract.py"
+      - "official_population_artifact_receipt.py"
       - "decision_outcome_export.py"
       - "staging_preflight_result.py"
       - "supabase-decision-outcome-shadow-v1.sql"
@@ -95,6 +96,7 @@ jobs:
           authoritative_pit_coverage_certification.py
           official_full_market_population.py
           market_population_contract.py
+          official_population_artifact_receipt.py
           decision_outcome_export.py
           staging_preflight_result.py
       - name: Run deterministic safety tests
