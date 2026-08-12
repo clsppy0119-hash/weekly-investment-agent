@@ -79,7 +79,89 @@ class AnnouncementFirstSeenDbContractTests(unittest.TestCase):
         self.assertFalse(result["migrationExecuted"])
         self.assertFalse(result["serviceRoleSafe"])
         self.assertEqual(result["migrationHash"], db.PINNED_MIGRATION_SHA256)
+        self.assertEqual(result["semanticContractHash"], db.PINNED_SEMANTIC_CONTRACT_SHA256)
+        self.assertEqual(db.MIGRATION_CONTRACT_VERSION, 2)
         self.assertIn("service_role_bypass_not_approved", result["blockers"])
+
+    def test_role_and_extension_preconditions_are_mandatory(self):
+        mutations = (
+            self.sql.replace("checked_role.rolcanlogin", "checked_role.rol_can_login"),
+            self.sql.replace("pg_catalog.pg_auth_members", "pg_catalog.pg_auth_members_missing"),
+            self.sql.replace("n.nspname = 'extensions'", "n.nspname = 'public'"),
+            self.sql.replace("extensions.digest", "public.digest"),
+            self.sql.replace("set search_path = pg_catalog", "set search_path = pg_catalog, public"),
+        )
+        for mutated in mutations:
+            with self.subTest(marker=mutated[:32]):
+                self.assertFalse(db.validate_migration(mutated, enabled=True)["contractReady"])
+
+    def test_owner_grants_force_rls_and_policies_are_mandatory(self):
+        required_lines = (
+            f"grant select, insert on public.{db.TABLE} to lineage_observer_owner;",
+            f"grant insert on public.{db.AUDIT_TABLE} to lineage_observer_owner;",
+            f"grant usage on sequence public.{db.AUDIT_TABLE}_audit_id_seq to lineage_observer_owner;",
+            "create policy announcement_first_seen_owner_select_v1",
+            "create policy announcement_first_seen_owner_insert_v1",
+            "create policy announcement_first_seen_audit_owner_insert_v1",
+        )
+        for line in required_lines:
+            with self.subTest(line=line):
+                mutated = self.sql.replace(line, "-- removed by fixture", 1)
+                self.assertFalse(db.validate_migration(mutated, enabled=True)["contractReady"])
+
+    def test_writer_and_denied_roles_cannot_gain_direct_or_schema_create_access(self):
+        unsafe = (
+            self.sql + f"\ngrant select on public.{db.TABLE} to lineage_observer_writer;",
+            self.sql + "\ngrant create on schema public to lineage_observer_writer;",
+            self.sql + f"\ngrant select on public.{db.TABLE} to authenticated;",
+            self.sql + f"\ngrant execute on function public.{db.RPC}(text,text,text,text,text,text,text,date,text,text,timestamptz,text,text,text,integer,text,text,text,jsonb) to service_role;",
+        )
+        for sql in unsafe:
+            result = db.validate_migration(sql, enabled=True)
+            self.assertFalse(result["contractReady"])
+
+    def test_private_management_ledger_is_unexposed_and_has_no_runtime_grants(self):
+        result = db.privilege_model(enabled=True)
+        self.assertEqual(result["privateLedger"]["schema"], db.ADMIN_SCHEMA)
+        self.assertTrue(result["privateLedger"]["privateUnexposed"])
+        self.assertFalse(result["privateLedger"]["dataApiExposure"])
+        self.assertEqual(result["privateLedger"]["runtimePrivileges"], [])
+        for mutation in (
+            self.sql.replace(
+                f"revoke all on schema {db.ADMIN_SCHEMA}", "-- missing private schema revoke",
+                1,
+            ),
+            self.sql + f"\ncreate view public.leaked_ledger as select * from {db.ADMIN_SCHEMA}.{db.LEDGER_TABLE};",
+            self.sql + "\nselect * from storage.objects;",
+            self.sql + f"\ngrant usage on schema {db.ADMIN_SCHEMA} to authenticated;",
+            self.sql + f"\ncreate function {db.ADMIN_SCHEMA}.leak() returns text language sql as $$ select migration_id from {db.ADMIN_SCHEMA}.{db.LEDGER_TABLE} limit 1 $$;",
+        ):
+            self.assertFalse(db.validate_migration(mutation, enabled=True)["contractReady"])
+
+    def test_migration_is_strict_single_use_and_collisions_fail_closed(self):
+        first = db.migration_preflight(enabled=True)
+        self.assertTrue(first["ready"])
+        self.assertTrue(first["singleUse"])
+        second = db.migration_preflight({db.TABLE}, enabled=True)
+        self.assertFalse(second["ready"])
+        self.assertEqual(second["reason"], "migration_target_exists")
+        lowered = self.sql.lower()
+        self.assertNotIn("create table if not exists", lowered)
+        self.assertNotIn("create or replace", lowered)
+        self.assertNotIn("commit;", lowered)
+        self.assertNotIn("rollback;", lowered)
+        self.assertIn("b2a2_migration_target_exists", lowered)
+        self.assertIn(db.MIGRATION_ID, self.sql)
+
+    def test_semantic_and_file_pins_fail_on_any_contract_drift(self):
+        self.assertEqual(db._canonical_hash(db.SEMANTIC_MANIFEST), db.PINNED_SEMANTIC_CONTRACT_SHA256)
+        for mutated in (
+            self.sql + "\n-- one byte drift",
+            self.sql.replace(db.PINNED_SEMANTIC_CONTRACT_SHA256, "0" * 64),
+        ):
+            result = db.validate_migration(mutated, enabled=True)
+            self.assertFalse(result["contractReady"])
+            self.assertIn("migration_hash_unpinned_or_drifted", result["blockers"])
 
     def test_parser_rejects_unpinned_destructive_foreign_or_alias_drift(self):
         variants = (
@@ -109,6 +191,9 @@ class AnnouncementFirstSeenDbContractTests(unittest.TestCase):
         self.assertTrue(result["updateDeleteTriggerAllCallers"])
         self.assertTrue(result["serviceRoleBypassesRls"])
         self.assertFalse(result["serviceRoleSafeForRoutineProducer"])
+        self.assertEqual(result["ownerPrivileges"]["main"], ["select", "insert"])
+        self.assertEqual(result["writerSchemaPrivileges"]["public"], ["usage"])
+        self.assertEqual(result["writerSchemaPrivileges"][db.ADMIN_SCHEMA], [])
 
     def test_sql_is_isolated_append_only_and_has_no_existing_table_change(self):
         lowered = self.sql.lower()
@@ -116,6 +201,7 @@ class AnnouncementFirstSeenDbContractTests(unittest.TestCase):
         self.assertNotIn("available_at", lowered)
         self.assertIn("before update or delete", lowered)
         self.assertIn("force row level security", lowered)
+        self.assertIn(f"create schema {db.ADMIN_SCHEMA} authorization postgres", lowered)
         self.assertIn("p_provider, p_official_document_id, p_entity_id", lowered)
         self.assertIn("revoke all", lowered)
         self.assertNotRegex(lowered, r"(?m)^\s*(drop|truncate|update|delete)\b")
