@@ -16,13 +16,16 @@ scoring on a thinner basis than production would.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from math import sqrt
 from pathlib import Path
 from random import Random
 from statistics import mean, stdev
 
+from actual_comprehensive_selection import POLICY_VERSION as SELECTION_POLICY_VERSION
+from actual_comprehensive_selection import rank_and_assess
 from backtest import (
     BUY_FEE, DEFAULT_BENCHMARK, DEFAULT_DATA, ETF_SELL_TAX, SELL_FEE,
     SLIPPAGE_BPS, STOCK_SELL_TAX, benchmark_total_return, load_history,
@@ -31,6 +34,43 @@ from point_in_time_fundamentals import PointInTimeFundamentals
 from scoring import MINIMUM_COVERAGE, WEIGHTS, candidates
 
 MA_LONG = 20
+SELECTION_EVIDENCE_SCHEMA_VERSION = 1
+
+
+def _canonical_hash(value: object) -> str:
+    encoded = json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _aware(value: object) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo is not None and parsed.utcoffset() is not None else None
+
+
+def build_selection_evidence(
+    signal_date: str,
+    decision_as_of: str,
+    actions: dict,
+    contract_blockers: list[str],
+) -> dict:
+    """Build a hash-bound PIT *shape*; this does not authenticate its source."""
+    body = {
+        "schemaVersion": SELECTION_EVIDENCE_SCHEMA_VERSION,
+        "signalDate": signal_date,
+        "decisionAsOf": decision_as_of,
+        "quality": "verified",
+        "conflictStatus": "no_conflict",
+        "actions": actions,
+        "contractBlockers": contract_blockers,
+    }
+    return {**body, "evidenceHash": _canonical_hash(body)}
 
 
 def factor_quotes(history: list[dict], index: int, min_volume: float) -> dict[str, dict]:
@@ -59,6 +99,16 @@ def benchmark_series(path: Path) -> dict[str, float]:
     rows = json.loads(path.read_text(encoding="utf-8-sig"))
     return {str(row.get("date")): row["total_return"] for row in rows
             if isinstance(row, dict) and isinstance(row.get("total_return"), (int, float))}
+
+
+def load_selection_evidence(path: Path | None) -> dict | None:
+    if path is None:
+        return None
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return value if isinstance(value, dict) else None
 
 
 def benchmark_between(series: dict[str, float], entry: str, exit_: str) -> float | None:
@@ -134,10 +184,80 @@ def fundamental_records(quotes: dict[str, dict], published: dict[str, dict]) -> 
     return records
 
 
+def _selection_evidence_at(source: object, signal_date: str) -> dict | None:
+    """Resolve a point-in-time selection-quality snapshot without fallback."""
+    if callable(source):
+        value = source(signal_date)
+    elif isinstance(source, dict) and isinstance(source.get("byDate"), dict):
+        value = source["byDate"].get(signal_date)
+    else:
+        # A single undated object is unsafe for historical use: it can silently
+        # apply today's actions/data-contract evidence to every earlier signal.
+        value = None
+    if not isinstance(value, dict):
+        return None
+    if set(value) != {
+        "schemaVersion", "signalDate", "decisionAsOf", "quality", "conflictStatus",
+        "actions", "contractBlockers", "evidenceHash",
+    } or value.get("schemaVersion") != SELECTION_EVIDENCE_SCHEMA_VERSION:
+        return None
+    try:
+        if date.fromisoformat(signal_date).isoformat() != signal_date:
+            return None
+    except (TypeError, ValueError):
+        return None
+    decision = _aware(value.get("decisionAsOf"))
+    actions = value.get("actions")
+    blockers = value.get("contractBlockers")
+    if decision is None or decision.utcoffset() != timedelta(hours=8) \
+            or decision.date().isoformat() != signal_date \
+            or (decision.hour, decision.minute, decision.second, decision.microsecond) != (14, 0, 0, 0) \
+            or value.get("signalDate") != signal_date \
+            or value.get("quality") != "verified" \
+            or value.get("conflictStatus") != "no_conflict" \
+            or not isinstance(actions, dict) or not isinstance(blockers, list) \
+            or any(not isinstance(item, str) for item in blockers):
+        return None
+    available = _aware(actions.get("availableAt"))
+    if available is None or available > decision \
+            or actions.get("conflictStatus") != "no_conflict" \
+            or not isinstance(actions.get("source"), str) \
+            or not isinstance(actions.get("dataset"), str) \
+            or not isinstance(actions.get("queried_codes"), list) \
+            or not isinstance(actions.get("failures"), dict):
+        return None
+    body = {key: value[key] for key in value if key != "evidenceHash"}
+    if value.get("evidenceHash") != _canonical_hash(body):
+        return None
+    return {
+        "decisionAsOf": value["decisionAsOf"],
+        "actions": actions,
+        "contractBlockers": list(blockers),
+        "evidenceHash": value["evidenceHash"],
+    }
+
+
+def select_signal_candidates(
+    quotes: dict[str, dict],
+    normalized_fundamentals: dict[str, dict],
+    signal_date: str,
+    selection_evidence: object,
+) -> dict:
+    """Run the actual comprehensive selection adapter for one signal date."""
+    evidence = _selection_evidence_at(selection_evidence, signal_date)
+    return rank_and_assess(
+        quotes,
+        normalized_fundamentals,
+        actions=evidence["actions"] if evidence else None,
+        contract_blockers=evidence["contractBlockers"] if evidence else None,
+    )
+
+
 def run_range(history: list[dict], dates: list[str], start: int, end: int, style: str, picks: int,
               holding: int, min_volume: float, weights: dict | None = None,
               minimum_coverage: int | None = None, pit: object | None = None,
-              continuous_trend: bool = False, reversal_aware: bool = False) -> dict:
+              continuous_trend: bool = False, reversal_aware: bool = False,
+              selection_evidence: object | None = None) -> dict:
     """Signals inside ``[start, end)``, exits kept inside it too.
 
     Moving averages read days before ``start`` on purpose: that is past data at
@@ -151,19 +271,52 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
     unfilled = 0
     stale_exits = 0
     no_candidate = 0
+    selection_blockers: set[str] = set()
+    selection_periods = 0
+    selection_evidence_periods = 0
+    cutoff_tie_periods = 0
+    if style == "comprehensive":
+        selection_blockers.update({
+            "selection_evidence_authority_unregistered",
+            "legacy_execution_accounting_unregistered",
+        })
     index = max(start, MA_LONG)
     while index + holding + 1 < end:
-        quotes = factor_quotes(history, index, min_volume)
+        selection_periods += 1
+        # Production comprehensive selection has no explicit liquidity filter.
+        # Applying the old CLI default here changed the eligible pool before
+        # scoring and made the evaluator test a different strategy.
+        quote_floor = 0 if style == "comprehensive" else min_volume
+        quotes = factor_quotes(history, index, quote_floor)
         # Fundamentals are read as of the signal date, so only figures already
         # filed on that day can influence the pick.  Without a cache every name
         # carries an empty record and `coverage` reflects that honestly.
         published = pit.as_of(dates[index]) if pit is not None else {}
         # Rank the whole eligible pool once: the head is what the product would
         # recommend, the rest is the pool it was chosen from.
-        eligible = candidates(style, quotes, fundamental_records(quotes, published), None,
-                              weights=weights, minimum_coverage=minimum_coverage,
-                              continuous_trend=continuous_trend, reversal_aware=reversal_aware)
-        selected = eligible[:picks]
+        records = fundamental_records(quotes, published)
+        if style == "comprehensive":
+            if picks != 3 or weights is not None or minimum_coverage is not None \
+                    or continuous_trend or reversal_aware:
+                raise ValueError("comprehensive_selection_policy_mismatch")
+            evidence = _selection_evidence_at(selection_evidence, dates[index])
+            selection = select_signal_candidates(
+                quotes, records, dates[index], selection_evidence
+            )
+            eligible = selection["poolTuples"]
+            selected = selection["selectedTuples"]
+            if evidence:
+                selection_evidence_periods += 1
+            else:
+                selection_blockers.add("selection_evidence_missing")
+            if selection["cutoffTieDependent"]:
+                cutoff_tie_periods += 1
+                selection_blockers.add("cutoff_tie_dependent")
+        else:
+            eligible = candidates(style, quotes, records, None,
+                                  weights=weights, minimum_coverage=minimum_coverage,
+                                  continuous_trend=continuous_trend, reversal_aware=reversal_aware)
+            selected = eligible[:picks]
         window = history[index + 1:index + holding + 2]
         trade_returns: list[float] = []
         for _score, _coverage, code, _quote, _fund in selected:
@@ -218,6 +371,23 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
         "win_rate": wins / len(returns) if returns else 0.0,
         "unfilled": unfilled, "stale_exits": stale_exits, "rebalances_without_candidates": no_candidate,
         "returns": returns, "rebalances": rebalances,
+        "selectionPolicyVersion": (
+            SELECTION_POLICY_VERSION if style == "comprehensive" else "legacy-research-selection"
+        ),
+        "selectionAdapterUsed": style == "comprehensive",
+        "selectionPeriods": selection_periods,
+        "selectionEvidencePeriods": selection_evidence_periods,
+        "selectionEvidenceShapeComplete": (
+            style != "comprehensive" or selection_evidence_periods == selection_periods
+        ),
+        # Shape-valid caller evidence is not an admitted authority artifact.
+        # Legacy execution below also remains explicitly non-promotable.
+        "selectionEvidenceComplete": style != "comprehensive",
+        "selectionCertified": style != "comprehensive",
+        "performanceEligible": False,
+        "executionAccountingStatus": "legacy_unregistered",
+        "cutoffTieDependentPeriods": cutoff_tie_periods,
+        "selectionBlockers": sorted(selection_blockers),
         # The screening question: did ranking beat holding the pool it ranked?
         # Beating 0050 also rewards the pool's size tilt; this does not.
         "versusEligiblePool": pool_summary(rebalances),
@@ -226,7 +396,8 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
 
 def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
              min_volume: float, drop: tuple[str, ...] = (), pit: object | None = None,
-             continuous_trend: bool = False, reversal_aware: bool = False) -> dict:
+             continuous_trend: bool = False, reversal_aware: bool = False,
+             selection_evidence: object | None = None) -> dict:
     dates, history = load_history(data)
     if len(history) < 120:
         raise SystemExit(f"歷史資料只有 {len(history)} 個交易日，不足 120，無法切出樣本外測試。")
@@ -248,7 +419,8 @@ def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
     result = {}
     for name, (start, end) in parts.items():
         run = run_range(history, dates, start, end, style, picks, holding, min_volume,
-                        weights, coverage_floor, pit, continuous_trend, reversal_aware)
+                        weights, coverage_floor, pit, continuous_trend, reversal_aware,
+                        selection_evidence)
         run["benchmark"] = benchmark_total_return(benchmark, dates[start:end])
         run["excess"] = None if run["benchmark"] is None else run["return"] - run["benchmark"]
         per_rebalance = []
@@ -265,7 +437,8 @@ def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "rule": "production scoring rule from scoring.py",
         "style": style,
-        "parameters": {"picks": picks, "holding": holding, "minVolume": min_volume,
+        "parameters": {"picks": picks, "holding": holding,
+                       "minVolume": None if style == "comprehensive" else min_volume,
                        "minimumCoverage": MINIMUM_COVERAGE[style]},
         "dataStart": dates[0], "dataEnd": dates[-1], "tradingDays": len(history),
         "factorBasis": ("technical factors plus point-in-time fundamentals" if pit is not None
@@ -289,11 +462,14 @@ def main() -> None:
                         help="研究用：趨勢因子改用與均線的乖離幅度，取代二元的 75/35")
     parser.add_argument("--fundamentals-cache", type=Path, default=None,
                         help="私有歷史財報快取目錄；提供後才能回測依賴基本面的 style")
+    parser.add_argument("--selection-evidence", type=Path, default=None,
+                        help="point-in-time actions/data-contract evidence by signal date")
     parser.add_argument("--output", type=Path, default=Path("data/strategy-backtest.json"))
     args = parser.parse_args()
     pit = PointInTimeFundamentals.from_cache(args.fundamentals_cache) if args.fundamentals_cache else None
     result = evaluate(args.input, args.benchmark, args.style, args.picks, args.holding,
-                      args.min_volume, tuple(args.drop), pit, args.continuous_trend)
+                      args.min_volume, tuple(args.drop), pit, args.continuous_trend,
+                      selection_evidence=load_selection_evidence(args.selection_evidence))
     result["droppedFactors"] = list(args.drop)
     result["continuousTrend"] = args.continuous_trend
     args.output.parent.mkdir(parents=True, exist_ok=True)

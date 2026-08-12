@@ -13,14 +13,15 @@ from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from point_in_time_fundamentals import PointInTimeFundamentals
-from strategy_backtest import fundamental_records, run_range
+from point_in_time_fundamentals import PointInTimeFundamentals, quarter_publication
+from strategy_backtest import build_selection_evidence, fundamental_records, run_range
 
-# Trailing-twelve-month EPS needs four filed quarters before it exists at all,
-# so the fixture carries two years; one year would leave the metric unavailable
-# until the very last filing and the style would never unlock.
-QUARTERS = ["2024-03-31", "2024-06-30", "2024-09-30", "2024-12-31",
-            "2025-03-31", "2025-06-30", "2025-09-30", "2025-12-31"]
+# The final production quality gate requires five reported financial years.
+QUARTERS = [
+    f"{year}-{month_day}"
+    for year in range(2020, 2026)
+    for month_day in ("03-31", "06-30", "09-30", "12-31")
+]
 
 
 def _history(days=80, codes=("1101", "2330", "2454", "3008")):
@@ -39,11 +40,12 @@ def _fundamentals_cache(folder: Path, codes):
     for rank, code in enumerate(codes):
         statements, balance = [], []
         for period in QUARTERS:
-            statements.append({"date": period, "type": "EPS", "value": 2.0 + rank})
-            statements.append({"date": period, "type": "IncomeAfterTaxes", "value": 1e8})
-            balance.append({"date": period, "type": "TotalEquity", "value": 1e9})
-            balance.append({"date": period, "type": "TotalAssets", "value": 2e9})
-            balance.append({"date": period, "type": "TotalLiabilities", "value": 6e8})
+            available = f"{quarter_publication(period)}T00:00:00+08:00"
+            statements.append({"date": period, "type": "EPS", "value": 2.0 + rank, "availableAt": available})
+            statements.append({"date": period, "type": "IncomeAfterTaxes", "value": 1e8, "availableAt": available})
+            balance.append({"date": period, "type": "TotalEquity", "value": 1e9, "availableAt": available})
+            balance.append({"date": period, "type": "TotalAssets", "value": 2e9, "availableAt": available})
+            balance.append({"date": period, "type": "TotalLiabilities", "value": 6e8, "availableAt": available})
         revenue = [{"revenue_year": year, "revenue_month": month, "revenue": 1e8 * (1.2 if year == 2025 else 1.0)}
                    for year in (2024, 2025) for month in range(1, 13)]
         (stocks / f"{code}.json").write_text(json.dumps({
@@ -68,11 +70,24 @@ def test_comprehensive_runs_once_fundamentals_are_available():
     with TemporaryDirectory() as folder:
         _fundamentals_cache(Path(folder), codes)
         pit = PointInTimeFundamentals.from_cache(Path(folder))
+        def evidence(day):
+            decision = f"{day}T14:00:00+08:00"
+            actions = {
+                "source": "fixture", "dataset": "actions", "availableAt": decision,
+                "conflictStatus": "no_conflict", "queried_codes": list(codes), "failures": {},
+            }
+            return build_selection_evidence(day, decision, actions, [])
         result = run_range(history, dates, 0, len(history), "comprehensive",
-                           picks=3, holding=5, min_volume=0, pit=pit)
+                           picks=3, holding=5, min_volume=9_999_999_999, pit=pit,
+                           selection_evidence=evidence)
 
-    assert result["trades"] > 0, "published financials must unlock the style"
+    assert result["trades"] > 0, "production comprehensive has no legacy volume floor"
     assert result["rebalances_without_candidates"] == 0
+    assert result["selectionEvidenceShapeComplete"] is True
+    assert result["selectionEvidenceComplete"] is False
+    assert result["selectionCertified"] is False
+    assert result["performanceEligible"] is False
+    assert "selection_evidence_authority_unregistered" in result["selectionBlockers"]
 
 
 def test_price_earnings_uses_the_signal_day_price():

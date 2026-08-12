@@ -15,8 +15,11 @@ from point_in_time_fundamentals import (
 )
 
 
-def _statement(period, type_name, value):
-    return {"date": period, "type": type_name, "value": value}
+def _statement(period, type_name, value, available_at=None):
+    result = {"date": period, "type": type_name, "value": value}
+    if available_at is not None:
+        result["availableAt"] = available_at
+    return result
 
 
 def _payload():
@@ -37,6 +40,32 @@ def _payload():
         "TaiwanStockFinancialStatements": statements,
         "TaiwanStockBalanceSheet": balance,
         "TaiwanStockMonthRevenue": revenue,
+    }
+
+
+def _five_year_payload(*, omit=None, late=None):
+    statements, balance = [], []
+    for year in range(2020, 2025):
+        for suffix in ("03-31", "06-30", "09-30", "12-31"):
+            period = f"{year}-{suffix}"
+            available = f"{quarter_publication(period)}T18:00:00+08:00"
+            for kind, rows, value in (
+                ("EPS", statements, 1.0),
+                ("IncomeAfterTaxes", statements, 1_000_000.0),
+                ("TotalEquity", balance, 50_000_000.0),
+                ("TotalAssets", balance, 100_000_000.0),
+                ("TotalLiabilities", balance, 40_000_000.0),
+            ):
+                if omit == (period, kind):
+                    continue
+                row_available = late if late and late[0] == (period, kind) else available
+                if late and late[0] == (period, kind):
+                    row_available = late[1]
+                rows.append(_statement(period, kind, value, row_available))
+    return {
+        "TaiwanStockFinancialStatements": statements,
+        "TaiwanStockBalanceSheet": balance,
+        "TaiwanStockMonthRevenue": [],
     }
 
 
@@ -106,6 +135,49 @@ def test_values_carry_forward_between_filings():
     a_month_later = series.as_of("2025-09-15")["1111"]
 
     assert at_filing == a_month_later, "no new filing means no new information"
+
+
+def test_financial_history_requires_five_complete_years_and_all_five_fields():
+    series = PointInTimeFundamentals({"1111": build_stock(_five_year_payload())})
+    assert series.as_of("2025-04-01")["1111"]["financialHistoryYears"] == 5
+
+    incomplete = PointInTimeFundamentals({
+        "1111": build_stock(_five_year_payload(omit=("2020-03-31", "EPS")))
+    })
+    assert incomplete.as_of("2025-04-01")["1111"]["financialHistoryYears"] == 4
+
+
+def test_one_quarter_or_one_field_per_year_never_counts_as_full_history():
+    payload = _five_year_payload()
+    payload["TaiwanStockFinancialStatements"] = [
+        row for row in payload["TaiwanStockFinancialStatements"]
+        if row["type"] == "EPS" and row["date"].endswith("12-31")
+    ]
+    payload["TaiwanStockBalanceSheet"] = []
+    series = PointInTimeFundamentals({"1111": build_stock(payload)})
+    assert series.as_of("2025-04-01")["1111"]["financialHistoryYears"] == 0
+
+
+def test_late_backfill_cannot_rewrite_an_earlier_history_snapshot():
+    missing = ("2020-03-31", "EPS")
+    payload = _five_year_payload(omit=missing)
+    payload["TaiwanStockFinancialStatements"].append(
+        _statement(missing[0], missing[1], 1.0, "2027-01-15T10:00:00+08:00")
+    )
+    series = PointInTimeFundamentals({"1111": build_stock(payload)})
+    assert series.as_of("2026-12-31")["1111"]["financialHistoryYears"] == 4
+    assert series.as_of("2027-01-15")["1111"]["financialHistoryYears"] == 5
+
+
+def test_late_value_correction_never_borrows_the_original_availability():
+    payload = _payload()
+    payload["TaiwanStockFinancialStatements"].append(
+        _statement("2025-03-31", "EPS", 1000.0, "2027-01-15T10:00:00+08:00")
+    )
+    series = PointInTimeFundamentals({"1111": build_stock(payload)})
+    assert series.as_of("2026-03-31")["1111"]["eps"] == 10.0
+    assert series.as_of("2027-01-14")["1111"]["eps"] == 10.0
+    assert series.as_of("2027-01-15")["1111"]["eps"] == 1009.0
 
 
 if __name__ == "__main__":

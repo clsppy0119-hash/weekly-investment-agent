@@ -8,11 +8,13 @@ import os
 from pathlib import Path
 from typing import Any
 
+from actual_comprehensive_selection import (
+    REQUIRED_FINAL_METRICS,
+    assess_ranked_preview,
+    quality_blockers,
+)
 from data_contract import build_contract
-from strategy_tracker import STRATEGY_VERSION, number
-
-
-REQUIRED_FINAL_METRICS = ("revenueYoY", "eps", "roe", "debtRatio")
+from strategy_tracker import STRATEGY_VERSION
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -59,21 +61,8 @@ def _quality_blockers(
     fundamentals: dict[str, Any],
     actions: dict[str, Any],
 ) -> list[str]:
-    blockers: list[str] = []
-    if coverage < 80:
-        blockers.append("analysis_coverage_below_80")
-    blockers.extend(
-        f"missing_{metric}"
-        for metric in REQUIRED_FINAL_METRICS
-        if not number(fundamentals.get(metric))
-    )
-    if fundamentals.get("financialHistoryYears", 0) < 5:
-        blockers.append("fewer_than_five_financial_years")
-    queried = {str(item) for item in actions.get("queried_codes", [])}
-    failures = actions.get("failures", {}) if isinstance(actions.get("failures"), dict) else {}
-    if code not in queried or code in failures:
-        blockers.append("corporate_actions_not_verified")
-    return blockers
+    """Backward-compatible wrapper around the shared production gate."""
+    return quality_blockers(code, coverage, fundamentals, actions)
 
 
 def build_manifest(
@@ -93,24 +82,7 @@ def build_manifest(
     news = load_json(news_path)
     pit_status = load_json(pit_path) if pit_path else {}
     contract = build_contract(quote_data, actions, news, pit_status)
-    preview: list[dict[str, Any]] = []
-    for style, items in ranked.items():
-        for rank, item in enumerate(items, 1):
-            score, coverage, code, quote, fundamentals = item
-            blockers = _quality_blockers(str(code), int(coverage), fundamentals, actions)
-            blockers.extend(contract["blockers"])
-            preview.append(
-                {
-                    "code": str(code),
-                    "name": quote.get("name", code),
-                    "style": style,
-                    "rank": rank,
-                    "score": score,
-                    "coverage": coverage,
-                    "entryPrice": quote.get("price"),
-                    "quality": {"passed": not blockers, "blockers": blockers},
-                }
-            )
+    preview = assess_ranked_preview(ranked, actions, contract["blockers"])
     advice_enabled = (
         advice_gate.get("status") == "advice_candidate"
         and advice_gate.get("adviceEnabled") is True

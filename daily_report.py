@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from actual_comprehensive_selection import rank_pool
 from candidate_manifest import atomic_write_json, build_manifest, load_json
 # The ranking rule lives in `scoring` so the backtest can score candidates with
 # the identical code path; see that module for why.
@@ -86,7 +87,7 @@ ranked_by_style = {}
 # the rest is what the recommendation has to be judged against. Beating 0050
 # also rewards whatever the pool's size tilt did; beating the pool does not.
 eligible_pool_by_style = {
-    key: candidates(key, quotes, fundamentals, None)
+    key: rank_pool(quotes, fundamentals)
     for key, _title in styles
 }
 preview_ranked_by_style = {

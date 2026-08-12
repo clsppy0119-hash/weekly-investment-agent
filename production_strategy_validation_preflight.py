@@ -29,8 +29,9 @@ STRATEGY_IDENTITY = "production-comprehensive-v1"
 # the same content.  A source change must update the contract and therefore
 # produces a new strategySpecHash.
 SOURCE_PINS = {
-    "candidate_manifest.py": "1f55b8e2d7107a37a85e608ba2a7b4ba79eb1faf6a50027b33a2fc87f7859712",
-    "daily_report.py": "80fdcb73e954f587899cc6a50fff9149db7da4a344160bfe5d90434914d1602b",
+    "actual_comprehensive_selection.py": "840d397957c172b4a543bd7ecc57911e787b93f288366dc016c30f1feadb4be0",
+    "candidate_manifest.py": "e5471941684838779a6e658de8efbce3799300a4fb0c609854f528f0ccd7aa6e",
+    "daily_report.py": "ca8a78cffeffe63c8503196f28cc58c7f06b7dd05fae12925e339b4c27ce9150",
     "data_contract.py": "f91475db7ece2dffef9bed86a1a5c1b0dbf12d4ecaba7a4c6b51447624987c45",
     "scoring.py": "3db3aaa02dbf9f419da48a6150ff8e479a42ec8f0bd0b2f55cd9ad74f456a50c",
     "strategy_tracker.py": "5ce5e846a99a66372e0f9a4e96fe5d80e34c8b58065d393419e87db87d86e393",
@@ -44,9 +45,14 @@ EVIDENCE_PRODUCER_PINS = {
     "freeze_lineage_summary.py": "58d5bb1c56b505bd52ae4d90129f575868e14da6460a3ab95a6dd6a5ac1462f8",
     "lineage_replay.py": "da0b2b83e094c8c040b1540f94795aa81eeb06ef149aa390adf92b83669778d8",
     "market_membership_snapshots.py": "2fcc10db99a7f9f60fc4e436fbd84d86b919e6f1c4032f7d809088e70ac99ff1",
-    "point_in_time_fundamentals.py": "2d1657b8e526ce9d44b616781535cc1978d39485052d46c9b380ddeabcba9afb",
-    "strategy_backtest.py": "9da2a5a8f1043b5d4ddcd76a221e7a41672d63f6bd70c8748b33d6927f6bd1f3",
+    "point_in_time_fundamentals.py": "91e3100a138355a08ddf4e8194a0af3f3209d16e5c72f8a27849b085e08b347a",
+    "strategy_backtest.py": "59f102821c3d7df61dbe3f0ba1b93dd2d37b3808e11864485a48f0ed254ead71",
 }
+
+# Node54 adds an executable, shared selector without pretending that a caller's
+# metadata proves parity.  This pin identifies the verifier policy; positive
+# parity comes only from running both paths over the same bounded fixture.
+SELECTION_PARITY_POLICY_VERSION = "actual-comprehensive-selection-parity-v1"
 
 AUTHORITY_CONTRACTS = {
     "official_membership_v1": {
@@ -264,28 +270,30 @@ def strategy_spec_hash() -> str:
 
 def production_engine_contract() -> dict[str, Any]:
     return {
-        "selectionEntryPoint": "daily_report->scoring.candidates",
+        "selectionEntryPoint": "daily_report->actual_comprehensive_selection",
         "strategySpecHash": strategy_spec_hash(),
         "minimumVolumePolicy": "no_explicit_threshold",
         "universePolicy": "production_quote_and_fundamentals_snapshot",
-        "finalQualityGate": "candidate_manifest_v1",
+        "finalQualityGate": "candidate_manifest_v1_shared_quality_function",
         "finalQualityGateOrdering": "top3_then_quality_no_backfill",
         "finalEligibility": "phase_final_and_advice_candidate_and_advice_enabled",
         "executionAccounting": "not_registered_for_live_screen",
+        "selectionParityPolicyVersion": SELECTION_PARITY_POLICY_VERSION,
     }
 
 
 def current_backtest_engine_contract() -> dict[str, Any]:
-    """Describe the current adapter honestly; this is expected to mismatch."""
+    """Describe selection parity only; execution remains separately blocked."""
     return {
-        "selectionEntryPoint": "strategy_backtest->scoring.candidates",
+        "selectionEntryPoint": "strategy_backtest->actual_comprehensive_selection",
         "strategySpecHash": strategy_spec_hash(),
-        "minimumVolumePolicy": "cli_default_500000",
-        "universePolicy": "signal_quotes_filtered_by_minimum_volume",
-        "finalQualityGate": "not_equivalent_to_candidate_manifest_v1",
-        "finalQualityGateOrdering": "not_registered",
-        "finalEligibility": "not_registered",
+        "minimumVolumePolicy": "no_explicit_threshold",
+        "universePolicy": "production_quote_and_fundamentals_snapshot",
+        "finalQualityGate": "candidate_manifest_v1_shared_quality_function",
+        "finalQualityGateOrdering": "top3_then_quality_no_backfill",
+        "finalEligibility": "phase_final_and_advice_candidate_and_advice_enabled",
         "executionAccounting": "legacy_mean_filled_slots_with_stale_exit_fallback",
+        "selectionParityPolicyVersion": SELECTION_PARITY_POLICY_VERSION,
     }
 
 
@@ -445,11 +453,11 @@ def evaluate(payload: Any) -> dict[str, Any]:
     if payload.get("schemaVersion") != 1:
         blockers.append("input_schema_invalid")
 
-    # A caller-supplied equality hash is not parity evidence.  A later node
-    # must run both engines over the same frozen fixture and provide a pinned
-    # replay artifact.  Until then this field stays deterministically false.
+    # A caller-supplied equality hash is not parity evidence.  Node54 provides
+    # a separate executable verifier, while this metadata preflight continues
+    # to reject self-asserted parity and never accepts a caller boolean.
     fixture_parity = False
-    blockers.append("deterministic_fixture_parity_not_implemented")
+    blockers.append("selection_parity_evidence_not_supplied_to_preflight")
     production_contract = production_engine_contract()
     backtest_contract = current_backtest_engine_contract()
     engine_contract_parity = production_contract == backtest_contract
@@ -592,6 +600,8 @@ def evaluate(payload: Any) -> dict[str, Any]:
         "sourcePinsRegistered": True,
         "strategyIdentityCertified": False,
         "productionBacktestParity": False,
+        "selectionParityPolicyVersion": SELECTION_PARITY_POLICY_VERSION,
+        "selectionParityPolicyRegistered": True,
         "engineContractParity": engine_contract_parity,
         "fixtureParity": fixture_parity,
         "paritySummary": {},
