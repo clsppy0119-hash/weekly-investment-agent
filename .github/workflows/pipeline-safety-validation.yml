@@ -23,6 +23,7 @@ on:
       - "decision_outcome_sandbox.py"
       - "decision_outcome_db_contract.py"
       - "decision_outcome_staging_dry_run.py"
+      - "decision_outcome_membership_probe.py"
       - "decision_outcome_export.py"
       - "staging_preflight_result.py"
       - "supabase-decision-outcome-shadow-v1.sql"
@@ -64,6 +65,7 @@ jobs:
           decision_outcome_sandbox.py
           decision_outcome_db_contract.py
           decision_outcome_staging_dry_run.py
+          decision_outcome_membership_probe.py
           decision_outcome_export.py
           staging_preflight_result.py
       - name: Run deterministic safety tests
