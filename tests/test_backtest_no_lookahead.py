@@ -3,8 +3,8 @@
 The previous candidate filter required an exit price to exist before a stock
 could be ranked, so any position that was delisted or halted mid-hold quietly
 left the pool and the backtest never paid for it.  These tests pin the fixed
-behaviour: selection uses signal-day information only, and the exit falls back
-to the last observed price.
+behaviour: selection uses signal-day information only, while an unverifiable
+exit fails closed instead of being replaced with a stale quote.
 """
 
 import sys
@@ -32,14 +32,16 @@ def _history_with_delisting():
     ]
 
 
-def test_delisted_pick_books_its_loss():
+def test_delisted_pick_is_selected_but_cannot_use_a_stale_sale():
     result = run_slice(_history_with_delisting(), lookback=1, count=1, holding=2)
 
-    assert result["trades"] == 1, "the signal day must still produce one rebalance"
-    assert result["stale_exits"] == 1, "the missing exit price must be reported, not hidden"
-    # 50/200 - 1 = -75% gross, a little worse after costs.  A leaking engine
-    # would have picked 2222 instead and reported roughly +10%.
-    assert result["return"] < -0.70, f"expected the delisting loss, got {result['return']:+.4f}"
+    accounting = result["executionAccounting"]
+    assert accounting["selectedSlots"] == 1
+    assert accounting["filledSlots"] == 1, "the signal-day pick must not be replaced with SAFE"
+    assert accounting["unresolvedExitSlots"] == 1
+    assert result["stale_exits"] == 1
+    assert result["executionComplete"] is False
+    assert result["return"] is None, "a stale last quote is not an executable delisting value"
 
 
 def test_missing_entry_price_leaves_the_slot_in_cash():
@@ -57,6 +59,7 @@ def test_missing_entry_price_leaves_the_slot_in_cash():
     assert result["unfilled"] == 1, "an unfillable pick must be counted"
     assert result["trades"] == 0, "no fill means no rebalance return"
     assert result["return"] == 0.0
+    assert result["executionAccounting"]["scheduledPeriods"] == 1
 
 
 def test_surviving_pick_is_unchanged():
@@ -72,6 +75,7 @@ def test_surviving_pick_is_unchanged():
     result = run_slice(history, lookback=1, count=1, holding=2)
 
     assert result["trades"] == 1
+    assert result["executionComplete"] is True
     assert result["stale_exits"] == 0 and result["unfilled"] == 0
     assert 0.18 < result["return"] < 0.20, f"240/200-1 net of costs, got {result['return']:+.4f}"
 

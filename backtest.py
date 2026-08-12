@@ -18,7 +18,16 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from statistics import mean
+
+from execution_accounting import (
+    aggregate_periods,
+    daily_equity_curve,
+    max_drawdown_from_equity,
+    max_drawdown_from_period_returns,
+    rebalance_schedule,
+    settle_equal_weight_period,
+    unconfigured_risk_policy,
+)
 
 try:
     import requests
@@ -205,16 +214,21 @@ def load_history(path: Path) -> tuple[list[str], list[dict[str, tuple[float, flo
     return [row["date"] for row in records], [{code: (float(close), float(volume)) for code, close, volume in row["rows"]} for row in records]
 
 
-def run_slice(history: list[dict[str, tuple[float, float]]], lookback: int, count: int, holding: int) -> dict:
-    returns: list[float] = []
-    signals = 0
-    wins = 0
-    unfilled = 0
-    stale_exits = 0
-    index = lookback
-    while index + holding + 1 < len(history):
+def run_slice(history: list[dict[str, tuple[float, float]]], lookback: int, count: int,
+              holding: int, dates: list[str] | None = None) -> dict:
+    if dates is not None and len(dates) != len(history):
+        raise ValueError("history_date_length_mismatch")
+    labels = dates if dates is not None else [str(index) for index in range(len(history))]
+    periods: list[dict] = []
+    buy_cost = BUY_FEE + SLIPPAGE_BPS / 10_000
+    sell_cost = SELL_FEE + STOCK_SELL_TAX + SLIPPAGE_BPS / 10_000
+    schedule = rebalance_schedule(
+        len(history), lookback, holding, convention="entry_plus_holding"
+    )
+    for point in schedule:
+        index = point.signal_index
         today, past = history[index], history[index - lookback]
-        window = history[index + 1:index + holding + 2]
+        window = history[point.entry_index:point.exit_index + 1]
         ranked = []
         # Rank on signal-day information only.  Requiring an entry or exit price
         # here would let a stock that stops trading during the holding period
@@ -227,39 +241,72 @@ def run_slice(history: list[dict[str, tuple[float, float]]], lookback: int, coun
             momentum = price / previous[0] - 1
             if price >= 10 and momentum > -0.25:
                 ranked.append((momentum, code))
-        trade_returns: list[float] = []
-        for _, code in sorted(ranked, reverse=True)[:count]:
+        ranked_order = sorted(ranked, reverse=True)
+        selected = ranked_order[:count]
+        tie_dependent = 0
+        if len(ranked_order) > count and selected and ranked_order[count][0] == selected[-1][0]:
+            cutoff = selected[-1][0]
+            tie_dependent = sum(1 for score, _ in selected if score == cutoff)
+        outcomes: list[dict] = []
+        for _, code in selected:
             entry_price = window[0].get(code)
             if not entry_price:
-                # No tradable price on the entry day; that slot stays in cash.
-                unfilled += 1
+                outcomes.append({"status": "cash_unfilled", "pathLength": len(window)})
                 continue
             exit_price = window[-1].get(code)
             if not exit_price:
-                # Exit at the last observed price instead of dropping the
-                # position.  These are counted so a run that leans on the
-                # fallback is visible rather than silently flattering.
-                exit_price = next((day[code] for day in reversed(window[:-1]) if code in day), None)
-                stale_exits += 1
-            if not exit_price:
+                outcomes.append({"status": "unresolved_exit", "reason": "nominal_exit_missing", "pathLength": len(window)})
                 continue
-            trade_returns.append(exit_price[0] / entry_price[0] - 1)
-        if trade_returns:
-            gross = mean(trade_returns)
-            net = (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - STOCK_SELL_TAX - SLIPPAGE_BPS / 10_000) - 1
-            returns.append(net)
-            signals += 1
-            wins += net > 0
-        index += holding
-    equity = 1.0
-    peak = 1.0
-    drawdown = 0.0
-    for value in returns:
-        equity *= 1 + value
-        peak = max(peak, equity)
-        drawdown = min(drawdown, equity / peak - 1)
-    return {"return": equity - 1, "mdd": drawdown, "trades": signals, "win_rate": wins / signals if signals else 0.0,
-            "returns": returns, "unfilled": unfilled, "stale_exits": stale_exits}
+            path_prices = [day.get(code) for day in window]
+            if any(price is None for price in path_prices):
+                outcomes.append({"status": "unresolved_exit", "reason": "daily_mark_missing", "pathLength": len(window)})
+                continue
+            factors = [price[0] / entry_price[0] for price in path_prices]
+            outcomes.append({"status": "closed", "grossReturn": factors[-1] - 1, "dailyGrossFactors": factors})
+        period = settle_equal_weight_period(
+            outcomes,
+            count,
+            buy_cost=buy_cost,
+            sell_cost=sell_cost,
+        )
+        period["tieBreakDependentSlots"] = tie_dependent
+        if tie_dependent:
+            period["blockers"] = sorted(set(period["blockers"]) | {"cutoff_tie_dependent"})
+        period.update({
+            "signalDate": labels[point.signal_index],
+            "entryDate": labels[point.entry_index],
+            "exitDate": labels[point.exit_index],
+        })
+        periods.append(period)
+    comparison_from = labels[schedule[0].entry_index] if schedule else None
+    comparison_to = labels[schedule[-1].exit_index] if schedule else None
+    accounting = aggregate_periods(periods, comparison_from=comparison_from, comparison_to=comparison_to)
+    comparison_days = (
+        labels.index(comparison_to) - labels.index(comparison_from) + 1
+        if comparison_from and comparison_to else 0
+    )
+    accounting["comparisonTradingDays"] = comparison_days
+    selection_certified = accounting["tieBreakDependentSlots"] == 0
+    returns = [period["return"] for period in periods] if accounting["complete"] else None
+    total = math.prod(1 + value for value in returns) - 1 if returns is not None else None
+    invested_returns = [period["return"] for period in periods if period.get("closedSlots", 0) > 0] if returns is not None else []
+    wins = sum(value > 0 for value in invested_returns)
+    result = {
+        "return": total,
+        "mdd": max_drawdown_from_equity(daily_equity_curve(periods)),
+        "mddBasis": "daily_mark_to_market_including_costs",
+        "selectionMdd": max_drawdown_from_period_returns(returns),
+        "selectionCertified": selection_certified,
+        "trades": accounting["investedPeriods"],
+        "win_rate": wins / len(invested_returns) if invested_returns else 0.0,
+        "returns": returns,
+        "unfilled": accounting["unfilledEntrySlots"],
+        "stale_exits": accounting["unresolvedExitSlots"],
+        "executionComplete": accounting["complete"],
+        "executionAccounting": accounting,
+    }
+    result.update(unconfigured_risk_policy())
+    return result
 
 
 def baseline_0050_price_proxy(history: list[dict[str, tuple[float, float]]]) -> float | None:
@@ -279,14 +326,18 @@ def benchmark_total_return(path: Path, dates: list[str]) -> float | None:
     except (OSError, json.JSONDecodeError):
         return None
     values = {row.get("date"): row.get("total_return") for row in rows if isinstance(row, dict)}
-    common = [(day, values[day]) for day in dates if day in values and isinstance(values[day], (int, float))]
-    if len(common) < 2 or common[0][1] <= 0:
+    if len(dates) < 2:
         return None
-    gross = common[-1][1] / common[0][1] - 1
+    start, end = dates[0], dates[-1]
+    if any(not isinstance(values.get(day), (int, float)) for day in dates):
+        return None
+    if values[start] <= 0:
+        return None
+    gross = values[end] / values[start] - 1
     return (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - ETF_SELL_TAX - SLIPPAGE_BPS / 10_000) - 1
 
 
-def select_parameters(history: list[dict[str, tuple[float, float]]]) -> tuple[dict, list[dict]]:
+def select_parameters(history: list[dict[str, tuple[float, float]]], dates: list[str] | None = None) -> tuple[dict, list[dict]]:
     candidates = []
     # A one-year split leaves roughly 48 trading days in each holdout period.
     # Keep the candidate window short enough that both holdouts contain several
@@ -294,11 +345,18 @@ def select_parameters(history: list[dict[str, tuple[float, float]]]) -> tuple[di
     for lookback in (5, 10, 20):
         for count in (3, 5, 10):
             for holding in (5,):
-                result = run_slice(history, lookback, count, holding)
+                result = run_slice(history, lookback, count, holding, dates=dates)
                 # Favour return but penalise unstable drawdowns; no test data is used here.
-                score = result["return"] + 0.35 * result["mdd"] if result["trades"] >= 6 else float("-inf")
+                score = (
+                    result["return"] + 0.35 * result["selectionMdd"]
+                    if result["executionComplete"] and result["selectionCertified"] and result["trades"] >= 6
+                    else float("-inf")
+                )
                 candidates.append({"lookback": lookback, "count": count, "holding": holding, "score": score, **result})
-    return max(candidates, key=lambda row: row["score"]), candidates
+    valid = [candidate for candidate in candidates if math.isfinite(candidate["score"])]
+    if not valid:
+        raise ValueError("execution_accounting_incomplete")
+    return max(valid, key=lambda row: row["score"]), candidates
 
 
 def pct(value: float | None) -> str:
@@ -312,40 +370,106 @@ def report(path: Path, output: Path, benchmark_path: Path = DEFAULT_BENCHMARK) -
     train_end = int(len(history) * 0.60)
     validation_end = int(len(history) * 0.80)
     train, validation, test = history[:train_end], history[train_end:validation_end], history[validation_end:]
-    chosen, _ = select_parameters(train)
-    validation_result = run_slice(validation, chosen["lookback"], chosen["count"], chosen["holding"])
-    test_result = run_slice(test, chosen["lookback"], chosen["count"], chosen["holding"])
-    if not validation_result["trades"] or not test_result["trades"]:
-        raise SystemExit("切分後沒有足夠的驗證或保留測試交易，拒絕產生無效回測結論。")
+    train_dates = dates[:train_end]
     validation_dates = dates[train_end:validation_end]
     test_dates = dates[validation_end:]
-    validation_benchmark = benchmark_total_return(benchmark_path, validation_dates)
-    test_benchmark = benchmark_total_return(benchmark_path, test_dates)
+    try:
+        chosen, _ = select_parameters(train, train_dates)
+    except ValueError as exc:
+        if str(exc) != "execution_accounting_incomplete":
+            raise
+        result = {
+            "schemaVersion": 2,
+            "source": "TWSE official daily close data; listed stocks only",
+            "data_start": dates[0], "data_end": dates[-1], "trading_days": len(history),
+            "split": {"train": len(train), "validation": len(validation), "test": len(test)},
+            "selected": None, "validation": None, "test": None,
+            "benchmark": {"total_return": False, "source": "TWSE official Taiwan 50 total-return index (IR0002)"},
+            "decision": "research_only",
+            "promotionBlockers": ["execution_accounting_incomplete"],
+        }
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.with_suffix(".json").write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+        output.write_text("研究模式：訓練資料的執行會計不完整，未產生可比較績效。\n", encoding="utf-8")
+        print(output.read_text(encoding="utf-8"))
+        return
+    validation_result = run_slice(validation, chosen["lookback"], chosen["count"], chosen["holding"], validation_dates)
+    test_result = run_slice(test, chosen["lookback"], chosen["count"], chosen["holding"], test_dates)
+    validation_bounds = [validation_result["executionAccounting"]["comparisonFrom"], validation_result["executionAccounting"]["comparisonTo"]]
+    test_bounds = [test_result["executionAccounting"]["comparisonFrom"], test_result["executionAccounting"]["comparisonTo"]]
+    validation_path = validation_dates[
+        validation_dates.index(validation_bounds[0]):validation_dates.index(validation_bounds[1]) + 1
+    ] if all(day in validation_dates for day in validation_bounds) else []
+    test_path = test_dates[
+        test_dates.index(test_bounds[0]):test_dates.index(test_bounds[1]) + 1
+    ] if all(day in test_dates for day in test_bounds) else []
+    validation_benchmark = benchmark_total_return(benchmark_path, validation_path)
+    test_benchmark = benchmark_total_return(benchmark_path, test_path)
     benchmark = test_benchmark
     passed = (
-        validation_benchmark is not None
+        validation_result["executionComplete"]
+        and test_result["executionComplete"]
+        and validation_result["selectionCertified"]
+        and test_result["selectionCertified"]
+        and validation_result["dailyMddGatePassed"]
+        and test_result["dailyMddGatePassed"]
+        and validation_benchmark is not None
         and test_benchmark is not None
         and validation_result["return"] > validation_benchmark
         and test_result["return"] > test_benchmark
         and test_result["trades"] >= 5
     )
     result = {
+        "schemaVersion": 2,
         "source": "TWSE official daily close data; listed stocks only",
         "data_start": dates[0], "data_end": dates[-1], "trading_days": len(history),
         "split": {"train": len(train), "validation": len(validation), "test": len(test)},
         "selected": {key: chosen[key] for key in ("lookback", "count", "holding")},
-        "validation": {key: validation_result[key] for key in ("return", "mdd", "trades", "win_rate")},
-        "test": {key: test_result[key] for key in ("return", "mdd", "trades", "win_rate")},
+        "validation": {key: validation_result[key] for key in ("return", "mdd", "mddBasis", "riskPolicyVersion", "dailyMddLimitConfigured", "dailyMddGatePassed", "riskGateEligible", "selectionCertified", "trades", "win_rate", "executionComplete", "executionAccounting")},
+        "test": {key: test_result[key] for key in ("return", "mdd", "mddBasis", "riskPolicyVersion", "dailyMddLimitConfigured", "dailyMddGatePassed", "riskGateEligible", "selectionCertified", "trades", "win_rate", "executionComplete", "executionAccounting")},
         "benchmark": {
             "total_return": validation_benchmark is not None and test_benchmark is not None,
+            "executionComplete": validation_benchmark is not None and test_benchmark is not None,
             "source": "TWSE official Taiwan 50 total-return index (IR0002)",
             "validation_net_return": validation_benchmark,
             "test_net_return": test_benchmark,
+            "validationAccounting": {
+                key: validation_result["executionAccounting"][key]
+                for key in ("comparisonFrom", "comparisonTo", "comparisonTradingDays")
+            },
+            "testAccounting": {
+                key: test_result["executionAccounting"][key]
+                for key in ("comparisonFrom", "comparisonTo", "comparisonTradingDays")
+            },
             "etf_costs_applied": True,
+            "cost_model": "one exact-boundary buy-and-hold round trip per split",
         },
         "benchmark_0050_price_return": baseline_0050_price_proxy(test),
         "benchmark_0050_total_return": test_benchmark,
-        "decision": "candidate" if passed else "rejected",
+        "decision": "candidate" if passed else (
+            "research_only" if not (
+                validation_result["executionComplete"]
+                and test_result["executionComplete"]
+                and validation_result["selectionCertified"]
+                and test_result["selectionCertified"]
+                and validation_result["dailyMddGatePassed"]
+                and test_result["dailyMddGatePassed"]
+            ) else "rejected"
+        ),
+        "promotionBlockers": [
+            blocker for blocker, active in {
+                "execution_accounting_incomplete": not (
+                    validation_result["executionComplete"] and test_result["executionComplete"]
+                ),
+                "cutoff_tie_dependent": not (
+                    validation_result["selectionCertified"] and test_result["selectionCertified"]
+                ),
+                "daily_mdd_limit_unconfigured": not (
+                    validation_result["dailyMddGatePassed"] and test_result["dailyMddGatePassed"]
+                ),
+                "benchmark_exact_bounds_missing": validation_benchmark is None or test_benchmark is None,
+            }.items() if active
+        ],
         "cost_assumptions": {"buy_fee": BUY_FEE, "sell_fee": SELL_FEE, "stock_sell_tax": STOCK_SELL_TAX, "etf_sell_tax": ETF_SELL_TAX, "one_way_slippage_bps": SLIPPAGE_BPS},
     }
     output.parent.mkdir(parents=True, exist_ok=True)

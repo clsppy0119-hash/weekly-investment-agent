@@ -25,6 +25,13 @@ on:
       - "decision_outcome_staging_dry_run.py"
       - "decision_outcome_membership_probe.py"
       - "decision_outcome_revoke_semantics_probe.py"
+      - "execution_accounting.py"
+      - "backtest.py"
+      - "total_return_backtest.py"
+      - "walk_forward.py"
+      - "weekly_walk_forward.py"
+      - "market_membership_snapshots.py"
+      - "investment_advice_gate.py"
       - "decision_outcome_export.py"
       - "staging_preflight_result.py"
       - "supabase-decision-outcome-shadow-v1.sql"
@@ -68,6 +75,9 @@ jobs:
           decision_outcome_staging_dry_run.py
           decision_outcome_membership_probe.py
           decision_outcome_revoke_semantics_probe.py
+          execution_accounting.py backtest.py total_return_backtest.py
+          walk_forward.py weekly_walk_forward.py market_membership_snapshots.py
+          investment_advice_gate.py
           decision_outcome_export.py
           staging_preflight_result.py
       - name: Run deterministic safety tests

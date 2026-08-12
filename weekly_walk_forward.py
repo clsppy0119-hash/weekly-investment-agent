@@ -15,22 +15,20 @@ from pathlib import Path
 
 from total_return_backtest import (
     BUY_FEE, ETF_SELL_TAX, HOLDING, PICKS, SLIPPAGE_BPS, STOCK_SELL_TAX,
-    Series, load, num, run_period, total_return_series,
+    Series, buy_and_hold_metrics, load, num, run_period, total_return_series,
 )
 
 
-def benchmark_return(series: Series, dates: list[str]) -> float | None:
+def benchmark_return(series: Series, dates: list[str], comparison_from: str | None,
+                     comparison_to: str | None) -> float | None:
     """Net 0050 total return over ``dates``; ``None`` when the window is unusable.
 
     Returning 0.0 here would silently turn the promotion rule into "did the
     strategy make any positive return", so a missing benchmark must fail the
     window rather than lower the bar.
     """
-    values = [series.values[day] for day in dates if day in series.values]
-    if len(values) < 2 or values[0] <= 0:
-        return None
-    gross = values[-1] / values[0] - 1
-    return (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - BUY_FEE - ETF_SELL_TAX - SLIPPAGE_BPS / 10_000) - 1
+    result = buy_and_hold_metrics(series, dates, comparison_from, comparison_to, is_etf=True)
+    return result["totalReturn"] if result["executionComplete"] else None
 
 
 def evaluate(cache_dir: Path, benchmark_path: Path, codes: set[str], train_days: int = 250,
@@ -51,24 +49,58 @@ def evaluate(cache_dir: Path, benchmark_path: Path, codes: set[str], train_days:
         scored = []
         for lookback, holding, picks, mode in grid:
             result = run_period(universe, train, lookback=lookback, holding=holding, picks_count=picks, ranking_mode=mode)
-            scored.append((result["totalReturn"], lookback, holding, picks, mode))
+            if result["executionComplete"] and result["selectionCertified"] and result["totalReturn"] is not None:
+                scored.append((result["totalReturn"], lookback, holding, picks, mode))
+        if not scored:
+            windows.append({
+                "from": train[0], "to": test[-1], "parameters": None,
+                "validation": None, "test": None, "passed": False,
+                "benchmarkAvailable": False,
+                "blockers": ["execution_accounting_incomplete"],
+            })
+            start += step
+            continue
         _, lookback, holding, picks, mode = max(scored, key=lambda item: item[0])
         validation_result = run_period(universe, validation, lookback=lookback, holding=holding, picks_count=picks, ranking_mode=mode)
         test_result = run_period(universe, test, lookback=lookback, holding=holding, picks_count=picks, ranking_mode=mode)
-        validation_benchmark = benchmark_return(benchmark, validation)
-        test_benchmark = benchmark_return(benchmark, test)
+        validation_benchmark = benchmark_return(
+            benchmark, validation,
+            validation_result["executionAccounting"]["comparisonFrom"],
+            validation_result["executionAccounting"]["comparisonTo"],
+        )
+        test_benchmark = benchmark_return(
+            benchmark, test,
+            test_result["executionAccounting"]["comparisonFrom"],
+            test_result["executionAccounting"]["comparisonTo"],
+        )
         windows.append({
             "from": train[0], "to": test[-1],
             "parameters": {"lookback": lookback, "holding": holding, "picks": picks, "ranking": mode},
-            "validation": {"strategy": validation_result["totalReturn"], "benchmark": validation_benchmark, "periods": validation_result["periods"]},
-            "test": {"strategy": test_result["totalReturn"], "benchmark": test_benchmark, "periods": test_result["periods"]},
+            "validation": {"strategy": validation_result["totalReturn"], "benchmark": validation_benchmark, "benchmarkAccounting": {key: validation_result["executionAccounting"][key] for key in ("comparisonFrom", "comparisonTo", "comparisonTradingDays")}, "benchmarkCostModel": "one exact-boundary buy-and-hold round trip per split", "periods": validation_result["periods"], "mdd": validation_result["mdd"], "mddBasis": validation_result["mddBasis"], "executionComplete": validation_result["executionComplete"], "selectionCertified": validation_result["selectionCertified"], "riskPolicyVersion": validation_result["riskPolicyVersion"], "dailyMddLimitConfigured": validation_result["dailyMddLimitConfigured"], "dailyMddGatePassed": validation_result["dailyMddGatePassed"], "riskGateEligible": validation_result["riskGateEligible"], "executionAccounting": validation_result["executionAccounting"]},
+            "test": {"strategy": test_result["totalReturn"], "benchmark": test_benchmark, "benchmarkAccounting": {key: test_result["executionAccounting"][key] for key in ("comparisonFrom", "comparisonTo", "comparisonTradingDays")}, "benchmarkCostModel": "one exact-boundary buy-and-hold round trip per split", "periods": test_result["periods"], "mdd": test_result["mdd"], "mddBasis": test_result["mddBasis"], "executionComplete": test_result["executionComplete"], "selectionCertified": test_result["selectionCertified"], "riskPolicyVersion": test_result["riskPolicyVersion"], "dailyMddLimitConfigured": test_result["dailyMddLimitConfigured"], "dailyMddGatePassed": test_result["dailyMddGatePassed"], "riskGateEligible": test_result["riskGateEligible"], "executionAccounting": test_result["executionAccounting"]},
             "passed": (
-                validation_benchmark is not None and test_benchmark is not None
+                validation_result["executionComplete"] and test_result["executionComplete"]
+                and validation_result["selectionCertified"] and test_result["selectionCertified"]
+                and validation_result["dailyMddGatePassed"] and test_result["dailyMddGatePassed"]
+                and validation_benchmark is not None and test_benchmark is not None
                 and validation_result["periods"] >= 3 and test_result["periods"] >= 3
                 and validation_result["totalReturn"] > validation_benchmark
                 and test_result["totalReturn"] > test_benchmark
             ),
             "benchmarkAvailable": validation_benchmark is not None and test_benchmark is not None,
+            "blockers": [
+                blocker for blocker, active in {
+                    "execution_accounting_incomplete": not (
+                        validation_result["executionComplete"] and test_result["executionComplete"]
+                    ),
+                    "cutoff_tie_dependent": not (
+                        validation_result["selectionCertified"] and test_result["selectionCertified"]
+                    ),
+                    "daily_mdd_limit_unconfigured": not (
+                        validation_result["dailyMddGatePassed"] and test_result["dailyMddGatePassed"]
+                    ),
+                }.items() if active
+            ],
         })
         start += step
     blockers = []
@@ -78,9 +110,15 @@ def evaluate(cache_dir: Path, benchmark_path: Path, codes: set[str], train_days:
         blockers.append("one_or_more_rolling_windows_failed")
     if any(not item["benchmarkAvailable"] for item in windows):
         blockers.append("benchmark_unavailable_for_one_or_more_windows")
+    if any("execution_accounting_incomplete" in item.get("blockers", []) for item in windows):
+        blockers.append("execution_accounting_incomplete")
+    if any("cutoff_tie_dependent" in item.get("blockers", []) for item in windows):
+        blockers.append("cutoff_tie_dependent")
+    if any("daily_mdd_limit_unconfigured" in item.get("blockers", []) for item in windows):
+        blockers.append("daily_mdd_limit_unconfigured")
     direct_official = benchmark_path.name.startswith("tai50_official")
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "status": "research_only",
         "promotionPassed": bool(windows) and not blockers,
