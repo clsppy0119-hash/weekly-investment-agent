@@ -104,7 +104,9 @@ def test_current_production_and_backtest_contract_mismatch_is_explicit():
     assert result["fixtureParity"] is False
     assert result["engineContractParity"] is False
     assert result["productionBacktestParity"] is False
-    assert "deterministic_fixture_parity_not_implemented" in result["blockers"]
+    assert result["selectionParityPolicyRegistered"] is True
+    assert result["selectionParityPolicyVersion"] == "actual-comprehensive-selection-parity-v1"
+    assert "selection_parity_evidence_not_supplied_to_preflight" in result["blockers"]
     assert "production_backtest_engine_mismatch" in result["blockers"]
 
 

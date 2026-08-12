@@ -37,6 +37,8 @@ on:
       - "lineage_replay.py"
       - "point_in_time_fundamentals.py"
       - "strategy_backtest.py"
+      - "actual_comprehensive_selection.py"
+      - "actual_comprehensive_selection_parity.py"
       - "investment_advice_gate.py"
       - "production_strategy_validation_preflight.py"
       - "authoritative_pit_coverage_certification.py"
@@ -95,6 +97,8 @@ jobs:
           walk_forward.py weekly_walk_forward.py market_membership_snapshots.py
           freeze_lineage_summary.py lineage_replay.py point_in_time_fundamentals.py
           strategy_backtest.py
+          actual_comprehensive_selection.py
+          actual_comprehensive_selection_parity.py
           investment_advice_gate.py
           production_strategy_validation_preflight.py
           authoritative_pit_coverage_certification.py

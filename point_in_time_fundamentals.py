@@ -19,7 +19,7 @@ import json
 import os
 from bisect import bisect_right
 from collections import defaultdict
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -86,17 +86,94 @@ def revenue_publication(year: int, month: int) -> str:
     return date(following.year, following.month, MONTHLY_REVENUE_DAY).isoformat()
 
 
-def _by_type(rows: list[dict], names: tuple[str, ...]) -> dict[str, float]:
-    """Latest value per period for the first matching type name."""
+def _revisions_by_type(
+    rows: list[dict], names: tuple[str, ...]
+) -> list[tuple[date, int, str, float, bool]]:
+    """Bind each value revision to its own availability day.
+
+    Legacy rows without an explicit timestamp retain the statutory filing-day
+    fallback for ratio calculation, but they cannot count toward certified
+    multi-year history.  A late corrected row therefore cannot borrow the
+    original row's earlier availability.
+    """
     wanted = {name.lower() for name in names}
-    result: dict[str, float] = {}
-    for row in rows:
-        if str(row.get("type", "")).lower() in wanted:
+    result: list[tuple[date, int, str, float, bool]] = []
+    for order, row in enumerate(rows):
+        if str(row.get("type", "")).lower() not in wanted:
+            continue
+        period = period_end(row.get("date"))
+        if period is None:
+            continue
+        explicit = False
+        available = None
+        raw_available = row.get("availableAt")
+        if isinstance(raw_available, str):
             try:
-                result[iso(row.get("date"))] = float(row.get("value"))
-            except (TypeError, ValueError):
-                continue
+                parsed = datetime.fromisoformat(raw_available.replace("Z", "+00:00"))
+            except ValueError:
+                parsed = None
+            if parsed is not None and parsed.tzinfo is not None and parsed.utcoffset() is not None:
+                available = parsed.astimezone(timezone(timedelta(hours=8))).date()
+                explicit = True
+        if available is None:
+            available = date.fromisoformat(quarter_publication(period))
+        try:
+            number = float(row.get("value"))
+        except (TypeError, ValueError):
+            continue
+        result.append((available, order, period, number, explicit))
+    result.sort(key=lambda item: (item[0], item[1], item[2]))
     return result
+
+
+def _values_as_of(
+    revisions: list[tuple[date, int, str, float, bool]], as_of: date
+) -> dict[str, float]:
+    """Select the latest available revision for each reported period."""
+    selected: dict[str, tuple[date, int, float]] = {}
+    for available, order, period, value, _explicit in revisions:
+        if available <= as_of:
+            previous = selected.get(period)
+            if previous is None or (available, order) > previous[:2]:
+                selected[period] = (available, order, value)
+    return {period: item[2] for period, item in selected.items()}
+
+
+def _explicit_first_availability(
+    revisions: list[tuple[date, int, str, float, bool]]
+) -> dict[str, date]:
+    result: dict[str, date] = {}
+    for available, _order, period, _value, explicit in revisions:
+        if explicit and (period not in result or available < result[period]):
+            result[period] = available
+    return result
+
+
+def _complete_financial_years_at(
+    availability: dict[str, dict[str, date]], as_of: date
+) -> int:
+    """Count full years whose five required statement fields were all available.
+
+    One quarter or one metric never counts as a year.  Rows without their own
+    timezone-bearing ``availableAt`` are deliberately ineligible for this
+    history gate, so a modern cache cannot silently backfill an old signal.
+    """
+    years = {
+        int(period[:4])
+        for series in availability.values()
+        for period in series
+        if len(period) >= 4 and period[:4].isdigit()
+    }
+    complete = 0
+    for year in years:
+        quarters = tuple(f"{year}-{suffix}" for suffix in ("03-31", "06-30", "09-30", "12-31"))
+        if all(
+            period in availability[field] and availability[field][period] <= as_of
+            for field in FIELDS
+            for period in quarters
+        ):
+            complete += 1
+    return complete
 
 
 def _ttm(series: dict[str, float], period: str, quarters: int = 4) -> float | None:
@@ -113,17 +190,36 @@ def build_stock(payload: dict[str, Any]) -> list[tuple[str, dict[str, float]]]:
     balance = payload.get("TaiwanStockBalanceSheet", [])
     revenue_rows = payload.get("TaiwanStockMonthRevenue", [])
 
-    eps = _by_type(statements, FIELDS["eps"])
-    net_income = _by_type(statements, FIELDS["net_income"])
-    equity = _by_type(balance, FIELDS["equity"])
-    assets = _by_type(balance, FIELDS["assets"])
-    liabilities = _by_type(balance, FIELDS["liabilities"])
+    revisions = {
+        "eps": _revisions_by_type(statements, FIELDS["eps"]),
+        "net_income": _revisions_by_type(statements, FIELDS["net_income"]),
+        "equity": _revisions_by_type(balance, FIELDS["equity"]),
+        "assets": _revisions_by_type(balance, FIELDS["assets"]),
+        "liabilities": _revisions_by_type(balance, FIELDS["liabilities"]),
+    }
+    history_availability = {
+        field: _explicit_first_availability(series)
+        for field, series in revisions.items()
+    }
 
     events: dict[str, dict[str, float]] = defaultdict(dict)
 
-    for period in sorted(set(eps) | set(net_income) | set(equity) | set(assets) | set(liabilities)):
-        available = quarter_publication(period)
+    for available_day in sorted({item[0] for series in revisions.values() for item in series}):
+        available = available_day.isoformat()
         entry = events[available]
+        entry["financialHistoryYears"] = _complete_financial_years_at(
+            history_availability, available_day
+        )
+        values = {
+            field: _values_as_of(series, available_day)
+            for field, series in revisions.items()
+        }
+        eps, net_income = values["eps"], values["net_income"]
+        equity, assets, liabilities = values["equity"], values["assets"], values["liabilities"]
+        periods = set(eps) | set(net_income) | set(equity) | set(assets) | set(liabilities)
+        if not periods:
+            continue
+        period = max(periods)
         ttm_eps = _ttm(eps, period)
         if ttm_eps is not None:
             entry["eps"] = ttm_eps
