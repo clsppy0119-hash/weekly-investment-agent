@@ -18,6 +18,7 @@ SCOPED_FLAGS = (
     "ARTIFACT_SHADOW_EXTRACT_ENABLED",
     "SHADOW_PIPELINE_ENABLED",
     "LINEAGE_FREEZE_ENABLED",
+    "CONTRACT_GAP_REPORT_ENABLED",
 )
 
 
@@ -73,6 +74,7 @@ def run(*, client: Any | None = None) -> dict[str, Any]:
             for key in (
                 "schemaVersion", "mode", "runId", "artifactId", "archiveSha256",
                 "archiveBytes", "pipelineMode", "blockers", "limitation",
+                "contractGapReport",
             )
             if key in result
         }

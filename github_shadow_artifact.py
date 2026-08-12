@@ -254,7 +254,7 @@ def run(*, run_id: int, decision_as_of: str, client: Any | None = None) -> dict[
             extracted["contract"], extracted["manifest"], decision_as_of=decision_as_of
         )
         mode = "shadow_only" if pipeline.get("mode") == "shadow_only" else "research_only"
-        return {
+        output = {
             "schemaVersion": 1,
             "mode": mode,
             "runId": run_id,
@@ -265,6 +265,9 @@ def run(*, run_id: int, decision_as_of: str, client: Any | None = None) -> dict[
             "blockers": pipeline.get("blockers", ["pipeline_not_certified"]),
             "limitation": "Read-only shadow validation; no formal advice, notification, or trading effect.",
         }
+        if "contractGapReport" in pipeline:
+            output["contractGapReport"] = pipeline["contractGapReport"]
+        return output
     except Exception as exc:
         blocker = exc.args[0] if isinstance(exc, FetchError) and exc.args else type(exc).__name__
         return {"schemaVersion": 1, "mode": "research_only", "blockers": [str(blocker)]}

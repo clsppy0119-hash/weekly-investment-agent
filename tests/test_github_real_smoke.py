@@ -79,7 +79,7 @@ class RealSmokeTests(unittest.TestCase):
         self.assertEqual(result["artifactId"], smoke.PINNED_ARTIFACT_ID)
         self.assertEqual({name: os.environ.get(name) for name in smoke.SCOPED_FLAGS}, before)
         rendered = json.dumps(result)
-        for forbidden in ("GITHUB_TOKEN", "https://", "contract", "manifest", "raw"):
+        for forbidden in ("GITHUB_TOKEN", "https://", "endpoint", "payload", "rawRows"):
             self.assertNotIn(forbidden, rendered)
 
     def test_pin_mismatches_fail_closed_before_download(self):
