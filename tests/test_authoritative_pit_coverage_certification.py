@@ -332,7 +332,7 @@ def test_population_policy_contains_all_markets_and_nontrading_semantics():
     assert {row["market"] for row in memberships} == {"TWSE", "TPEx", "emerging"}
     assert {row["status"] for row in memberships} >= {"active", "suspended", "zero_volume"}
     assert any(row["exitEffectiveAt"] is not None for row in memberships)
-    assert "prices" in cert.POPULATION_POLICY["prohibitedDerivations"]
+    assert "price" in cert.POPULATION_POLICY["prohibitedDerivations"]
     assert "current-survivors" in cert.POPULATION_POLICY["prohibitedDerivations"]
 
 

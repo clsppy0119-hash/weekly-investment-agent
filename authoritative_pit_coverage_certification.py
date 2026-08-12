@@ -23,6 +23,10 @@ from pathlib import Path
 from typing import Any
 
 import production_strategy_validation_preflight as strategy_preflight
+from market_population_contract import (
+    POPULATION_POLICY_VERSION, population_policy_view,
+    population_policy_hash as _shared_population_policy_hash,
+)
 
 
 SCHEMA_VERSION = 1
@@ -31,22 +35,7 @@ REGISTRY_POLICY_VERSION = "trusted-pit-bundle-registry-v1"
 REGISTRY_PATH = Path(__file__).with_name("trusted_pit_bundle_registry_v1.json")
 TIMEZONE = "Asia/Taipei"
 MARKET_SCOPE = ("TWSE", "TPEx", "emerging", "delisted/terminated")
-POPULATION_POLICY_VERSION = "official-full-market-population-v1"
-POPULATION_POLICY = {
-    "policyVersion": POPULATION_POLICY_VERSION,
-    "securityIdRule": "four-digit-taiwan-equity",
-    "marketComponents": [
-        "twse_active", "tpex_active", "emerging_active", "membership_events",
-    ],
-    "includedStates": ["active", "suspended", "zero_volume"],
-    "membershipInterval": "entry-inclusive-exit-exclusive",
-    "includeLaterDelistedWhileEffective": True,
-    "universeDerivation": "official-membership-components-only",
-    "prohibitedDerivations": [
-        "prices", "volume", "fundamentals", "cache", "candidates",
-        "current-survivors",
-    ],
-}
+POPULATION_POLICY = population_policy_view()
 REQUIRED_COMPONENTS = tuple(POPULATION_POLICY["marketComponents"])
 COMPONENT_MARKETS = {
     "twse_active": "TWSE",
@@ -150,7 +139,7 @@ def digest(value: Any) -> str:
 
 
 def population_policy_hash() -> str:
-    return digest(POPULATION_POLICY)
+    return _shared_population_policy_hash()
 
 
 def pit_requirements_hash() -> str:
