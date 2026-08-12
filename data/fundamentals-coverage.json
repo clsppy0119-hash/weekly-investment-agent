@@ -2,56 +2,59 @@
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
   "credentialMode": "authenticated",
-  "updatedAt": "2026-08-11T04:51:20.861031+00:00",
+  "updatedAt": "2026-08-12T05:46:47.001617+00:00",
   "activeStage": "電子其他",
   "universeCodes": 2783,
-  "currentStageCodes": 927,
+  "currentStageCodes": 930,
   "queriedCodes": [
-    "2342",
-    "2427",
-    "2428",
-    "2429",
-    "2430",
-    "2431",
-    "2433",
-    "2434",
-    "2436",
-    "2438",
-    "2439",
-    "2440",
-    "2441",
-    "2444",
-    "2449",
-    "2450",
-    "2453",
-    "2454",
-    "2455",
-    "2457",
-    "2458",
-    "2459",
-    "2460",
-    "2461",
-    "2462",
-    "2464",
-    "2465",
-    "2466",
-    "2467",
-    "2468"
+    "4967",
+    "6206",
+    "2471",
+    "2472",
+    "2474",
+    "2476",
+    "2477",
+    "2478",
+    "2480",
+    "2481",
+    "2482",
+    "2483",
+    "2484",
+    "2485",
+    "2486",
+    "2488",
+    "2489",
+    "2491",
+    "2492",
+    "2493",
+    "2495",
+    "2498",
+    "2640",
+    "2949",
+    "3002",
+    "3003",
+    "3005",
+    "3006",
+    "3008",
+    "3010"
   ],
-  "priorityCodes": [],
+  "priorityCodes": [
+    "4967",
+    "6206"
+  ],
   "successfulCodes": 30,
-  "enrichedCodes": 652,
-  "remainingCodes": 2131,
+  "enrichedCodes": 781,
+  "remainingCodes": 2002,
   "stageCoverage": {
     "半導體": {
-      "total": 161,
+      "total": 158,
       "reviewed": 171,
       "remaining": 0
     },
     "電子其他": {
-      "total": 927,
-      "reviewed": 120,
-      "remaining": 807
+      "total": 930,
+      "reviewed": 150,
+      "remaining": 780
     },
     "金融": {
       "total": 63,
@@ -59,71 +62,113 @@
       "remaining": 63
     },
     "傳產與其他": {
-      "total": 1419,
+      "total": 1420,
       "reviewed": 0,
-      "remaining": 1419
+      "remaining": 1420
     },
     "興櫃": {
-      "total": 213,
+      "total": 212,
       "reviewed": 0,
-      "remaining": 213
+      "remaining": 212
     }
   },
   "failures": {},
   "sourceDisagreements": {
-    "2430": {
+    "4967": {
       "eps": {
-        "openData": 0.09,
-        "finmind": 0.5
+        "openData": 53.44,
+        "finmind": 65.41
       }
     },
-    "2439": {
+    "2471": {
       "eps": {
-        "openData": 1.54,
-        "finmind": 5.45
+        "openData": 1.6,
+        "finmind": 4.83
       }
     },
-    "2441": {
+    "6206": {
+      "eps": {
+        "openData": 5.93,
+        "finmind": 9.06
+      }
+    },
+    "2474": {
+      "eps": {
+        "openData": 5.14,
+        "finmind": 13.64
+      }
+    },
+    "2476": {
       "eps": {
         "openData": 2.98,
-        "finmind": 5.41
+        "finmind": 6.23
       }
     },
-    "2450": {
+    "2480": {
       "eps": {
-        "openData": 0.67,
-        "finmind": 1.62
+        "openData": 4.91,
+        "finmind": 8.75
       }
     },
-    "2454": {
+    "2483": {
       "eps": {
-        "openData": 30.44,
-        "finmind": 60.69
+        "openData": 0.4,
+        "finmind": 0.25
       }
     },
-    "2455": {
+    "2484": {
       "eps": {
-        "openData": 2.2,
-        "finmind": 4.12
+        "openData": 0.86,
+        "finmind": 1.4
       }
     },
-    "2464": {
+    "2486": {
       "eps": {
-        "openData": 0.66,
-        "finmind": 0.41
+        "openData": 0.91,
+        "finmind": 1.19
       }
     },
-    "2467": {
+    "2488": {
       "eps": {
-        "openData": 7.16,
-        "finmind": 10.27
+        "openData": 2.21,
+        "finmind": 4.86
+      }
+    },
+    "2492": {
+      "eps": {
+        "openData": 4.93,
+        "finmind": 8.9
+      }
+    },
+    "2495": {
+      "eps": {
+        "openData": 0.61,
+        "finmind": 2.03
+      }
+    },
+    "2498": {
+      "eps": {
+        "openData": -0.62,
+        "finmind": 2.59
+      }
+    },
+    "3008": {
+      "eps": {
+        "openData": 82.35,
+        "finmind": 185.73
+      }
+    },
+    "3006": {
+      "eps": {
+        "openData": 27.58,
+        "finmind": 31.16
       }
     }
   },
   "metrics": {
-    "eps": 655,
-    "roe": 652,
-    "debtRatio": 672
+    "eps": 784,
+    "roe": 781,
+    "debtRatio": 801
   },
-  "fiveYearHistory": 258
+  "fiveYearHistory": 286
 }
