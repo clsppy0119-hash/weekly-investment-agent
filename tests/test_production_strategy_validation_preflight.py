@@ -212,13 +212,18 @@ def test_registered_manifest_semantics_are_exercised_by_production_functions():
 
 
 def test_registered_source_pins_match_the_current_production_path():
+    def canonical_source_hash(path):
+        text = path.read_text(encoding="utf-8")
+        normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+        return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
     actual = {
-        name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        name: canonical_source_hash(ROOT / name)
         for name in preflight.SOURCE_PINS
     }
     assert actual == preflight.SOURCE_PINS
     producer_actual = {
-        name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+        name: canonical_source_hash(ROOT / name)
         for name in preflight.EVIDENCE_PRODUCER_PINS
     }
     assert producer_actual == preflight.EVIDENCE_PRODUCER_PINS

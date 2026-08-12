@@ -24,14 +24,16 @@ POLICY_VERSION = "production-strategy-validation-preflight-v1"
 STRATEGY_IDENTITY = "production-comprehensive-v1"
 
 # These pins bind the specification to the exact production selection path on
-# main at the time the contract was registered.  A source change must update
-# the contract and therefore produces a new strategySpecHash.
+# main at the time the contract was registered.  Source text is canonicalized
+# to UTF-8 with LF newlines before hashing so Windows and Linux checkouts prove
+# the same content.  A source change must update the contract and therefore
+# produces a new strategySpecHash.
 SOURCE_PINS = {
-    "candidate_manifest.py": "0963853c011f95af1cdfceef8e66d75773f3de9d658db7c2d41b9fb7690e6dbc",
-    "daily_report.py": "c3ce38aa07e5b27ef00cb8de3b78d2147b497fd9be7f81462bdc9c1011379efc",
-    "data_contract.py": "cea060fbe8bfcc25818be8cdbd9840891c433e644ada69e33c3d1f559c7f57a8",
-    "scoring.py": "bcbd59d8ad215dbe8cc4ea09e2d43e55896dc12eb378bf35937741be1cafe9c5",
-    "strategy_tracker.py": "c42556a24428c44273f0369411ae5aa4e173022a29d0f9641e3dadb8b7f6ca15",
+    "candidate_manifest.py": "1f55b8e2d7107a37a85e608ba2a7b4ba79eb1faf6a50027b33a2fc87f7859712",
+    "daily_report.py": "80fdcb73e954f587899cc6a50fff9149db7da4a344160bfe5d90434914d1602b",
+    "data_contract.py": "f91475db7ece2dffef9bed86a1a5c1b0dbf12d4ecaba7a4c6b51447624987c45",
+    "scoring.py": "3db3aaa02dbf9f419da48a6150ff8e479a42ec8f0bd0b2f55cd9ad74f456a50c",
+    "strategy_tracker.py": "5ce5e846a99a66372e0f9a4e96fe5d80e34c8b58065d393419e87db87d86e393",
 }
 
 # Only fixed, reviewed producers may describe evidence to this preflight.  The
@@ -39,11 +41,11 @@ SOURCE_PINS = {
 # package obeys this contract; it cannot authenticate that the package came
 # from an official provider, so this node never sets ``pitCertified`` true.
 EVIDENCE_PRODUCER_PINS = {
-    "freeze_lineage_summary.py": "6d183139f9a81081c92e6fe09593ca12af74959208894d6e8eef7dfc523249e3",
-    "lineage_replay.py": "69b5cb18dfd0791273c14238a89a0da93a56fab3f60dad9019d666eb41ca03c6",
-    "market_membership_snapshots.py": "80fdb3c919d859d08eb30f05c1591be59f3ca22ac91d58fc64da0ec45acfc9c7",
-    "point_in_time_fundamentals.py": "24cdbe37e210bad6a89944b9fd18804bd17b766070e08028c9df776f1d583d0e",
-    "strategy_backtest.py": "f07dd6c04e234ffe8121887883ac5696154af1aa1767686802c24d42d02f459a",
+    "freeze_lineage_summary.py": "58d5bb1c56b505bd52ae4d90129f575868e14da6460a3ab95a6dd6a5ac1462f8",
+    "lineage_replay.py": "da0b2b83e094c8c040b1540f94795aa81eeb06ef149aa390adf92b83669778d8",
+    "market_membership_snapshots.py": "2fcc10db99a7f9f60fc4e436fbd84d86b919e6f1c4032f7d809088e70ac99ff1",
+    "point_in_time_fundamentals.py": "2d1657b8e526ce9d44b616781535cc1978d39485052d46c9b380ddeabcba9afb",
+    "strategy_backtest.py": "9da2a5a8f1043b5d4ddcd76a221e7a41672d63f6bd70c8748b33d6927f6bd1f3",
 }
 
 AUTHORITY_CONTRACTS = {
