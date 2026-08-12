@@ -8,6 +8,7 @@ runs the migration, creates schemas/tables, invokes RPCs, or reads app rows.
 from __future__ import annotations
 
 import hashlib
+import re
 from typing import Any
 
 
@@ -52,14 +53,17 @@ begin
   revoke {ROLE_OWNER} from postgres;
   revoke {ROLE_WRITER} from postgres;
 
-  select pg_catalog.coalesce(
+  select coalesce(
     pg_catalog.jsonb_agg(
       pg_catalog.jsonb_build_object(
         'grantedRole', granted_role.rolname,
         'memberRole', member_role.rolname,
         'grantorRole', grantor_role.rolname,
-        'options', pg_catalog.to_jsonb(m)
-          - 'roleid' - 'member' - 'grantor'
+        'options', pg_catalog.jsonb_build_object(
+          'adminOption', m.admin_option,
+          'inheritOption', m.inherit_option,
+          'setOption', m.set_option
+        )
       ) order by granted_role.rolname, member_role.rolname, grantor_role.rolname
     ), '[]'::jsonb
   ) into membership_summary
@@ -104,6 +108,10 @@ def validate(sql: Any, *, enabled: bool = False) -> dict[str, Any]:
         f"revoke {ROLE_OWNER} from postgres;", f"revoke {ROLE_WRITER} from postgres;",
         "from pg_catalog.pg_auth_members", "join pg_catalog.pg_roles granted_role",
         "join pg_catalog.pg_roles member_role", "join pg_catalog.pg_roles grantor_role",
+        "select coalesce(",
+        "'options', pg_catalog.jsonb_build_object(",
+        "'adminoption', m.admin_option", "'inheritoption', m.inherit_option",
+        "'setoption', m.set_option",
         "membership_probe_result:%", "rollback;",
     )
     if any(fragment not in lowered for fragment in required):
@@ -117,9 +125,22 @@ def validate(sql: Any, *, enabled: bool = False) -> dict[str, Any]:
         "alter publication", "insert into", "update ", "delete from", "truncate ",
         "append_decision_outcome", "investment_decision_shadow", "supabase_url",
         "service_role_key", "postgresql://", "https://", "telegram", "investment_advice",
+        "to_jsonb(m)", "'oid'", "'roleid'", "'member'", "'grantor'",
     )
     if any(fragment in lowered for fragment in forbidden):
         blockers.append("external_formal_or_data_operation_forbidden")
+    if re.search(r"\b(?:[a-z_][a-z0-9_]*\.)+coalesce\s*\(", lowered):
+        blockers.append("schema_qualified_coalesce_forbidden")
+    option_keys = re.findall(
+        r"'([a-zA-Z][a-zA-Z0-9]*)'\s*,\s*m\.(admin_option|inherit_option|set_option)",
+        sql,
+    )
+    if option_keys != [
+        ("adminOption", "admin_option"),
+        ("inheritOption", "inherit_option"),
+        ("setOption", "set_option"),
+    ]:
+        blockers.append("membership_option_allowlist_invalid")
     return _verdict(sql, blockers)
 
 
