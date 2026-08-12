@@ -107,6 +107,7 @@ def build_manifest(
                     "rank": rank,
                     "score": score,
                     "coverage": coverage,
+                    "entryPrice": quote.get("price"),
                     "quality": {"passed": not blockers, "blockers": blockers},
                 }
             )

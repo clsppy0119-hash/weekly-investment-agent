@@ -103,6 +103,7 @@ class CandidatePipelineTests(unittest.TestCase):
 
             manifest = json.loads((root / "data" / "candidate-manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["candidateOrder"], ["2330"])
+            self.assertEqual(manifest["previewCandidates"][0]["entryPrice"], 1000.0)
             self.assertEqual(manifest["eligibleCandidates"], [])
             self.assertFalse((root / "strategy_data" / "recommendations.json").exists())
 
