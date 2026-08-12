@@ -39,6 +39,8 @@ on:
       - "strategy_backtest.py"
       - "investment_advice_gate.py"
       - "production_strategy_validation_preflight.py"
+      - "authoritative_pit_coverage_certification.py"
+      - "trusted_pit_bundle_registry_v1.json"
       - "decision_outcome_export.py"
       - "staging_preflight_result.py"
       - "supabase-decision-outcome-shadow-v1.sql"
@@ -88,6 +90,7 @@ jobs:
           strategy_backtest.py
           investment_advice_gate.py
           production_strategy_validation_preflight.py
+          authoritative_pit_coverage_certification.py
           decision_outcome_export.py
           staging_preflight_result.py
       - name: Run deterministic safety tests
