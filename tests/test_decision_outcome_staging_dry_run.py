@@ -85,6 +85,27 @@ class OutcomeStagingDryRunTests(unittest.TestCase):
         ):
             self.assertIn(required, sql)
 
+    def test_postgresql_creator_memberships_are_removed_before_migration(self):
+        events, manifest, anchor = fixture()
+        sql = dry_run.build(self.migration, events, manifest, anchor, enabled=True)["sql"].lower()
+        owner_revoke = "revoke decision_outcome_owner from postgres;"
+        writer_revoke = "revoke decision_outcome_writer from postgres;"
+        migration_preflight = "do $preflight$"
+        self.assertIn(owner_revoke, sql)
+        self.assertIn(writer_revoke, sql)
+        self.assertLess(sql.index(owner_revoke), sql.index(migration_preflight))
+        self.assertLess(sql.index(writer_revoke), sql.index(migration_preflight))
+        self.assertNotIn("grant decision_outcome_owner", sql)
+        self.assertNotIn("grant decision_outcome_writer", sql)
+        self.assertFalse(dry_run.validate(
+            sql.replace(owner_revoke, "-- missing owner membership cleanup"),
+            self.migration, enabled=True,
+        )["valid"])
+        self.assertFalse(dry_run.validate(
+            sql.replace(writer_revoke, "-- missing writer membership cleanup"),
+            self.migration, enabled=True,
+        )["valid"])
+
     def test_output_has_no_credentials_urls_or_formal_flow(self):
         events, manifest, anchor = fixture()
         sql = dry_run.build(self.migration, events, manifest, anchor, enabled=True)["sql"].lower()

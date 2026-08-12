@@ -93,6 +93,12 @@ create role {ROLE_OWNER} nologin noinherit nosuperuser nocreatedb
   nocreaterole noreplication nobypassrls;
 create role {ROLE_WRITER} nologin noinherit nosuperuser nocreatedb
   nocreaterole noreplication nobypassrls;
+-- PostgreSQL 16+ may grant the creating role an implicit membership in each
+-- newly created role.  The production contract intentionally requires an
+-- empty membership graph, so remove only that creator edge before running the
+-- unchanged migration preflight.  This does not grant any privilege.
+revoke {ROLE_OWNER} from postgres;
+revoke {ROLE_WRITER} from postgres;
 revoke create on schema public from {ROLE_OWNER}, {ROLE_WRITER};
 
 {migration_sql.rstrip()}
@@ -214,6 +220,8 @@ def validate(sql: Any, migration_sql: str, *, enabled: bool = False) -> dict[str
         "decision_outcome_staging_executor_invalid", "decision_outcome_staging_not_clean",
         f"create role {ROLE_OWNER} nologin noinherit nosuperuser",
         f"create role {ROLE_WRITER} nologin noinherit nosuperuser",
+        f"revoke {ROLE_OWNER} from postgres;",
+        f"revoke {ROLE_WRITER} from postgres;",
         "revoke create on schema public", "set local role decision_outcome_writer",
         "decision_outcome_direct_dml_unexpectedly_allowed", "when insufficient_privilege",
         "decision_outcome_insert_receipt_invalid", "decision_outcome_duplicate_receipt_invalid",
@@ -225,6 +233,11 @@ def validate(sql: Any, migration_sql: str, *, enabled: bool = False) -> dict[str
     for fragment in required:
         if fragment.lower() not in lowered:
             blockers.append("required_guard_missing")
+    migration_start = lowered.find("do $preflight$")
+    for role in (ROLE_OWNER, ROLE_WRITER):
+        revoke_at = lowered.find(f"revoke {role} from postgres;")
+        if revoke_at < 0 or migration_start < 0 or revoke_at > migration_start:
+            blockers.append("creator_membership_guard_order_invalid")
     if sql.rstrip().splitlines()[-1].strip().lower() != "rollback;":
         blockers.append("final_rollback_missing")
     if lowered.count("rollback;") != 2 or lowered.count("begin;") != 1 or lowered.count("begin transaction read only;") != 1:
