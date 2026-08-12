@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "forward-only-full-market-observation-contract-v1",
+  "mode": "research_only",
+  "events": [],
+  "ledgerHash": "13d25effcbee1c94254c48db8a9238a5898b45d958b35aad95f74ede0fd863aa"
+}
