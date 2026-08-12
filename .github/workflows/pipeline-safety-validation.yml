@@ -12,6 +12,7 @@ on:
       - "investment_agent/research_team.py"
       - "pit_availability_evidence.py"
       - "official_availability_capability.py"
+      - "official_metadata_smoke.py"
       - "tests/**"
       - ".github/workflows/**"
 
@@ -36,5 +37,6 @@ jobs:
           finmind_fundamentals.py finmind_actions.py investment_agent/cloud_report.py
           investment_agent/research_team.py pit_availability_evidence.py
           official_availability_capability.py
+          official_metadata_smoke.py
       - name: Run deterministic safety tests
         run: python -m unittest discover -s tests -v
