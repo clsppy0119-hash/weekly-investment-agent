@@ -26,6 +26,11 @@ from statistics import mean, stdev
 
 from actual_comprehensive_selection import POLICY_VERSION as SELECTION_POLICY_VERSION
 from actual_comprehensive_selection import rank_and_assess
+from actual_comprehensive_outcome_accounting import (
+    POLICY_VERSION as OUTCOME_ACCOUNTING_POLICY_VERSION,
+    aggregate_measurements,
+    measure_cohort,
+)
 from backtest import (
     BUY_FEE, DEFAULT_BENCHMARK, DEFAULT_DATA, ETF_SELL_TAX, SELL_FEE,
     SLIPPAGE_BPS, STOCK_SELL_TAX, benchmark_total_return, load_history,
@@ -108,6 +113,17 @@ def load_selection_evidence(path: Path | None) -> dict | None:
         value = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return None
+    return value if isinstance(value, dict) else None
+
+
+def _dated_evidence_at(source: object, signal_date: str) -> dict | None:
+    """Resolve a separate settlement snapshot; never reuse undated evidence."""
+    if callable(source):
+        value = source(signal_date)
+    elif isinstance(source, dict) and isinstance(source.get("byDate"), dict):
+        value = source["byDate"].get(signal_date)
+    else:
+        value = None
     return value if isinstance(value, dict) else None
 
 
@@ -257,7 +273,9 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
               holding: int, min_volume: float, weights: dict | None = None,
               minimum_coverage: int | None = None, pit: object | None = None,
               continuous_trend: bool = False, reversal_aware: bool = False,
-              selection_evidence: object | None = None) -> dict:
+              selection_evidence: object | None = None,
+              outcome_evidence: object | None = None,
+              benchmark_values: dict[str, float] | None = None) -> dict:
     """Signals inside ``[start, end)``, exits kept inside it too.
 
     Moving averages read days before ``start`` on purpose: that is past data at
@@ -275,6 +293,7 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
     selection_periods = 0
     selection_evidence_periods = 0
     cutoff_tie_periods = 0
+    comprehensive_cohorts: list[dict] = []
     if style == "comprehensive":
         selection_blockers.update({
             "selection_evidence_authority_unregistered",
@@ -317,6 +336,60 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
                                   weights=weights, minimum_coverage=minimum_coverage,
                                   continuous_trend=continuous_trend, reversal_aware=reversal_aware)
             selected = eligible[:picks]
+        if style == "comprehensive":
+            # Signal at this close, enter at the next official market date, and
+            # measure exactly ``holding`` trading intervals.  The horizon is a
+            # research measurement, not a registered live sell instruction.
+            measurement_dates = dates[index:index + holding + 2]
+            pool_codes = [row["code"] for row in selection["fullPool"]]
+            price_paths = {
+                code: {
+                    dates[position]: float(history[position][code][0])
+                    for position in range(index + 1, index + holding + 2)
+                    if code in history[position]
+                }
+                for code in pool_codes
+            }
+            cohort = measure_cohort({
+                "schemaVersion": 1,
+                "selection": {
+                    key: value for key, value in selection.items()
+                    if key not in {"poolTuples", "previewTuples", "selectedTuples"}
+                },
+                "dates": measurement_dates,
+                "pricePaths": price_paths,
+                "benchmarkTotalReturn": {
+                    day: benchmark_values[day]
+                    for day in measurement_dates[1:]
+                    if benchmark_values is not None and day in benchmark_values
+                },
+                "outcomeEvidence": _dated_evidence_at(outcome_evidence, dates[index]),
+            }, enabled=True)
+            comprehensive_cohorts.append(cohort)
+            accounting = cohort.get("selectionAccounting", {})
+            selection_blockers.update(cohort.get("blockers", []))
+            unfilled += int(accounting.get("unfilledEntrySlots", 0))
+            if not selection["qualityPassedCodes"]:
+                no_candidate += 1
+            if cohort.get("accountingComplete") is True:
+                net = float(cohort["selectionReturn"])
+                returns.append(net)
+                if accounting.get("closedSlots", 0) > 0:
+                    wins += net > 0
+                pool_excess = cohort.get("selectionExcessVersusPool")
+                # Every complete scheduled period belongs to the comparison
+                # sample, including all-cash and all-unfilled periods.  Active
+                # trade counts and win rate remain separate diagnostics.
+                rebalances.append({
+                    "entry": cohort["comparisonFrom"],
+                    "exit": cohort["comparisonTo"],
+                    "net": net,
+                    "poolExcess": pool_excess,
+                    "poolSize": cohort["selectionIdentity"]["poolSize"],
+                    "active": accounting.get("closedSlots", 0) > 0,
+                })
+            index += holding
+            continue
         window = history[index + 1:index + holding + 2]
         trade_returns: list[float] = []
         for _score, _coverage, code, _quote, _fund in selected:
@@ -360,6 +433,61 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
             })
             wins += net > 0
         index += holding
+    if style == "comprehensive":
+        summary = aggregate_measurements(comprehensive_cohorts)
+        if summary["complete"]:
+            benchmark_periods = summary["benchmarkScheduledReturns"]
+            if len(benchmark_periods) != len(rebalances):
+                raise ValueError("scheduled_benchmark_comparison_mismatch")
+            for item, reference in zip(rebalances, benchmark_periods):
+                item["benchmarkReturn"] = reference
+        else:
+            # One unresolved cohort invalidates the split; never report a
+            # partial significance sample from only the surviving periods.
+            rebalances = []
+        active = int(summary["executionAccounting"].get("investedPeriods", 0))
+        return {
+            "return": summary["return"],
+            "mdd": summary["mdd"],
+            "mddBasis": "daily_mark_to_market_including_costs",
+            "trades": active,
+            "scheduledPeriods": int(summary["executionAccounting"].get("scheduledPeriods", 0)),
+            "win_rate": wins / active if active else 0.0,
+            "unfilled": int(summary["executionAccounting"].get("unfilledEntrySlots", 0)),
+            "stale_exits": 0,
+            "rebalances_without_candidates": no_candidate,
+            "returns": returns,
+            "rebalances": rebalances,
+            "selectionPolicyVersion": SELECTION_POLICY_VERSION,
+            "selectionAdapterUsed": True,
+            "selectionPeriods": selection_periods,
+            "selectionEvidencePeriods": selection_evidence_periods,
+            "selectionEvidenceShapeComplete": selection_evidence_periods == selection_periods,
+            "selectionEvidenceComplete": False,
+            "selectionCertified": False,
+            "performanceEligible": False,
+            "executionAccountingStatus": "registered_for_measurement_only",
+            "liveExecutionSpecStatus": "decision_required",
+            "riskPolicyStatus": "unregistered",
+            "eligiblePoolAccountingStatus": "registered_for_measurement_only",
+            "outcomeAccountingPolicyVersion": OUTCOME_ACCOUNTING_POLICY_VERSION,
+            "outcomeAccountingComplete": summary["complete"],
+            "executionAccounting": summary["executionAccounting"],
+            "eligiblePoolAccounting": summary["eligiblePoolAccounting"],
+            "eligiblePoolReturn": summary["eligiblePoolReturn"],
+            "eligiblePoolMdd": summary["eligiblePoolMdd"],
+            "benchmarkReturn": summary["benchmarkReturn"],
+            "benchmarkMdd": summary["benchmarkMdd"],
+            "benchmarkCostedRoundTrips": summary["benchmarkCostedRoundTrips"],
+            "benchmarkCostModel": summary["benchmarkCostModel"],
+            "benchmarkScheduledReturns": summary["benchmarkScheduledReturns"],
+            "comparisonFrom": summary.get("comparisonFrom"),
+            "comparisonTo": summary.get("comparisonTo"),
+            "measurementDigests": summary.get("measurementDigests", []),
+            "cutoffTieDependentPeriods": cutoff_tie_periods,
+            "selectionBlockers": sorted(selection_blockers | set(summary["blockers"])),
+            "versusEligiblePool": pool_summary(rebalances),
+        }
     equity = peak = 1.0
     drawdown = 0.0
     for value in returns:
@@ -397,7 +525,8 @@ def run_range(history: list[dict], dates: list[str], start: int, end: int, style
 def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
              min_volume: float, drop: tuple[str, ...] = (), pit: object | None = None,
              continuous_trend: bool = False, reversal_aware: bool = False,
-             selection_evidence: object | None = None) -> dict:
+             selection_evidence: object | None = None,
+             outcome_evidence: object | None = None) -> dict:
     dates, history = load_history(data)
     if len(history) < 120:
         raise SystemExit(f"歷史資料只有 {len(history)} 個交易日，不足 120，無法切出樣本外測試。")
@@ -420,12 +549,29 @@ def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
     for name, (start, end) in parts.items():
         run = run_range(history, dates, start, end, style, picks, holding, min_volume,
                         weights, coverage_floor, pit, continuous_trend, reversal_aware,
-                        selection_evidence)
-        run["benchmark"] = benchmark_total_return(benchmark, dates[start:end])
-        run["excess"] = None if run["benchmark"] is None else run["return"] - run["benchmark"]
+                        selection_evidence, outcome_evidence, series)
+        comparison_dates = dates[start:end]
+        if style == "comprehensive" and run.get("comparisonFrom") and run.get("comparisonTo"):
+            comparison_dates = [
+                day for day in dates
+                if run["comparisonFrom"] <= day <= run["comparisonTo"]
+            ]
+        run["benchmark"] = (
+            run.get("benchmarkReturn")
+            if style == "comprehensive"
+            else benchmark_total_return(benchmark, comparison_dates)
+        )
+        run["excess"] = (
+            run["return"] - run["benchmark"]
+            if run["benchmark"] is not None and run["return"] is not None else None
+        )
         per_rebalance = []
         for item in run["rebalances"]:
-            reference = benchmark_between(series, item["entry"], item["exit"])
+            reference = (
+                item.get("benchmarkReturn")
+                if style == "comprehensive"
+                else benchmark_between(series, item["entry"], item["exit"])
+            )
             if reference is not None:
                 per_rebalance.append(item["net"] - reference)
         run["significance"] = significance(per_rebalance)
@@ -433,7 +579,11 @@ def evaluate(data: Path, benchmark: Path, style: str, picks: int, holding: int,
         run.pop("rebalances")
         result[name] = run
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2 if style == "comprehensive" else 1,
+        "artifactPolicyVersion": (
+            "actual-comprehensive-outcome-accounting-v1"
+            if style == "comprehensive" else "legacy-strategy-backtest-v1"
+        ),
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "rule": "production scoring rule from scoring.py",
         "style": style,
@@ -464,12 +614,15 @@ def main() -> None:
                         help="私有歷史財報快取目錄；提供後才能回測依賴基本面的 style")
     parser.add_argument("--selection-evidence", type=Path, default=None,
                         help="point-in-time actions/data-contract evidence by signal date")
+    parser.add_argument("--outcome-evidence", type=Path, default=None,
+                        help="hash-bound corporate-action/terminal evidence by signal date")
     parser.add_argument("--output", type=Path, default=Path("data/strategy-backtest.json"))
     args = parser.parse_args()
     pit = PointInTimeFundamentals.from_cache(args.fundamentals_cache) if args.fundamentals_cache else None
     result = evaluate(args.input, args.benchmark, args.style, args.picks, args.holding,
                       args.min_volume, tuple(args.drop), pit, args.continuous_trend,
-                      selection_evidence=load_selection_evidence(args.selection_evidence))
+                      selection_evidence=load_selection_evidence(args.selection_evidence),
+                      outcome_evidence=load_selection_evidence(args.outcome_evidence))
     result["droppedFactors"] = list(args.drop)
     result["continuousTrend"] = args.continuous_trend
     args.output.parent.mkdir(parents=True, exist_ok=True)

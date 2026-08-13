@@ -39,6 +39,7 @@ on:
       - "strategy_backtest.py"
       - "actual_comprehensive_selection.py"
       - "actual_comprehensive_selection_parity.py"
+      - "actual_comprehensive_outcome_accounting.py"
       - "investment_advice_gate.py"
       - "production_strategy_validation_preflight.py"
       - "authoritative_pit_coverage_certification.py"
@@ -99,6 +100,7 @@ jobs:
           strategy_backtest.py
           actual_comprehensive_selection.py
           actual_comprehensive_selection_parity.py
+          actual_comprehensive_outcome_accounting.py
           investment_advice_gate.py
           production_strategy_validation_preflight.py
           authoritative_pit_coverage_certification.py

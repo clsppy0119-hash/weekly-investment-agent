@@ -46,13 +46,17 @@ EVIDENCE_PRODUCER_PINS = {
     "lineage_replay.py": "da0b2b83e094c8c040b1540f94795aa81eeb06ef149aa390adf92b83669778d8",
     "market_membership_snapshots.py": "2fcc10db99a7f9f60fc4e436fbd84d86b919e6f1c4032f7d809088e70ac99ff1",
     "point_in_time_fundamentals.py": "91e3100a138355a08ddf4e8194a0af3f3209d16e5c72f8a27849b085e08b347a",
-    "strategy_backtest.py": "59f102821c3d7df61dbe3f0ba1b93dd2d37b3808e11864485a48f0ed254ead71",
+    "strategy_backtest.py": "fc3a81c71349e07367e2d690563e0bc8172c4291ba10ce9401a1e308d069fda7",
+    "actual_comprehensive_outcome_accounting.py": "e69c13b9f33e36427d6dee86980664f9e66dbd07b43b8cc01f6752989c6b4099",
+    "execution_accounting.py": "86191bc936dbd3f2f79ef44b084ff8c89f6588e98edeb2e10873d60d5b842c63",
+    "backtest.py": "aea1fd294108d7083049cb38c1f18e64e0c49e5b3b0ea092994371002b4b3e24",
 }
 
 # Node54 adds an executable, shared selector without pretending that a caller's
 # metadata proves parity.  This pin identifies the verifier policy; positive
 # parity comes only from running both paths over the same bounded fixture.
 SELECTION_PARITY_POLICY_VERSION = "actual-comprehensive-selection-parity-v1"
+OUTCOME_ACCOUNTING_POLICY_VERSION = "actual-comprehensive-outcome-accounting-v1"
 
 AUTHORITY_CONTRACTS = {
     "official_membership_v1": {
@@ -292,7 +296,10 @@ def current_backtest_engine_contract() -> dict[str, Any]:
         "finalQualityGate": "candidate_manifest_v1_shared_quality_function",
         "finalQualityGateOrdering": "top3_then_quality_no_backfill",
         "finalEligibility": "phase_final_and_advice_candidate_and_advice_enabled",
-        "executionAccounting": "legacy_mean_filled_slots_with_stale_exit_fallback",
+        "executionAccounting": "actual-comprehensive-outcome-accounting-v1-measurement-only",
+        "eligiblePoolAccounting": "fixed-signal-pool-equal-weight-same-calendar-and-costs",
+        "liveExecutionSpecStatus": "decision_required",
+        "riskPolicyStatus": "unregistered",
         "selectionParityPolicyVersion": SELECTION_PARITY_POLICY_VERSION,
     }
 
@@ -602,6 +609,9 @@ def evaluate(payload: Any) -> dict[str, Any]:
         "productionBacktestParity": False,
         "selectionParityPolicyVersion": SELECTION_PARITY_POLICY_VERSION,
         "selectionParityPolicyRegistered": True,
+        "outcomeAccountingPolicyVersion": OUTCOME_ACCOUNTING_POLICY_VERSION,
+        "validationOutcomeAccountingStatus": "registered_for_measurement_only",
+        "eligiblePoolAccountingStatus": "registered_for_measurement_only",
         "engineContractParity": engine_contract_parity,
         "fixtureParity": fixture_parity,
         "paritySummary": {},

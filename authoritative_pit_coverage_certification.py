@@ -57,7 +57,7 @@ CERTIFICATION_PRODUCER_PINS = {
     "official_availability_capability.py": "dba9b99b0026236d0a4ed3e86f07d72c5e248e201746b0c6675dd041887e932b",
     "pit_availability_evidence.py": "c64fbbfdfb06dcdfc67eb45e8ee3acca70eb561a945523ead9edf5614d701fb2",
     "official_announcement_availability.py": "3024f72313372184c9d206ea6849a9fc19954c26cd4eab112b5082c30f585149",
-    "production_strategy_validation_preflight.py": "691fd34a2f710f811fda1ce6f08f27b6fe5bc7431ae74e5f879838ad5701a862",
+    "production_strategy_validation_preflight.py": "efadd356a1e13df537d9e137a069996687d50af5c0f0d9fc7ff99a46d771e3a0",
 }
 
 ROOT_KEYS = frozenset({
