@@ -50,6 +50,7 @@ on:
       - "official_population_source_admission.py"
       - "official_population_source_admission_registry_v1.json"
       - "forward_population_observation.py"
+      - "forward_population_ledger_store.py"
       - "forward_population_observation_ledger_v1.json"
       - "decision_outcome_export.py"
       - "staging_preflight_result.py"
@@ -109,6 +110,7 @@ jobs:
           official_population_artifact_receipt.py
           official_population_source_admission.py
           forward_population_observation.py
+          forward_population_ledger_store.py
           decision_outcome_export.py
           staging_preflight_result.py
       - name: Run deterministic safety tests

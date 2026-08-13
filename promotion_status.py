@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -15,6 +16,8 @@ from strategy_tracker import HORIZONS, load_state
 
 STAGES = ("research_only", "screening_assistant", "assisted_selection", "autonomous_selection")
 REQUIRED_SETTLED = {"assisted_selection": (20, 30), "autonomous_selection": (60, 60)}
+PROMOTION_EVIDENCE_POLICY_VERSION = "legacy-evidence-quarantine-v1"
+MAX_RECOMMENDATIONS = 10_000
 
 LABELS = {
     "research_only": "僅研究：資料或決策紀錄未達門檻，輸出不得視為推薦。",
@@ -28,15 +31,27 @@ def settled(state: dict, horizon: int, field: str = "excessReturnPct") -> tuple[
     """依決策日彙總，並同時回傳原始股票結果筆數。"""
     by_date: dict[str, list[float]] = {}
     outcomes = 0
-    for item in state.get("recommendations", []):
+    recommendations = state.get("recommendations", []) if isinstance(state, dict) else []
+    if not isinstance(recommendations, list):
+        return [], 0
+    for item in recommendations:
+        if not isinstance(item, dict) or not isinstance(item.get("outcomes", {}), dict):
+            continue
         outcome = item.get("outcomes", {}).get(str(horizon), {})
-        if outcome.get("status") == "complete" and field in outcome:
-            by_date.setdefault(item.get("date", ""), []).append(outcome[field] / 100)
+        value = outcome.get(field) if isinstance(outcome, dict) else None
+        if (
+            outcome.get("status") == "complete"
+            and isinstance(value, (int, float)) and not isinstance(value, bool)
+            and math.isfinite(value)
+        ):
+            by_date.setdefault(str(item.get("date", "")), []).append(value / 100)
             outcomes += 1
     return [sum(values) / len(values) for values in by_date.values()], outcomes
 
 
-def assess(state: dict, advice_gate: dict) -> dict:
+def _assess(state: dict, advice_gate: dict) -> dict:
+    state = state if isinstance(state, dict) else {}
+    advice_gate = advice_gate if isinstance(advice_gate, dict) else {}
     horizons = {}
     pools = {}
     for horizon in HORIZONS:
@@ -46,7 +61,10 @@ def assess(state: dict, advice_gate: dict) -> dict:
                 "settled": len(values), "outcomes": outcomes, **significance(values)
             }
 
-    reached = "screening_assistant" if state.get("recommendations") else "research_only"
+    # schemaVersion 1 is a mutable diagnostic tracker.  Its outcomes predate
+    # the authoritative PIT, Node55 accounting, and preregistered risk
+    # contracts, so no numeric value in it is promotion evidence.
+    reached = "research_only"
     blockers: dict[str, list[str]] = {}
     for stage in ("assisted_selection", "autonomous_selection"):
         horizon, needed = REQUIRED_SETTLED[stage]
@@ -63,24 +81,52 @@ def assess(state: dict, advice_gate: dict) -> dict:
                 missing.append(f"{horizon} 日{against}平均超額報酬不為正")
         if stage == "autonomous_selection" and not advice_gate.get("adviceEnabled"):
             missing.append("investment-advice-gate 尚未開啟")
-        if missing:
-            blockers[stage] = missing
-        else:
-            reached = stage
+        missing.extend([
+            "legacy_tracker_outcomes_quarantined",
+            "actual_forward_outcome_contract_not_available",
+        ])
+        blockers[stage] = list(dict.fromkeys(missing))
 
     return {
-        "schemaVersion": 1,
+        "schemaVersion": 2,
+        "promotionEvidencePolicyVersion": PROMOTION_EVIDENCE_POLICY_VERSION,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "stage": reached,
         "stageLabel": LABELS[reached],
         "recommendations": len(state.get("recommendations", [])),
         "horizons": horizons,
         "versusEligiblePool": pools,
+        "promotionEvidenceAccepted": 0,
+        "legacyOutcomesExcluded": sum(
+            isinstance(item.get("outcomes"), dict)
+            and isinstance(item["outcomes"].get(str(horizon)), dict)
+            and item["outcomes"][str(horizon)].get("status") == "complete"
+            for item in state.get("recommendations", []) if isinstance(item, dict)
+            for horizon in HORIZONS
+        ) if isinstance(state.get("recommendations", []), list) else 0,
+        "formalEvidenceEligible": False,
+        "promotionEligible": False,
+        "adviceEnabled": False,
         "blockers": blockers,
         "note": "每一階都要同時跑贏 0050 與合格池。跑贏 0050 決定這套系統是否值得使用；"
                 "跑贏合格池則確認成果來自選股能力，而非整個候選池剛好上漲。"
                 "同一天的多檔股票只算一個獨立決策日，避免高估樣本數。",
     }
+
+
+def assess(state: dict, advice_gate: dict) -> dict:
+    """Fail-closed public boundary for mutable legacy tracker state."""
+    try:
+        if type(state) is not dict or type(advice_gate) is not dict:
+            return _assess({}, {})
+        recommendations = state.get("recommendations", [])
+        if type(recommendations) is not list or len(recommendations) > MAX_RECOMMENDATIONS:
+            return _assess({}, {})
+        if any(type(item) is not dict or len(item) > 32 for item in recommendations):
+            return _assess({}, {})
+        return _assess(state, advice_gate)
+    except Exception:
+        return _assess({}, {})
 
 
 def render(report: dict) -> str:

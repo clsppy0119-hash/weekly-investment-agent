@@ -1,43 +1,81 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-08-08T16:32:39.132040+00:00",
-  "stage": "screening_assistant",
-  "stageLabel": "篩選助手：可提供附證據的候選清單，最終判斷由人做。",
+  "schemaVersion": 2,
+  "promotionEvidencePolicyVersion": "legacy-evidence-quarantine-v1",
+  "generatedAt": "2026-08-13T06:00:59.867836+00:00",
+  "stage": "research_only",
+  "stageLabel": "僅研究：資料或決策紀錄未達門檻，輸出不得視為推薦。",
   "recommendations": 15,
   "horizons": {
     "5": {
-      "settled": 4,
-      "rebalances": 4,
-      "meanExcessPerRebalance": 0.09992499999999999,
-      "stdev": 0.21472584652683677,
-      "tStat": 0.9307216771178145,
+      "settled": 3,
+      "outcomes": 15,
+      "rebalances": 3,
+      "meanExcessPerRebalance": 0.0771797619047619,
+      "stdev": 0.010996824874159134,
+      "tStat": 12.156169663958408,
       "ci95": [
-        -0.029375,
-        0.31765
+        0.064525,
+        0.0844142857142857
       ],
-      "conclusive": false
+      "conclusive": true
     },
     "20": {
       "settled": 0,
+      "outcomes": 0,
       "rebalances": 0,
       "conclusive": false,
       "reason": "fewer_than_three_rebalances"
     },
     "60": {
       "settled": 0,
+      "outcomes": 0,
       "rebalances": 0,
       "conclusive": false,
       "reason": "fewer_than_three_rebalances"
     }
   },
+  "versusEligiblePool": {
+    "5": {
+      "settled": 0,
+      "outcomes": 0,
+      "rebalances": 0,
+      "conclusive": false,
+      "reason": "fewer_than_three_rebalances"
+    },
+    "20": {
+      "settled": 0,
+      "outcomes": 0,
+      "rebalances": 0,
+      "conclusive": false,
+      "reason": "fewer_than_three_rebalances"
+    },
+    "60": {
+      "settled": 0,
+      "outcomes": 0,
+      "rebalances": 0,
+      "conclusive": false,
+      "reason": "fewer_than_three_rebalances"
+    }
+  },
+  "promotionEvidenceAccepted": 0,
+  "legacyOutcomesExcluded": 15,
+  "formalEvidenceEligible": false,
+  "promotionEligible": false,
+  "adviceEnabled": false,
   "blockers": {
     "assisted_selection": [
-      "20 日已結算 0/30 筆"
+      "20 日對 0050僅有 0/30 個獨立決策日",
+      "20 日對合格池僅有 0/30 個獨立決策日",
+      "legacy_tracker_outcomes_quarantined",
+      "actual_forward_outcome_contract_not_available"
     ],
     "autonomous_selection": [
-      "60 日已結算 0/60 筆",
-      "investment-advice-gate 尚未開啟"
+      "60 日對 0050僅有 0/60 個獨立決策日",
+      "60 日對合格池僅有 0/60 個獨立決策日",
+      "investment-advice-gate 尚未開啟",
+      "legacy_tracker_outcomes_quarantined",
+      "actual_forward_outcome_contract_not_available"
     ]
   },
-  "note": "前瞻結果以 0050 總報酬為基準；追蹤層尚未記錄合格池，因此無法在此檢驗『優於同池』，該項目目前僅能由回測評估。"
+  "note": "每一階都要同時跑贏 0050 與合格池。跑贏 0050 決定這套系統是否值得使用；跑贏合格池則確認成果來自選股能力，而非整個候選池剛好上漲。同一天的多檔股票只算一個獨立決策日，避免高估樣本數。"
 }
