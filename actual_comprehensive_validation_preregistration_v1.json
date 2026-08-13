@@ -1,0 +1,324 @@
+{
+  "manifest": {
+    "accounting": {
+      "benchmarkCost": "single_round_trip_per_split",
+      "buyFee": 0.001425,
+      "cashSlotsChargedCosts": false,
+      "corporateActions": "verified_total_return_only",
+      "etfSellTax": 0.001,
+      "oneWaySlippageBps": 10,
+      "sellFee": 0.001425,
+      "stockSellTax": 0.003,
+      "unfilledEntry": "cash",
+      "unresolvedExitOrMark": "invalidate_entire_cohort"
+    },
+    "adviceBoundary": {
+      "automaticTradingAllowed": false,
+      "formalResearchAdviceRequiresSeparateUserConfirmation": true,
+      "modeAfterSuccessfulValidation": "shadow_only"
+    },
+    "allocation": {
+      "confirmatoryNotional": "normalized_strategy_sleeve_100_pct",
+      "leverageAllowed": false,
+      "qualityRejectedOrMissingEntry": "cash_no_backfill_no_reallocation",
+      "shortingAllowed": false,
+      "targetSlots": 3,
+      "withinSleeveSlotWeight": "one_third_fixed"
+    },
+    "baseReceipt": {
+      "baseMainSha": "4a31db49a1f1f9e04dd5f42a8e4c6862269001f0",
+      "baseMergedAt": "2026-08-13T12:47:06Z",
+      "basePrNumber": 117,
+      "repository": "clsppy0119-hash/weekly-investment-agent"
+    },
+    "comparators": {
+      "passRule": "intersection_union_both_must_pass",
+      "required": [
+        "official_0050_total_return_exact_bounds",
+        "signal_date_full_pit_eligible_pool_equal_weight"
+      ],
+      "sameCalendarCostsAndMissingness": true,
+      "survivorOrOutcomeFilteredPoolAllowed": false
+    },
+    "confirmatoryEvaluation": {
+      "allCashScheduledCohortsCountAsActive": false,
+      "allCashScheduledCohortsCountInAggregate": true,
+      "bootstrap": {
+        "blockLengthCohorts": 3,
+        "blocks": "all_non_circular_consecutive_length_3_blocks",
+        "confidenceLevel": 0.95,
+        "draws": "ceil_n_div_3_block_starts_with_replacement_then_concatenate_and_truncate_to_n",
+        "indexGenerator": "sha256_of_uint64be_seed_resample_index_draw_index_modulo_valid_block_start_count",
+        "input": "all_unique_accounting_complete_scheduled_cohorts_from_all_5_rolling_test_blocks_in_time_order_including_all_cash",
+        "method": "paired_moving_block_percentile",
+        "numericRule": "finite_ieee754_binary64_unrounded",
+        "pairedValue": "selection_net_return_minus_same_cohort_comparator_net_return",
+        "passRule": "lower_bound_strictly_greater_than_zero_for_both_comparators",
+        "quantile": "sort_10000_statistics_take_zero_based_index_249_for_0.025_nearest_rank",
+        "resamples": 10000,
+        "seed": 20260813,
+        "statistic": "math_fsum_paired_excess_divided_by_cohort_count"
+      },
+      "calendarAnchor": {
+        "anchorMovesAfterCoverageGap": false,
+        "anchorRule": "first_official_session_whose_signal_cutoff_is_strictly_after_trusted_seal_and_all_required_source_contract_registration_receipts",
+        "calendar": "official_taiwan_equity_trading_sessions",
+        "insufficientOrGapPolicy": "wait_or_fail_never_shift_anchor",
+        "selectionUsesPerformanceOrCoverageOutcome": false,
+        "signalCutoffTimezone": "Asia/Taipei"
+      },
+      "everyWindowMustPassBothComparatorsAndRisk": true,
+      "expectedScheduledCohortsPer252SessionBlock": 12,
+      "holdoutAccess": {
+        "accessPolicyVersion": "single-use-untouched-holdout-v1",
+        "holdoutExcludedFromRollingBootstrap": true,
+        "maximumQualifiedAccessCount": 1,
+        "mustBeDisjointFromAllPriorAndLegacyOutcomeDates": true,
+        "mustFollowAllRollingTests": true,
+        "secondAccessOrPolicyMutation": "permanently_invalidate_and_require_new_future_holdout"
+      },
+      "minimumActiveInvestedOosCohorts": 20,
+      "minimumDistinctRollingWindows": 5,
+      "minimumScheduledOosCohorts": 60,
+      "minimumUntouchedHoldoutCohorts": 12,
+      "purgeTradingSessions": 20,
+      "returnFreeInventory": {
+        "binds": [
+          "preregistration_hash",
+          "anchor_session",
+          "ordered_session_ids",
+          "block_bounds",
+          "scheduled_cohort_ids",
+          "source_registration_receipts",
+          "pit_population_requirement_hashes"
+        ],
+        "forbiddenContent": "prices_returns_mdd_scores_ranks_winner_or_outcome_status",
+        "inventoryGapOrMutation": "invalidate_without_reanchoring",
+        "mustPrecedeAnyQualifiedOutcomeAccess": true,
+        "policyVersion": "actual-comprehensive-return-free-inventory-v1",
+        "schemaVersion": 1
+      },
+      "rollingStepTradingSessionsIncludingEmbargo": 272,
+      "rollingTestTradingSessions": 252,
+      "secondaryHorizonMultiplicity": "not_tested_not_displayed_before_primary_verdict",
+      "testFeedbackIntoPolicyAllowed": false,
+      "trainMinimumTradingSessions": 504,
+      "untouchedHoldoutTradingSessions": 252,
+      "validationTradingSessions": 252,
+      "windowConstruction": {
+        "algorithmVersion": "prospective-sequential-nonoverlap-v1",
+        "allBlocksUseAllConsecutiveSessions": true,
+        "allRollingTestCohortIdsGloballyUnique": true,
+        "blockOrder": [
+          "train_504",
+          "embargo_20",
+          "validation_252",
+          "embargo_20",
+          "rolling_test_1_252",
+          "embargo_20",
+          "rolling_test_2_252",
+          "embargo_20",
+          "rolling_test_3_252",
+          "embargo_20",
+          "rolling_test_4_252",
+          "embargo_20",
+          "rolling_test_5_252",
+          "embargo_20",
+          "untouched_holdout_252"
+        ],
+        "cohortAssignment": "signal_entry_all_marks_and_nominal_exit_must_be_inside_one_evaluation_block",
+        "cohortSchedule": "signal_offsets_0_20_40_et_seq_entry_offset_plus_1_exit_offset_plus_21_next_entry_equals_prior_exit_close",
+        "partialTailPolicy": "wait_until_complete_never_move_anchor",
+        "rollingAndHoldoutOverlapAllowed": false,
+        "skipReorderOrRegimeSelectionAllowed": false,
+        "trainMode": "frozen_strategy_plumbing_only_no_policy_or_model_tuning"
+      },
+      "windowVerdict": {
+        "aggregateRollingTests": "selection_compounded_net_return_strictly_greater_than_each_comparator_compounded_net_return_both_bootstrap_lower_bounds_strictly_positive_and_continuous_risk_pass",
+        "cohortCompoundedReturn": "chronological_iterative_binary64_product_of_one_plus_net_return_minus_one_including_all_cash_scheduled_cohorts",
+        "eachRollingTest": "selection_compounded_net_return_strictly_greater_than_each_comparator_compounded_net_return_and_risk_pass",
+        "oneFailedOrIncompleteScope": "entire_confirmatory_verdict_fail_closed",
+        "returnDomain": "finite_binary64_each_cohort_net_return_greater_than_or_equal_to_minus_1",
+        "rollingPlusHoldout": "continuous_curve_risk_pass_required_without_equity_or_peak_reset",
+        "untouchedHoldout": "selection_compounded_net_return_strictly_greater_than_each_comparator_compounded_net_return_and_risk_pass",
+        "validation": "selection_compounded_net_return_strictly_greater_than_each_comparator_compounded_net_return_and_risk_pass"
+      }
+    },
+    "futureLivePolicyIntent": {
+      "doesNotAffectConfirmatoryReturnMddOrVerdict": true,
+      "existingHoldingsMustBeCombinedForLimits": true,
+      "maxSinglePositionPctOfTotalAssets": 15,
+      "maxSingleSectorPctOfTotalAssets": 30,
+      "minimumCashPctOfTotalAssets": 10,
+      "requiredFutureGate": "position_sector_holdings_and_delayed_exit_accounting_contract",
+      "status": "adopted_intent_unregistered_for_validation_or_live_use",
+      "strategySleeveMaxPct": 45,
+      "suspensionIntent": "first_later_legal_execution_or_verified_terminal_value"
+    },
+    "identity": {
+      "confirmatoryEvaluator": {
+        "outcomeAccessBeforeRegistrationAllowed": false,
+        "registrationRule": "git_main_receipt_binds_source_hash_and_preregistration_hash_before_anchor_session",
+        "requiredModule": "actual_comprehensive_confirmatory_evaluator.py",
+        "requiredPolicyVersion": "actual-comprehensive-confirmatory-evaluator-v1",
+        "requiredSchemaVersion": 1,
+        "status": "unregistered"
+      },
+      "forwardLedgerContractHash": "5d2b641d00d49a45fae609d6e1405c04c94519241cb731cdd331d9fe7eb92b0b",
+      "outcomeAccountingContractHash": "77904590b5bedb47f5f6195bc65aaf0e7ec8fee7020fbd8c1bda50dc7e39d168",
+      "pitContractHash": "53e8a373352bb80be610e730644480f0952add88b7d4fd7285d467fd857dafb0",
+      "pitRequirementsHash": "a7fe498e4367e0b176e007c2b66a1a16ca00edd62febfa94e3bcf5b34a70fb47",
+      "selectionContractHash": "c737149531d5bf7caaf94d3b784eb26ddea7ad01eb091e1b7bfd3588455acde1",
+      "sourcePinSetHash": "42b19558e9e0e3bf6ed67064dff609f67e9f376e02acd089919155e325889aa3",
+      "sourcePins": {
+        "actual_comprehensive_outcome_accounting.py": "e69c13b9f33e36427d6dee86980664f9e66dbd07b43b8cc01f6752989c6b4099",
+        "actual_comprehensive_selection.py": "840d397957c172b4a543bd7ecc57911e787b93f288366dc016c30f1feadb4be0",
+        "actual_comprehensive_selection_parity.py": "59ab0ad5175648c49825340569aaacf6000ed0536aeb958dc7fc3aec9094eab8",
+        "authoritative_pit_coverage_certification.py": "8166184916725eb3662d077d5f497ad94c78ce6401fa97cf8207475d6d8d688f",
+        "backtest.py": "aea1fd294108d7083049cb38c1f18e64e0c49e5b3b0ea092994371002b4b3e24",
+        "candidate_manifest.py": "e5471941684838779a6e658de8efbce3799300a4fb0c609854f528f0ccd7aa6e",
+        "daily_report.py": "ca8a78cffeffe63c8503196f28cc58c7f06b7dd05fae12925e339b4c27ce9150",
+        "data_contract.py": "f91475db7ece2dffef9bed86a1a5c1b0dbf12d4ecaba7a4c6b51447624987c45",
+        "execution_accounting.py": "86191bc936dbd3f2f79ef44b084ff8c89f6588e98edeb2e10873d60d5b842c63",
+        "forward_population_ledger_store.py": "37feb51bd369c9661cf5933e6af2eda36fb2f78ce98645da55c2d699685ebcb3",
+        "forward_population_observation.py": "53ef3ffe8fa09a0275551cce3d34a9205cf0de10b954e582315a80ac14ecc572",
+        "market_population_contract.py": "d06a065fa4148063cb89b4d54f0e698190cade140caebdcd3d27aed842d59809",
+        "official_full_market_population.py": "e383c82a10fdcfd61142ffcf650505b6b34783ff6cf1b0d4973c2927775b3a40",
+        "official_population_artifact_receipt.py": "2b4d8a19ded8ccf6f02d36b42163e53a0b44ba4068862bc72954e93e23756bc5",
+        "official_population_source_admission.py": "73253532654f4cdb30661e4c534731363dbb2bab67590a56870c840af4587ce1",
+        "point_in_time_fundamentals.py": "91e3100a138355a08ddf4e8194a0af3f3209d16e5c72f8a27849b085e08b347a",
+        "production_strategy_validation_preflight.py": "d4bf6b7dea61a2b30512731ee8a99955c907d1dbd78aa39b1d3412c154e62462",
+        "scoring.py": "3db3aaa02dbf9f419da48a6150ff8e479a42ec8f0bd0b2f55cd9ad74f456a50c",
+        "strategy_backtest.py": "fc3a81c71349e07367e2d690563e0bc8172c4291ba10ce9401a1e308d069fda7",
+        "strategy_tracker.py": "9468603d5e668e5e795852d7a231a5d2163895a6fe4cff0d6b5318540cb9d3de"
+      },
+      "strategyIdentity": "production-comprehensive-v1",
+      "strategySpecHash": "e66b2f81b8f6400b6b6239b625f50f3b9a7c0e789ae63250ee6fc261272ae616"
+    },
+    "legacyExposureBoundary": {
+      "allowedUses": [
+        "training",
+        "diagnostic"
+      ],
+      "confirmatoryReuseAllowed": false,
+      "existingBacktestsAndCaches": "exploratory_only",
+      "historicalArchiveAcquiredAfterSealUse": "training_diagnostic_only_not_confirmatory_v1",
+      "newConfirmatoryEvidenceRule": "strictly_post_seal_prospective_signal_decisions_only",
+      "preSealBlindHoldoutRegistered": false
+    },
+    "pit": {
+      "availableAtRule": "available_at_must_not_exceed_decision_as_of",
+      "conflictCount": 0,
+      "firstSeenHistoricalBackfillAllowed": false,
+      "fullMarketScope": "TWSE_TPEx_emerging_and_later_delisted_while_effective",
+      "requiredCoveragePct": 100,
+      "uniqueVersionRequired": true
+    },
+    "policyDecision": {
+      "adoptedPolicyIntent": {
+        "absoluteDailyMddLimit": 0.15,
+        "benchmarkMddAllowance": 0.05,
+        "earlyExitRule": "none_in_v1",
+        "entryIntent": "next_official_trading_session_close",
+        "exitIntent": "twenty_official_trading_interval_measurement",
+        "maxSinglePositionPctOfTotalAssets": 15,
+        "maxSingleSectorPctOfTotalAssets": 30,
+        "minimumCashPctOfTotalAssets": 10,
+        "postValidationMode": "shadow_only",
+        "primaryHorizonTradingDays": 20,
+        "secondaryHorizons": [
+          5,
+          60
+        ],
+        "strategySleeveMaxPct": 45,
+        "suspensionIntent": "first_later_legal_execution_or_verified_terminal_value"
+      },
+      "adoptedPolicyPresetHash": "4aec8b5b2ccc2168f9e5f305f98315b5dc778cabbb8f4023b0339f71d696e61e",
+      "adoptedPolicyPresetId": "conservative-20d-15mdd-45-15-30-10-shadow-v1",
+      "decisionClass": "explicit_user_adoption_reference_captured",
+      "decisionReceiptCommitment": {
+        "commitmentPolicy": "sha256_canonical_private_receipt_v1",
+        "opaqueReceiptCommitment": "c169c48ee703c5189a14541c2c113ce202310b3e1d72687e666b4f6249578de3",
+        "privateLookupDataPublished": false,
+        "receiptEvidenceClass": "private_codex_user_decision_receipt",
+        "receivedAt": "2026-08-13T20:46:14+08:00",
+        "schemaVersion": 1
+      },
+      "decisionReceiptCommitmentHash": "171f69c4d809de5365cb28c6d8fc38e6f6fafeb571c906f4c42cbdbae533be46",
+      "decisionReceiptVerificationStatus": "pending_trusted_seal_verifier",
+      "legacyExploratoryOutcomesKnown": true,
+      "newQualifiedConfirmatoryOutcomesOpenedBeforeDecision": false
+    },
+    "policyVersion": "actual-comprehensive-validation-preregistration-v1",
+    "primaryExecution": {
+      "capitalExposureDoesNotOverlapBeyondSharedBoundaryClose": true,
+      "cohortOffsetContract": {
+        "entrySessionOffset": 1,
+        "exitSessionOffset": 21,
+        "nextEntrySessionOffset": 21,
+        "nextSignalSessionOffset": 20,
+        "signalSessionOffset": 0
+      },
+      "earlyExitRule": "none_in_v1",
+      "entryConvention": "next_official_trading_session_close",
+      "exitConvention": "twenty_official_trading_intervals_after_entry_close",
+      "holdingIntervalTradingDays": 20,
+      "laterTradePriceSubstitutionAllowed": false,
+      "nextEntryConvention": "same_close_as_prior_nominal_exit",
+      "nextSignalConvention": "prior_nominal_exit_immediately_preceding_official_session_close",
+      "nominalExitUnavailable": "verified_terminal_value_at_nominal_exit_or_entire_cohort_invalid",
+      "primaryHorizonTradingDays": 20,
+      "rebalanceConvention": "strict_non_overlapping_cohorts",
+      "secondaryHorizonUse": "diagnostic_only_excluded_from_primary_verdict",
+      "secondaryHorizons": [
+        5,
+        60
+      ],
+      "signalConvention": "official_session_close_decision",
+      "stalePriceFallbackAllowed": false
+    },
+    "risk": {
+      "absoluteDailyMddLimit": 0.15,
+      "absolutePassFormula": "selection_mdd >= -0.15",
+      "benchmark": "official_0050_total_return_exact_bounds",
+      "benchmarkMddAllowance": 0.05,
+      "comparisonTolerance": 0.0,
+      "continuousCurveInitialEquity": 1.0,
+      "continuousCurveRule": "chronological_blocks_joined_without_equity_or_peak_reset_embargo_sessions_are_flat_cash_and_boundary_costs_remain",
+      "equalityPasses": true,
+      "evaluationNotional": "normalized_strategy_sleeve_100_pct",
+      "mddBasis": "daily_mark_to_market_including_costs_pre_entry_equity_1",
+      "mddDomain": "finite_binary64_inclusive_range_minus_1_to_0",
+      "missingNonfiniteOrOutOfDomain": "fail_closed",
+      "passRule": "both_formulas_must_pass_every_required_scope",
+      "relativePassFormula": "selection_mdd >= benchmark_0050_mdd - 0.05",
+      "requiredScopes": [
+        "validation_block",
+        "each_rolling_test_block",
+        "untouched_holdout_block",
+        "aggregate_rolling_tests_with_embargo_cash_continuous_daily_curve",
+        "aggregate_rolling_plus_holdout_with_embargo_cash_continuous_daily_curve"
+      ]
+    },
+    "schemaVersion": 1,
+    "seal": {
+      "effectiveFromRule": "strictly_after_verified_node57_main_merge_time_and_decision_receipt_verification",
+      "policyMutationRule": "new_version_new_identity_and_new_untouched_holdout",
+      "qualifiedOutcomeAccessBeforeSealAllowed": false,
+      "requiredReceiptBindings": [
+        "repository",
+        "node57_main_merge_sha",
+        "server_merge_time",
+        "workflow_file_hash",
+        "preregistration_hash",
+        "decision_receipt_commitment_hash"
+      ],
+      "sealReceipt": null,
+      "sealedAt": null,
+      "status": "awaiting_node57_main_merge_receipt"
+    }
+  },
+  "policyVersion": "actual-comprehensive-validation-preregistration-v1",
+  "preregistrationHash": "8ad3599eb1d7b1adc3ae8d59fd19c1d3d42aeebf6e1928fe52afb5fc55eb13d5",
+  "schemaVersion": 1
+}

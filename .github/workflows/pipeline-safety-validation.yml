@@ -40,6 +40,8 @@ on:
       - "actual_comprehensive_selection.py"
       - "actual_comprehensive_selection_parity.py"
       - "actual_comprehensive_outcome_accounting.py"
+      - "actual_comprehensive_validation_preregistration.py"
+      - "actual_comprehensive_validation_preregistration_v1.json"
       - "investment_advice_gate.py"
       - "production_strategy_validation_preflight.py"
       - "authoritative_pit_coverage_certification.py"
@@ -102,6 +104,7 @@ jobs:
           actual_comprehensive_selection.py
           actual_comprehensive_selection_parity.py
           actual_comprehensive_outcome_accounting.py
+          actual_comprehensive_validation_preregistration.py
           investment_advice_gate.py
           production_strategy_validation_preflight.py
           authoritative_pit_coverage_certification.py
