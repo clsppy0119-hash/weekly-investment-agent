@@ -106,6 +106,9 @@ def test_current_production_and_backtest_contract_mismatch_is_explicit():
     assert result["productionBacktestParity"] is False
     assert result["selectionParityPolicyRegistered"] is True
     assert result["selectionParityPolicyVersion"] == "actual-comprehensive-selection-parity-v1"
+    assert result["validationOutcomeAccountingStatus"] == "registered_for_measurement_only"
+    assert result["eligiblePoolAccountingStatus"] == "registered_for_measurement_only"
+    assert result["outcomeAccountingPolicyVersion"] == "actual-comprehensive-outcome-accounting-v1"
     assert "selection_parity_evidence_not_supplied_to_preflight" in result["blockers"]
     assert "production_backtest_engine_mismatch" in result["blockers"]
 
@@ -414,6 +417,8 @@ def test_unregistered_execution_risk_and_pool_always_block():
     assert result["executionSpecStatus"] == "unregistered"
     assert result["riskPolicyStatus"] == "unregistered"
     assert result["eligiblePoolBenchmarkStatus"] == "unregistered"
+    assert result["validationOutcomeAccountingStatus"] == "registered_for_measurement_only"
+    assert result["eligiblePoolAccountingStatus"] == "registered_for_measurement_only"
     for blocker in (
         "execution_spec_unregistered", "risk_policy_unregistered",
         "eligible_pool_benchmark_unregistered",
