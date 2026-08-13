@@ -336,6 +336,7 @@ def horizon_review(state):
 
 
 def review_summary(state):
+    legacy_notice = "【舊版診斷】以下統計不是策略驗證或升級證據。\n"
     review = horizon_review(state)
     lines = []
     for horizon in HORIZONS:
@@ -350,8 +351,8 @@ def review_summary(state):
             line += f"，對合格池超額 {entry['meanPoolExcessPct']:+.2f}%（{entry['beatPoolPct']}% 跑贏）"
         lines.append(line + "。")
     if all(not review[str(horizon)]["settled"] for horizon in HORIZONS):
-        return "策略追蹤：已開始保存候選紀錄，尚無任何期間結算。"
-    return ("策略追蹤（各期間分開統計，報酬已扣手續費、證交稅與滑價）：\n"
+        return legacy_notice + "策略追蹤：已開始保存候選紀錄，尚無任何期間結算。"
+    return (legacy_notice + "策略追蹤（各期間分開統計，報酬已扣手續費、證交稅與滑價）：\n"
             "　對 0050 為總報酬對總報酬；對合格池雙方皆為價格報酬。\n" + "\n".join(lines))
 
 

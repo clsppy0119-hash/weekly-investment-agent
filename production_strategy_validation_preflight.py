@@ -34,7 +34,7 @@ SOURCE_PINS = {
     "daily_report.py": "ca8a78cffeffe63c8503196f28cc58c7f06b7dd05fae12925e339b4c27ce9150",
     "data_contract.py": "f91475db7ece2dffef9bed86a1a5c1b0dbf12d4ecaba7a4c6b51447624987c45",
     "scoring.py": "3db3aaa02dbf9f419da48a6150ff8e479a42ec8f0bd0b2f55cd9ad74f456a50c",
-    "strategy_tracker.py": "5ce5e846a99a66372e0f9a4e96fe5d80e34c8b58065d393419e87db87d86e393",
+    "strategy_tracker.py": "9468603d5e668e5e795852d7a231a5d2163895a6fe4cff0d6b5318540cb9d3de",
 }
 
 # Only fixed, reviewed producers may describe evidence to this preflight.  The
