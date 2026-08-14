@@ -56,6 +56,37 @@ _SOURCE_PIN_ITEMS = (
 # snapshot and never consults this object again.
 SOURCE_PINS = MappingProxyType(dict(_SOURCE_PIN_ITEMS))
 
+def drifted_sources(sources: Any, *, _pins: tuple = _SOURCE_PIN_ITEMS) -> tuple[str, ...]:
+    """Registered files whose supplied text differs from what was registered.
+
+    A confirmatory run is evidence about the rule that was registered, and
+    nothing else. Once production code moves on, the honest response is to
+    register again before running -- not to edit this record so a check passes,
+    and not to run anyway and call the result preregistered.
+
+    The caller supplies ``{name: text}`` rather than a directory: this module
+    stays free of filesystem and network access so that reading it can have no
+    effect on anything, and a missing entry counts as drift rather than as
+    nothing to check.
+
+    This is a runtime gate, not a test assertion. Drift is expected while
+    development continues; it only disqualifies at the moment confirmatory
+    evidence is produced.
+    """
+    if not isinstance(sources, dict):
+        return tuple(name for name, _ in _pins)
+    drifted = []
+    for name, pinned in _pins:
+        text = sources.get(name)
+        if not isinstance(text, str):
+            drifted.append(name)
+            continue
+        normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+        if hashlib.sha256(normalized.encode("utf-8")).hexdigest() != pinned:
+            drifted.append(name)
+    return tuple(drifted)
+
+
 STRATEGY_SPEC_HASH = "e66b2f81b8f6400b6b6239b625f50f3b9a7c0e789ae63250ee6fc261272ae616"
 PIT_REQUIREMENTS_HASH = "a7fe498e4367e0b176e007c2b66a1a16ca00edd62febfa94e3bcf5b34a70fb47"
 

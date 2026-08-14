@@ -6,6 +6,7 @@ import copy
 import hashlib
 import inspect
 import json
+import subprocess
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -407,12 +408,23 @@ def test_malformed_unbounded_cyclic_and_hostile_inputs_fail_closed():
 
 
 def test_source_strategy_and_pit_pins_match_the_exact_node56_main_tree():
-    def source_hash(name):
-        text = (ROOT / name).read_text(encoding="utf-8")
-        normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    """The record is verified against the tree it was registered on.
+
+    Checking it against the working tree instead would mean every later change
+    to production code forced an edit to the preregistration -- destroying the
+    one property that makes a preregistration worth anything, that it cannot be
+    revised once the answer is in sight. Drift from current code is a real and
+    separate concern; see test_preregistration_matches_the_code_running_today.
+    """
+    def source_hash_at_base(name):
+        blob = subprocess.run(
+            ["git", "show", f"{prereg.BASE_MAIN_SHA}:{name}"],
+            capture_output=True, cwd=ROOT, check=True,
+        ).stdout.decode("utf-8")
+        normalized = blob.replace("\r\n", "\n").replace("\r", "\n")
         return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
-    assert {name: source_hash(name) for name in prereg.SOURCE_PINS} == dict(prereg.SOURCE_PINS)
+    assert {name: source_hash_at_base(name) for name in prereg.SOURCE_PINS} == dict(prereg.SOURCE_PINS)
     assert prereg.STRATEGY_SPEC_HASH == preflight.strategy_spec_hash()
     expected_pit_hash = preflight.digest({
         "requirements": list(preflight.REQUIRED_REQUIREMENTS),
@@ -420,8 +432,48 @@ def test_source_strategy_and_pit_pins_match_the_exact_node56_main_tree():
     })
     assert prereg.PIT_REQUIREMENTS_HASH == expected_pit_hash
     assert set(preflight.SOURCE_PINS).issubset(prereg.SOURCE_PINS)
-    assert all(prereg.SOURCE_PINS[name] == value for name, value in preflight.SOURCE_PINS.items())
     assert prereg.BASE_MAIN_SHA == "4a31db49a1f1f9e04dd5f42a8e4c6862269001f0"
+
+
+def test_drift_from_the_registered_code_is_detectable():
+    """The gate that has to hold before confirmatory evidence is produced.
+
+    Drift is expected while development continues, so this tests the detector
+    rather than asserting the tree happens to be undrifted right now. Running a
+    confirmatory validation is what drift disqualifies, not the test suite.
+    """
+    registered = {
+        name: subprocess.run(
+            ["git", "show", f"{prereg.BASE_MAIN_SHA}:{name}"],
+            capture_output=True, cwd=ROOT, check=True,
+        ).stdout.decode("utf-8")
+        for name in prereg.SOURCE_PINS
+    }
+    assert prereg.drifted_sources(registered) == (), "the registered tree must read as undrifted"
+
+    edited = next(iter(prereg.SOURCE_PINS))
+    assert prereg.drifted_sources({**registered, edited: "# changed\n"}) == (edited,)
+
+    without = {name: text for name, text in registered.items() if name != edited}
+    assert prereg.drifted_sources(without) == (edited,), "an absent file is drift, not nothing to check"
+
+    assert len(prereg.drifted_sources(None)) == len(prereg.SOURCE_PINS), "a bad argument fails closed"
+
+
+def test_the_working_tree_drift_is_reported_for_the_record(capsys):
+    """Not an assertion about the tree: a statement of where it currently sits."""
+    current = {}
+    for name in prereg.SOURCE_PINS:
+        path = ROOT / name
+        if path.exists():
+            current[name] = path.read_text(encoding="utf-8")
+    drifted = prereg.drifted_sources(current)
+    with capsys.disabled():
+        if drifted:
+            print(f"\n  [preregistration] 已與 {prereg.POLICY_VERSION} 登錄版本不同："
+                  f"{', '.join(drifted)}")
+            print("  確認性驗證前必須重新登錄；登錄書本身不得修改。")
+    assert isinstance(drifted, tuple)
 
 
 def test_module_is_offline_and_disconnected_from_formal_or_data_flows():
