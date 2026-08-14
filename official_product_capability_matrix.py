@@ -577,7 +577,7 @@ def _factory() -> tuple[Any, Any, Any]:
             return report(False, ["input_fail_closed"])
 
     def run(value: Any, *, enabled: bool = False) -> dict[str, Any]:
-        if not enabled:
+        if enabled is not True:
             return {
                 "schemaVersion": schema_version,
                 "policyVersion": policy_version,

@@ -49,7 +49,11 @@ def test_default_off_never_inspects_input_and_public_signatures_are_closed():
         def __getattribute__(self, name):
             raise AssertionError(name)
 
-    assert matrix.run(Explodes(), enabled=False) == {
+    class BoolExplodes:
+        def __bool__(self):
+            raise AssertionError("boolean coercion is forbidden")
+
+    disabled = {
         "schemaVersion": 1,
         "policyVersion": matrix.POLICY_VERSION,
         "mode": "disabled",
@@ -59,6 +63,22 @@ def test_default_off_never_inspects_input_and_public_signatures_are_closed():
         "adviceEnabled": False,
         "tradingEnabled": False,
     }
+    for enabled in (
+        False,
+        None,
+        0,
+        1,
+        1.0,
+        float("nan"),
+        "true",
+        "false",
+        [],
+        [1],
+        {},
+        object(),
+        BoolExplodes(),
+    ):
+        assert matrix.run(Explodes(), enabled=enabled) == disabled
     assert not inspect.signature(matrix.artifact).parameters
     assert tuple(inspect.signature(matrix.evaluate).parameters) == ("value",)
     assert tuple(inspect.signature(matrix.run).parameters) == ("value", "enabled")
