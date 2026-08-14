@@ -152,6 +152,22 @@ def test_expectation_pins_exact_node57_tree_files_policy_and_safety_run():
     assert expected["safetyRun"]["pullRequestAssociationCount"] == 0
 
     bindings = expected["node57Bindings"]
+    merge_tree = subprocess.check_output(
+        ["git", "rev-parse", f"{seal.MERGE_COMMIT_SHA}^{{tree}}"],
+        cwd=ROOT,
+        text=True,
+    ).strip()
+    merge_parents = subprocess.check_output(
+        ["git", "show", "-s", "--format=%P", seal.MERGE_COMMIT_SHA],
+        cwd=ROOT,
+        text=True,
+    ).split()
+    assert merge_tree == seal.REVIEWED_TREE_SHA
+    assert merge_parents == [seal.MERGE_PARENT_SHA]
+    assert seal.MERGE_COMMIT_SHA not in (
+        seal.REVIEWED_HEAD_SHA,
+        seal.REVIEWED_BASE_MAIN_SHA,
+    )
     assert bindings["preregistrationHash"] == seal.PREREGISTRATION_HASH
     assert bindings["decisionReceiptCommitmentHash"] == (
         seal.DECISION_RECEIPT_COMMITMENT_HASH
@@ -163,7 +179,7 @@ def test_expectation_pins_exact_node57_tree_files_policy_and_safety_run():
     actual = []
     for item in bindings["filePins"]:
         data = subprocess.check_output(
-            ["git", "show", f"{seal.REVIEWED_HEAD_SHA}:{item['path']}"],
+            ["git", "show", f"{seal.MERGE_COMMIT_SHA}:{item['path']}"],
             cwd=ROOT,
         )
         sha256 = hashlib.sha256(data).hexdigest()
@@ -505,6 +521,7 @@ def test_pipeline_safety_covers_node58a_without_oidc_attestation_or_secrets():
     assert "actual_comprehensive_main_seal_receipt.py" in workflow
     assert "tests/**" in workflow
     assert "contents: read" in workflow
+    assert workflow.count("fetch-depth: 0") == 1
     for forbidden in ("id-token: write", "attestations: write", "secrets."):
         assert forbidden not in workflow
     before_jobs, after_jobs = workflow.split("\njobs:\n", 1)
