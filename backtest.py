@@ -166,6 +166,55 @@ def collect_tai50(days: int, output: Path, end: date | None = None) -> None:
     print(f"Taiwan 50 total-return rows: {len(rows)} -> {output}")
     if not rows:
         raise RuntimeError("official Taiwan 50 total-return endpoint returned no usable rows")
+    # A month that failed all three attempts returns [] and merges in as
+    # nothing, so partial coverage has to be reported rather than inferred from
+    # the row count looking plausible.
+    expected = {month.strftime("%Y-%m") for month in month_starts(start, end)}
+    covered = {day[:7] for day in rows}
+    if expected - covered:
+        print(f"警告：{len(expected - covered)} 個月份沒有任何指數資料："
+              f"{', '.join(sorted(expected - covered)[:8])}")
+        print("  基準不完整時，該期間的超額報酬無法計算，回測會靜默略過那些窗口。")
+
+
+# Lunar New Year closes the exchange for up to nine weekdays, and a warning
+# that fires every February is a warning nobody reads.
+MAX_HOLIDAY_RUN = 9
+
+
+def report_gaps(existing: dict[str, dict], failed_days: list[str]) -> None:
+    """Say out loud when the cache is not continuous.
+
+    Both fetchers give up quietly -- a day returns None, a month returns [] --
+    and a partial download then looks exactly like a complete one. The backtest
+    indexes history by position, so a hole does not raise: it silently stretches
+    "twenty trading days later" into whatever the gap spans. A run that ended
+    with three years missing in the middle still printed a success line.
+    """
+    days_present = sorted(existing)
+    if len(days_present) < 2:
+        return
+    start, end = date.fromisoformat(days_present[0]), date.fromisoformat(days_present[-1])
+    absent, cursor = [], start
+    while cursor <= end:
+        if cursor.weekday() < 5 and cursor.isoformat() not in existing:
+            absent.append(cursor)
+        cursor += timedelta(days=1)
+    runs: list[list[date]] = []
+    for day in absent:
+        if runs and (day - runs[-1][-1]).days <= 3:
+            runs[-1].append(day)
+        else:
+            runs.append([day])
+    # Public holidays cluster; a longer run is a download that did not finish.
+    suspicious = [run for run in runs if len(run) > MAX_HOLIDAY_RUN]
+    if failed_days:
+        print(f"警告：{len(failed_days)} 個交易日抓取失敗，最早 {min(failed_days)}")
+    if suspicious:
+        print(f"警告：資料不連續，{len(suspicious)} 個區段的缺口長於假期可解釋的範圍：")
+        for run in suspicious[:10]:
+            print(f"  {run[0].isoformat()} → {run[-1].isoformat()}（缺 {len(run)} 個平日）")
+        print("  回測以位置索引，缺口會讓持有期被無聲拉長；補齊後再使用。")
 
 
 def collect(days: int, output: Path, workers: int, end: date | None = None, request_delay: float = 2.0) -> None:
@@ -206,6 +255,7 @@ def collect(days: int, output: Path, workers: int, end: date | None = None, requ
 
     if not existing:
         raise RuntimeError(f"official daily endpoint returned no usable rows; failed_dates={len(failed_days)}")
+    report_gaps(existing, failed_days)
 
 
 def load_history(path: Path) -> tuple[list[str], list[dict[str, tuple[float, float]]]]:
