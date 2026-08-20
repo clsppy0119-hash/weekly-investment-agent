@@ -49,7 +49,7 @@ EVIDENCE_PRODUCER_PINS = {
     "strategy_backtest.py": "fc3a81c71349e07367e2d690563e0bc8172c4291ba10ce9401a1e308d069fda7",
     "actual_comprehensive_outcome_accounting.py": "e69c13b9f33e36427d6dee86980664f9e66dbd07b43b8cc01f6752989c6b4099",
     "execution_accounting.py": "86191bc936dbd3f2f79ef44b084ff8c89f6588e98edeb2e10873d60d5b842c63",
-    "backtest.py": "aea1fd294108d7083049cb38c1f18e64e0c49e5b3b0ea092994371002b4b3e24",
+    "backtest.py": "fe65a86c5dda678314dedc7d2481dacd00ad9a5cdb82c9017527d1a41827fb76",
 }
 
 # Node54 adds an executable, shared selector without pretending that a caller's
