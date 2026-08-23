@@ -16,6 +16,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: prospective-daily-report-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   daily-report:
     runs-on: ubuntu-latest
@@ -23,6 +27,8 @@ jobs:
       FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -111,6 +117,7 @@ jobs:
           key: ai-review-v1-${{ runner.os }}-${{ github.run_id }}
           restore-keys: ai-review-v1-${{ runner.os }}-
       - name: Review comprehensive candidates with AI
+        if: steps.ai-eligibility.outputs.needs_ai == 'true'
         continue-on-error: true
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -177,4 +184,95 @@ jobs:
                       result = json.load(response)
                   if not result.get("ok"):
                       raise RuntimeError(result)
+          PY
+      - name: Build isolated paper-cohort action universe
+        id: paper_universe
+        if: ${{ !cancelled() && github.event_name == 'schedule' }}
+        continue-on-error: true
+        run: >-
+          python paper_trading.py action-universe
+          --manifest data/candidate-manifest.json
+          --ledger paper_data/comprehensive-v1.json
+          --output data/paper-action-universe.json
+      - name: Refresh actions for open paper cohorts
+        id: paper_actions
+        if: ${{ !cancelled() && github.event_name == 'schedule' && steps.paper_universe.outcome == 'success' }}
+        continue-on-error: true
+        run: >-
+          python finmind_actions.py
+          --candidate-manifest data/paper-action-universe.json
+          --as-of-quotes quotes.json
+          --output data/paper-actions.json
+      - name: Advance prospective paper-only ledger
+        id: paper_advance
+        if: ${{ !cancelled() && github.event_name == 'schedule' && steps.paper_universe.outcome == 'success' && steps.paper_actions.outcome == 'success' }}
+        continue-on-error: true
+        run: >-
+          python paper_trading.py advance
+          --manifest data/candidate-manifest.json
+          --quotes quotes.json
+          --actions data/paper-actions.json
+          --ledger paper_data/comprehensive-v1.json
+          --progress data/prospective-paper-progress.json
+      - name: Render tracked model advice
+        id: model_advice
+        if: ${{ !cancelled() && github.event_name == 'schedule' && steps.paper_advance.outcome == 'success' }}
+        continue-on-error: true
+        run: >-
+          python model_advice.py
+          --ledger paper_data/comprehensive-v1.json
+          --output model-advice.txt
+      - name: Require and persist prospective paper ledger
+        id: paper_persist
+        if: ${{ !cancelled() && github.event_name == 'schedule' }}
+        env:
+          PAPER_UNIVERSE_OUTCOME: ${{ steps.paper_universe.outcome }}
+          PAPER_ACTIONS_OUTCOME: ${{ steps.paper_actions.outcome }}
+          PAPER_ADVANCE_OUTCOME: ${{ steps.paper_advance.outcome }}
+        run: |
+          test "$PAPER_UNIVERSE_OUTCOME" = success
+          test "$PAPER_ACTIONS_OUTCOME" = success
+          test "$PAPER_ADVANCE_OUTCOME" = success
+          test -s paper_data/comprehensive-v1.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- paper_data/comprehensive-v1.json
+          git diff --cached --quiet -- paper_data/comprehensive-v1.json || git commit -m "Append prospective paper observation" -- paper_data/comprehensive-v1.json
+          git fetch origin "+refs/heads/$GITHUB_REF_NAME:refs/remotes/origin/$GITHUB_REF_NAME"
+          git rebase --autostash "origin/$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+      - name: Upload prospective paper artifact
+        if: ${{ !cancelled() && github.event_name == 'schedule' && steps.paper_persist.outcome == 'success' && steps.model_advice.outcome == 'success' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: prospective-paper-observation
+          if-no-files-found: error
+          path: |
+            paper_data/comprehensive-v1.json
+            data/prospective-paper-progress.json
+            data/paper-actions.json
+            model-advice.txt
+      - name: Push persisted model advice to Telegram
+        if: ${{ !cancelled() && github.event_name == 'schedule' }}
+        env:
+          PAPER_PERSIST_OUTCOME: ${{ steps.paper_persist.outcome }}
+          MODEL_ADVICE_OUTCOME: ${{ steps.model_advice.outcome }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          test "$PAPER_PERSIST_OUTCOME" = success
+          test "$MODEL_ADVICE_OUTCOME" = success
+          test -s model-advice.txt
+          python - <<'PY'
+          import json, os, urllib.parse, urllib.request
+          url = f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage"
+          text = open("model-advice.txt", encoding="utf-8").read().strip()
+          for start in range(0, len(text), 3900):
+              body = urllib.parse.urlencode({"chat_id": os.environ["TELEGRAM_CHAT_ID"], "text": text[start:start + 3900]}).encode()
+              request = urllib.request.Request(url, data=body)
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  result = json.load(response)
+              if not result.get("ok"):
+                  raise RuntimeError(result)
           PY

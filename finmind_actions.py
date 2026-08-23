@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from provenance import record
+from provenance import record, stable_hash
 from quote_provenance import available_at
 
 
@@ -40,16 +40,45 @@ def _load_json(path: Path) -> dict:
         return {}
 
 
+def quote_session(path: Path) -> date:
+    """Derive the paper evidence cutoff from a bound, already-closed quote snapshot."""
+    payload = _load_json(path)
+    provenance_root = payload.get("provenance")
+    provenance = provenance_root.get("quote") if isinstance(provenance_root, dict) else None
+    rows = payload.get("quotes")
+    if not isinstance(provenance, dict) or not isinstance(rows, dict):
+        raise ValueError("quote provenance is missing")
+    value = provenance.get("effectiveDate")
+    try:
+        parsed = date.fromisoformat(value) if isinstance(value, str) else None
+    except ValueError as error:
+        raise ValueError("quote session is invalid") from error
+    if (
+        parsed is None
+        or parsed.isoformat() != value
+        or provenance.get("availableAt") != available_at(value)
+        or provenance.get("contentHash") != stable_hash(rows)
+        or provenance.get("status") != "success"
+        or provenance.get("conflictStatus") != "no_conflict"
+    ):
+        raise ValueError("quote session is not bound to the snapshot")
+    return parsed
+
+
 def active_codes(tracker: Path, manifest: Path | None = None) -> list[str]:
-    if manifest and manifest.exists():
+    if manifest is not None:
+        if not manifest.exists():
+            raise ValueError("candidate manifest is missing")
         payload = _load_json(manifest)
+        preview = payload.get("previewCandidates")
+        if not isinstance(preview, list):
+            raise ValueError("candidate manifest preview is invalid")
         codes = {
             str(item.get("code", ""))
-            for item in payload.get("previewCandidates", [])
+            for item in preview
             if isinstance(item, dict) and str(item.get("code", "")).isdigit()
         }
-        if codes:
-            return sorted(codes)
+        return sorted(codes)
     if not tracker.exists():
         return []
     rows = _load_json(tracker).get("recommendations", [])
@@ -109,7 +138,12 @@ def build_payload(codes: list[str], cache_path: Path, days: int, ttl_hours: floa
             verified_at = datetime.fromisoformat(str(entry.get("verifiedAt", "")).replace("Z", "+00:00")).astimezone(timezone.utc)
         except ValueError:
             pass
-        if verified_at and now - verified_at <= timedelta(hours=max(0.0, ttl_hours)) and entry.get("queriedThrough") == today.isoformat():
+        try:
+            queried_through = date.fromisoformat(str(entry.get("queriedThrough", "")))
+        except ValueError:
+            queried_through = None
+        age = now - verified_at if verified_at else None
+        if age is not None and timedelta(0) <= age <= timedelta(hours=max(0.0, ttl_hours)) and queried_through is not None and queried_through >= today:
             hits.append(code)
             continue
         through = entry.get("queriedThrough")
@@ -138,7 +172,13 @@ def build_payload(codes: list[str], cache_path: Path, days: int, ttl_hours: floa
             refreshed.append(code)
 
     verified_codes = [code for code in codes if code in hits or code in refreshed]
-    events = [row for code in verified_codes for row in entries.get(code, {}).get("events", [])]
+    events = [
+        row
+        for code in verified_codes
+        for row in entries.get(code, {}).get("events", [])
+        if isinstance(row, dict)
+        if window_start.isoformat() <= str(row.get("date", "")) <= today.isoformat()
+    ]
     last_event_dates = {code: entries.get(code, {}).get("lastEventDate") for code in codes}
     candidate_key = hashlib.sha256(json.dumps({"codes": codes, "lastEventDates": last_event_dates}, sort_keys=True).encode()).hexdigest()
     cache_payload = {"schemaVersion": CACHE_SCHEMA, "updatedAt": now.isoformat(), "entries": entries}
@@ -189,6 +229,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=ROOT / "backtest_data" / "candidate_actions.json")
     parser.add_argument("--tracker", type=Path, default=ROOT / "strategy_data" / "recommendations.json")
     parser.add_argument("--candidate-manifest", type=Path, default=None)
+    parser.add_argument("--as-of-quotes", type=Path, default=None)
     parser.add_argument("--cache", type=Path, default=ROOT / ".private-data-cache" / "market-evidence-v1" / "corporate-actions.json")
     parser.add_argument("--days", type=int, default=365)
     parser.add_argument("--ttl-hours", type=float, default=12.0)
@@ -196,7 +237,11 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=3)
     args = parser.parse_args()
     codes = active_codes(args.tracker, args.candidate_manifest)
-    payload = build_payload(codes, args.cache, args.days, args.ttl_hours, args.overlap_days, args.workers)
+    today = quote_session(args.as_of_quotes) if args.as_of_quotes else None
+    payload = build_payload(
+        codes, args.cache, args.days, args.ttl_hours, args.overlap_days, args.workers,
+        today=today,
+    )
     _atomic_json(args.output, payload)
     print(json.dumps({"codes": len(codes), "events": len(payload["events"]), "failures": len(payload["failures"]), "cache": payload["cache"]}, ensure_ascii=False))
 

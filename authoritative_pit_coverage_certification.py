@@ -30,7 +30,7 @@ from market_population_contract import (
 
 
 SCHEMA_VERSION = 1
-POLICY_VERSION = "authoritative-pit-coverage-certification-v1"
+POLICY_VERSION = "authoritative-pit-coverage-certification-benchmark-accounting-v4"
 REGISTRY_POLICY_VERSION = "trusted-pit-bundle-registry-v1"
 REGISTRY_PATH = Path(__file__).with_name("trusted_pit_bundle_registry_v1.json")
 TIMEZONE = "Asia/Taipei"
@@ -57,7 +57,7 @@ CERTIFICATION_PRODUCER_PINS = {
     "official_availability_capability.py": "dba9b99b0026236d0a4ed3e86f07d72c5e248e201746b0c6675dd041887e932b",
     "pit_availability_evidence.py": "c64fbbfdfb06dcdfc67eb45e8ee3acca70eb561a945523ead9edf5614d701fb2",
     "official_announcement_availability.py": "3024f72313372184c9d206ea6849a9fc19954c26cd4eab112b5082c30f585149",
-    "production_strategy_validation_preflight.py": "775404b60a26bcc5f2aa23f970f59a5d20e2564babe79a81eb97d570b573c5dd",
+    "production_strategy_validation_preflight.py": "5e0b088ace1bcc4dc65f3fe39d7b3b6a69f48765bd5d59ac1a1f5b86a2890e26",
 }
 
 ROOT_KEYS = frozenset({

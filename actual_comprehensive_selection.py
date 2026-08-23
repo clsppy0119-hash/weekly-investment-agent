@@ -18,11 +18,11 @@ import hashlib
 import json
 from typing import Any, Iterable
 
-from scoring import DEFAULT_PICKS, candidates, number
+from scoring import DEFAULT_PICKS, candidates, number, ranking_volume
 
 
 SCHEMA_VERSION = 1
-POLICY_VERSION = "actual-comprehensive-selection-v1"
+POLICY_VERSION = "actual-comprehensive-selection-v2"
 STYLE = "comprehensive"
 REQUIRED_FINAL_METRICS = ("revenueYoY", "eps", "roe", "debtRatio")
 
@@ -33,6 +33,17 @@ def _canonical(value: Any) -> str:
 
 def digest(value: Any) -> str:
     return hashlib.sha256(_canonical(value).encode("utf-8")).hexdigest()
+
+
+def display_name(value: Any, fallback: str) -> str:
+    """A bounded UTF-8 label safe for the public JSON/report projection."""
+    if type(value) is not str or any(ord(character) < 32 or ord(character) == 127 for character in value):
+        return fallback
+    try:
+        encoded = value.encode("utf-8")
+    except UnicodeEncodeError:
+        return fallback
+    return value if len(encoded) <= 256 else fallback
 
 
 def quality_blockers(
@@ -80,12 +91,13 @@ def assess_ranked_preview(
     for style, items in ranked.items():
         for rank, item in enumerate(items, 1):
             score, coverage, code, quote, fundamentals = item
+            name = display_name(quote.get("name"), str(code))
             blockers = quality_blockers(
                 str(code), int(coverage), fundamentals, actions, contract_blockers
             )
             preview.append({
                 "code": str(code),
-                "name": quote.get("name", code),
+                "name": name,
                 "style": style,
                 "rank": rank,
                 "score": score,
@@ -103,11 +115,11 @@ def _cutoff_tie(pool: list[tuple], preview_picks: int) -> bool:
     excluded_boundary = pool[preview_picks]
     selected_key = (
         selected_boundary[0], selected_boundary[1],
-        selected_boundary[3].get("volume") or 0,
+        ranking_volume(selected_boundary[3]),
     )
     excluded_key = (
         excluded_boundary[0], excluded_boundary[1],
-        excluded_boundary[3].get("volume") or 0,
+        ranking_volume(excluded_boundary[3]),
     )
     return selected_key == excluded_key
 
@@ -152,7 +164,7 @@ def rank_and_assess(
             "code": str(item[2]),
             "score": item[0],
             "coverage": item[1],
-            "volume": item[3].get("volume") or 0,
+            "volume": ranking_volume(item[3]),
         }
         for item in pool
     ]

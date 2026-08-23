@@ -20,8 +20,8 @@ from typing import Any
 
 
 SCHEMA_VERSION = 1
-POLICY_VERSION = "production-strategy-validation-preflight-v1"
-STRATEGY_IDENTITY = "production-comprehensive-v1"
+POLICY_VERSION = "production-strategy-validation-preflight-benchmark-accounting-v4"
+STRATEGY_IDENTITY = "production-comprehensive-finite-input-v2"
 
 # These pins bind the specification to the exact production selection path on
 # main at the time the contract was registered.  Source text is canonicalized
@@ -29,12 +29,12 @@ STRATEGY_IDENTITY = "production-comprehensive-v1"
 # the same content.  A source change must update the contract and therefore
 # produces a new strategySpecHash.
 SOURCE_PINS = {
-    "actual_comprehensive_selection.py": "840d397957c172b4a543bd7ecc57911e787b93f288366dc016c30f1feadb4be0",
-    "candidate_manifest.py": "e5471941684838779a6e658de8efbce3799300a4fb0c609854f528f0ccd7aa6e",
-    "daily_report.py": "ca8a78cffeffe63c8503196f28cc58c7f06b7dd05fae12925e339b4c27ce9150",
-    "data_contract.py": "f91475db7ece2dffef9bed86a1a5c1b0dbf12d4ecaba7a4c6b51447624987c45",
-    "scoring.py": "3db3aaa02dbf9f419da48a6150ff8e479a42ec8f0bd0b2f55cd9ad74f456a50c",
-    "strategy_tracker.py": "9468603d5e668e5e795852d7a231a5d2163895a6fe4cff0d6b5318540cb9d3de",
+    "actual_comprehensive_selection.py": "60a3fbe2d14ce9388a5731e1a03416ff61880670aab6e6fa104dd8ab1b67bcef",
+    "candidate_manifest.py": "8b17dbddd4957bf4c55bd02b63098b1afac20e55785d1ccbfaee8cbe4b0fd8b8",
+    "daily_report.py": "c5aba2ecc1f49cc81f855d85a715c4cfae350f3a58fa8a18489511ed22668ebd",
+    "data_contract.py": "220a4208afab4e4b182808b0784b93662a7d486e0c3815e1c8bcdee49c309e58",
+    "scoring.py": "f4f0f538f0176e885925842decc6ab45f9b5d1dddc2871ffe404a56f8d59fa42",
+    "strategy_tracker.py": "84269cca5b889feed4cc67ace4e5e927b02c3b9297c4e7f46a98652bbbb2ea07",
 }
 
 # Only fixed, reviewed producers may describe evidence to this preflight.  The
@@ -57,6 +57,12 @@ EVIDENCE_PRODUCER_PINS = {
 # parity comes only from running both paths over the same bounded fixture.
 SELECTION_PARITY_POLICY_VERSION = "actual-comprehensive-selection-parity-v1"
 OUTCOME_ACCOUNTING_POLICY_VERSION = "actual-comprehensive-outcome-accounting-v1"
+LEGACY_BENCHMARK_COST_MODEL_VERSION = "official-0050-total-return-single-split-round-trip-v1"
+LEGACY_BENCHMARK_COMPARATOR_VERSION = "full-scheduled-calendar-0050-total-return-comparator-v2"
+LEGACY_BENCHMARK_ARTIFACT_POLICY_VERSION = "legacy-strategy-backtest-single-split-benchmark-v2"
+REGISTERED_LEGACY_RUNNER_HASH = "fc3a81c71349e07367e2d690563e0bc8172c4291ba10ce9401a1e308d069fda7"
+CORRECTED_LEGACY_RUNNER_HASH = "52e9f669fc344d5234b26091968d27c0d2f3c087811e6d2d249883b930b9f7d0"
+LEGACY_BENCHMARK_REGISTRATION_STATUS = "successor_unregistered_requires_new_preregistration"
 
 AUTHORITY_CONTRACTS = {
     "official_membership_v1": {
@@ -210,23 +216,35 @@ def strategy_spec() -> dict[str, Any]:
     spec = {
         "schemaVersion": 1,
         "strategyIdentity": STRATEGY_IDENTITY,
-        "strategyTrackerVersion": "2.0",
+        "strategyTrackerVersion": "2.1",
+        "registrationStatus": "successor_unregistered_requires_new_preregistration",
         "candidateManifestSchemaVersion": 1,
         "reportMode": "comprehensive",
         "style": "comprehensive",
+        "selectionPolicyVersion": "actual-comprehensive-selection-v2",
         "sourcePins": dict(SOURCE_PINS),
         "selection": {
             "weights": dict(COMPREHENSIVE_WEIGHTS),
             "minimumScore": 60,
             "minimumScoringCoverage": 70,
             "previewPicks": 3,
-            "sort": ["score:desc", "coverage:desc", "volume:desc", "code:desc"],
+            "sort": ["score:desc", "coverage:desc", "normalizedVolume:desc", "code:desc"],
             "scoreRounding": "python-round-nearest-even",
             "availableFactorNormalization": True,
-            "numericBooleansRejected": True,
+            "numericDomain": {
+                "exactBuiltinIntOrFloat": True,
+                "finiteFloatRequired": True,
+                "maximumAbsoluteValue": 10**18,
+                "numericBooleansRejected": True,
+                "positivePriceRequired": True,
+                "invalidOrNegativeVolumeSortValue": 0,
+                "negativeZeroCanonicalizedToIntegerZero": True,
+                "invalidFactorTreatment": "missing_without_coverage",
+                "derivedValuesMustRemainInDomain": True,
+            },
             "continuousTrend": False,
             "reversalAware": False,
-            "universeIteration": "fundamentals keys with four-digit numeric code and numeric price",
+            "universeIteration": "fundamentals keys with four-ASCII-digit code and bounded-finite positive price",
             "explicitMinimumVolume": None,
         },
         "finalQualityGate": {
@@ -568,7 +586,15 @@ def evaluate(payload: Any) -> dict[str, Any]:
             "statusCounts": local_counts,
         })
 
-    blockers.extend(["execution_spec_unregistered", "risk_policy_unregistered", "eligible_pool_benchmark_unregistered"])
+    blockers.extend([
+        "corrected_legacy_benchmark_runner_not_preregistered",
+        "corrected_legacy_benchmark_evidence_producer_unregistered",
+        "successor_strategy_spec_not_preregistered",
+        "successor_source_pins_not_registered",
+        "execution_spec_unregistered",
+        "risk_policy_unregistered",
+        "eligible_pool_benchmark_unregistered",
+    ])
     blockers = list(dict.fromkeys(blockers))
     pit_blockers = (
         "input_contract_invalid", "input_schema_invalid", "decision_snapshots_missing",
@@ -603,8 +629,32 @@ def evaluate(payload: Any) -> dict[str, Any]:
             "recordKeys": sorted(ALLOWED_RECORD_KEYS),
             "universeKeys": sorted(ALLOWED_UNIVERSE_KEYS),
         }),
-        "strategySpecRegistered": True,
-        "sourcePinsRegistered": True,
+        "strategySpecRegistered": False,
+        "sourcePinsRegistered": False,
+        "legacyBenchmarkCostModelVersion": LEGACY_BENCHMARK_COST_MODEL_VERSION,
+        "legacyBenchmarkComparatorVersion": LEGACY_BENCHMARK_COMPARATOR_VERSION,
+        "legacyBenchmarkArtifactPolicyVersion": LEGACY_BENCHMARK_ARTIFACT_POLICY_VERSION,
+        "legacyBenchmarkComparatorHistory": {
+            "legacy-strategy-backtest-v1": {
+                "comparatorVersion": "active-only-interval-costed-0050-total-return-comparator-v1",
+                "denominator": "active_intervals_only",
+                "roundTripAllocation": "one_full_round_trip_per_active_interval",
+            },
+            LEGACY_BENCHMARK_ARTIFACT_POLICY_VERSION: {
+                "comparatorVersion": LEGACY_BENCHMARK_COMPARATOR_VERSION,
+                "denominator": "all_scheduled_intervals_including_cash_no_candidate_and_unfilled",
+                "roundTripAllocation": "one_split_round_trip_first_buy_last_sell",
+            },
+        },
+        "registeredLegacyRunnerHash": REGISTERED_LEGACY_RUNNER_HASH,
+        "correctedLegacyRunnerHash": CORRECTED_LEGACY_RUNNER_HASH,
+        "legacyBenchmarkRunnerDriftDetected": (
+            CORRECTED_LEGACY_RUNNER_HASH != REGISTERED_LEGACY_RUNNER_HASH
+        ),
+        "correctedLegacyBenchmarkRunnerRegistered": False,
+        "correctedLegacyBenchmarkEvidenceProducerRegistered": False,
+        "evidenceProducerPinsRegistered": True,
+        "legacyBenchmarkRegistrationStatus": LEGACY_BENCHMARK_REGISTRATION_STATUS,
         "strategyIdentityCertified": False,
         "productionBacktestParity": False,
         "selectionParityPolicyVersion": SELECTION_PARITY_POLICY_VERSION,

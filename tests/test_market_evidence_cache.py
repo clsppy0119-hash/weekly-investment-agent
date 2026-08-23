@@ -7,9 +7,66 @@ from unittest.mock import patch
 
 import finmind_actions
 import market_news
+from quote_provenance import build as build_quote_provenance
 
 
 class MarketEvidenceCacheTests(unittest.TestCase):
+    def test_explicit_empty_paper_universe_never_falls_back_to_the_legacy_tracker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            tracker = root / "tracker.json"
+            manifest = root / "paper-universe.json"
+            tracker.write_text(json.dumps({
+                "recommendations": [{"date": "2026-08-06", "code": "2330"}],
+            }), encoding="utf-8")
+            manifest.write_text(json.dumps({"previewCandidates": []}), encoding="utf-8")
+            self.assertEqual(finmind_actions.active_codes(tracker, manifest), [])
+            with self.assertRaisesRegex(ValueError, "missing"):
+                finmind_actions.active_codes(tracker, root / "missing.json")
+
+    def test_paper_action_cutoff_is_derived_from_bound_quote_session(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "quotes.json"
+            rows = {"2330": {"price": 100.0}}
+            fundamentals = {"2330": {"eps": 8.0}}
+            provenance = build_quote_provenance(
+                "2026-08-06", "2026-08-06T15:00:00+08:00",
+                rows, fundamentals, {"twse": ["2330"], "tpex": []},
+            )
+            path.write_text(json.dumps({
+                "quotes": rows, "fundamentals": fundamentals, "provenance": provenance,
+            }), encoding="utf-8")
+            self.assertEqual(finmind_actions.quote_session(path), date(2026, 8, 6))
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            payload["quotes"]["2330"]["price"] = 999.0
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "not bound"):
+                finmind_actions.quote_session(path)
+
+    def test_later_cache_hit_is_clipped_to_the_quote_session_cutoff(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cache = Path(tmp) / "actions.json"
+            now = datetime(2026, 8, 7, 1, tzinfo=timezone.utc)
+            cache.write_text(json.dumps({
+                "schemaVersion": 1,
+                "entries": {"2330": {
+                    "queriedThrough": "2026-08-07",
+                    "verifiedAt": (now - timedelta(hours=1)).isoformat(),
+                    "lastEventDate": "2026-08-07",
+                    "events": [
+                        {"code": "2330", "date": "2026-08-05"},
+                        {"code": "2330", "date": "2026-08-07"},
+                    ],
+                }},
+            }), encoding="utf-8")
+            with patch.object(finmind_actions, "fetch", side_effect=AssertionError("must not fetch")):
+                payload = finmind_actions.build_payload(
+                    ["2330"], cache, 365, 12, 14, 1,
+                    date(2026, 8, 6), now,
+                )
+            self.assertEqual([row["date"] for row in payload["events"]], ["2026-08-05"])
+            self.assertEqual(payload["period"]["end"], "2026-08-06")
+
     def test_news_fresh_complete_cache_avoids_fetch(self):
         with tempfile.TemporaryDirectory() as tmp:
             cache = Path(tmp) / "news.json"

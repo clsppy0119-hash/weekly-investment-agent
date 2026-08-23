@@ -3,11 +3,18 @@ import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from actual_comprehensive_selection import rank_pool
+from actual_comprehensive_selection import display_name, rank_pool
 from candidate_manifest import atomic_write_json, build_manifest, load_json
 # The ranking rule lives in `scoring` so the backtest can score candidates with
 # the identical code path; see that module for why.
-from scoring import DEFAULT_PICKS, candidates, number, score_metric, stock_score  # noqa: F401
+from scoring import (  # noqa: F401
+    DEFAULT_PICKS,
+    candidates,
+    number,
+    ranking_volume,
+    score_metric,
+    stock_score,
+)
 from strategy_tracker import record_recommendations, review_summary
 
 
@@ -40,7 +47,8 @@ def candidate_line(item):
     if number(quote.get("change")):
         reasons.append(f"當日 {quote['change']:+.2f}")
     detail = "、".join(reasons[:2]) or "可用資料有限"
-    return f"• {quote.get('name', code)}（{code}）｜{quote['price']:.2f}｜評分 {score}｜{detail}"
+    name = display_name(quote.get("name"), str(code))
+    return f"• {name}（{code}）｜{quote['price']:.2f}｜評分 {score}｜{detail}"
 
 
 with open("quotes.json", encoding="utf-8") as source:
@@ -48,14 +56,26 @@ with open("quotes.json", encoding="utf-8") as source:
 
 quotes = data.get("quotes", {})
 fundamentals = data.get("fundamentals", {})
-valid = [(code, row) for code, row in quotes.items() if number(row.get("price"))]
-volume = sorted(valid, key=lambda item: item[1].get("volume", 0), reverse=True)[:3]
+valid = [
+    (code, row)
+    for code, row in quotes.items()
+    if (
+        type(row) is dict
+        and number(row.get("price"))
+        and row["price"] > 0
+    )
+]
+volume = sorted(valid, key=lambda item: ranking_volume(item[1]), reverse=True)[:3]
 today = datetime.now(TZ_TAIPEI).strftime("%Y-%m-%d")
 
 
 def quote_line(item):
     code, row = item
-    return f"• {row.get('name', code)}（{code}）｜{row['price']:.2f}｜{row.get('change', 0):+.2f}"
+    safe_code = display_name(code, "代碼不可用")
+    change = row.get("change")
+    change_text = f"{change:+.2f}" if number(change) else "資料不可用"
+    name = display_name(row.get("name"), safe_code)
+    return f"• {name}（{safe_code}）｜{row['price']:.2f}｜{change_text}"
 
 
 def market_news_lines():

@@ -34,12 +34,24 @@ def file_sha256(path: Path) -> str | None:
 
 def evidence_sha256(path: Path) -> str | None:
     """Hash evidence content while excluding retrieval-cache diagnostics."""
-    payload = load_json(path)
+    try:
+        payload = load_json(path)
+    except (ValueError, OverflowError, UnicodeError):
+        return None
     if not payload:
         return file_sha256(path)
     payload.pop("cache", None)
-    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    try:
+        canonical = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    except (TypeError, ValueError, OverflowError, UnicodeEncodeError):
+        return None
 
 
 def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -47,7 +59,7 @@ def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     try:
         temporary.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+            json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
             encoding="utf-8",
         )
         os.replace(temporary, path)

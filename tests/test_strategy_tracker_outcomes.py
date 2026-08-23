@@ -168,3 +168,13 @@ if __name__ == "__main__":
         if name.startswith("test_"):
             case()
             print(f"PASS  {name}")
+
+
+def load_tests(loader, tests, pattern):
+    import unittest
+
+    suite = unittest.TestSuite()
+    for name, case in sorted(globals().items()):
+        if name.startswith("test_") and callable(case):
+            suite.addTest(unittest.FunctionTestCase(case, description=name))
+    return suite

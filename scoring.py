@@ -9,6 +9,8 @@ so a backtest result says something about the recommendations users see.
 
 from __future__ import annotations
 
+import math
+
 WEIGHTS = {
     "value": {"revenue": 15, "eps": 15, "roe": 15, "debt": 15, "pe": 15, "pb": 10, "dividend": 5, "trend20": 10},
     "swing": {"revenue": 10, "eps": 5, "roe": 5, "debt": 5, "pe": 5, "trend20": 25, "trend5": 20, "change": 25},
@@ -19,10 +21,32 @@ WEIGHTS = {
 MINIMUM_COVERAGE = {"value": 70, "swing": 45, "dividend": 70, "comprehensive": 70}
 MINIMUM_SCORE = 60
 DEFAULT_PICKS = 3
+MAX_NUMBER_ABS = 10**18
 
 
 def number(value):
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
+    """True only for bounded, finite built-in JSON numbers.
+
+    Python comparisons with NaN and infinity do not fail closed: NaN can fall
+    through score thresholds, while infinity can win a ranking tie.  The
+    production inputs are JSON, so accepting numeric subclasses or integers
+    too large for a float conversion only creates an extra hostile surface.
+    """
+    if type(value) is int:
+        return abs(value) <= MAX_NUMBER_ABS
+    return (
+        type(value) is float
+        and math.isfinite(value)
+        and abs(value) <= MAX_NUMBER_ABS
+    )
+
+
+def ranking_volume(quote):
+    """Positive finite volume, with every zero/invalid form canonicalized to 0."""
+    if type(quote) is not dict:
+        return 0
+    value = quote.get("volume")
+    return value if number(value) and value > 0 else 0
 
 
 def score_metric(value, thresholds, default=None):
@@ -74,6 +98,8 @@ def trend_score(price, average, continuous: bool, reversal_aware: bool = False):
     if not continuous:
         return 75 if price >= average else 35
     premium = (price / average - 1) * 100
+    if not math.isfinite(premium):
+        return None
     if reversal_aware:
         return max(0.0, min(100.0, 100 - TREND_DECAY * abs(premium - TREND_PEAK_PCT)))
     return max(0.0, min(100.0, 50 + premium * TREND_SLOPE))
@@ -138,7 +164,14 @@ def candidates(style, quotes, fundamentals, picks: int | None = DEFAULT_PICKS,
         minimum_coverage = MINIMUM_COVERAGE[style]
     for code, fund in fundamentals.items():
         quote = quotes.get(code, {})
-        if not (code.isdigit() and len(code) == 4 and number(quote.get("price"))):
+        price = quote.get("price")
+        if not (
+            type(code) is str
+            and len(code) == 4
+            and all("0" <= character <= "9" for character in code)
+            and number(price)
+            and price > 0
+        ):
             continue
         score, coverage = stock_score(code, style, quotes, fundamentals, weights,
                                       continuous_trend, reversal_aware)
@@ -149,5 +182,8 @@ def candidates(style, quotes, fundamentals, picks: int | None = DEFAULT_PICKS,
     # descending.  That silently bought the highest-numbered names, which in
     # Taiwan skews to small speculative listings.  Break on traded volume
     # instead, keeping the code only as a last resort for reproducibility.
-    ranked.sort(key=lambda item: (item[0], item[1], item[3].get("volume") or 0, item[2]), reverse=True)
+    ranked.sort(
+        key=lambda item: (item[0], item[1], ranking_volume(item[3]), item[2]),
+        reverse=True,
+    )
     return ranked if picks is None else ranked[:picks]

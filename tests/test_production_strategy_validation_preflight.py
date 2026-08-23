@@ -8,6 +8,7 @@ from pathlib import Path
 
 import candidate_manifest
 import scoring
+import actual_comprehensive_validation_preregistration as prereg
 import production_strategy_validation_preflight as preflight
 
 
@@ -113,6 +114,46 @@ def test_current_production_and_backtest_contract_mismatch_is_explicit():
     assert "production_backtest_engine_mismatch" in result["blockers"]
 
 
+def test_corrected_legacy_benchmark_runner_is_versioned_but_not_preregistered():
+    result = preflight.evaluate(payload())
+    assert preflight.strategy_spec_hash() \
+        == "b11ca90c3fd7d6d0e8ed4ca1f477e07e2038e9c7a37f6cdb89980cc379749d33"
+    assert preflight.strategy_spec_hash() != prereg.STRATEGY_SPEC_HASH
+    assert result["strategySpecRegistered"] is False
+    assert result["sourcePinsRegistered"] is False
+    assert result["legacyBenchmarkCostModelVersion"] \
+        == "official-0050-total-return-single-split-round-trip-v1"
+    assert result["legacyBenchmarkComparatorVersion"] \
+        == "full-scheduled-calendar-0050-total-return-comparator-v2"
+    assert result["legacyBenchmarkArtifactPolicyVersion"] \
+        == "legacy-strategy-backtest-single-split-benchmark-v2"
+    history = result["legacyBenchmarkComparatorHistory"]
+    assert history["legacy-strategy-backtest-v1"] == {
+        "comparatorVersion": "active-only-interval-costed-0050-total-return-comparator-v1",
+        "denominator": "active_intervals_only",
+        "roundTripAllocation": "one_full_round_trip_per_active_interval",
+    }
+    assert history["legacy-strategy-backtest-single-split-benchmark-v2"] == {
+        "comparatorVersion": "full-scheduled-calendar-0050-total-return-comparator-v2",
+        "denominator": "all_scheduled_intervals_including_cash_no_candidate_and_unfilled",
+        "roundTripAllocation": "one_split_round_trip_first_buy_last_sell",
+    }
+    assert result["registeredLegacyRunnerHash"] == prereg.SOURCE_PINS["strategy_backtest.py"]
+    assert result["correctedLegacyRunnerHash"] \
+        == preflight.CORRECTED_LEGACY_RUNNER_HASH
+    assert result["legacyBenchmarkRunnerDriftDetected"] is True
+    assert result["correctedLegacyBenchmarkRunnerRegistered"] is False
+    assert result["correctedLegacyBenchmarkEvidenceProducerRegistered"] is False
+    assert result["evidenceProducerPinsRegistered"] is True
+    assert result["legacyBenchmarkRegistrationStatus"] \
+        == "successor_unregistered_requires_new_preregistration"
+    assert result["pitRequirementsHash"] \
+        == "571fec5d0b3db3596d282d6188d251535b3135525fcea2d742f9c04d155ea9c9"
+    assert "corrected_legacy_benchmark_runner_not_preregistered" in result["blockers"]
+    assert "corrected_legacy_benchmark_evidence_producer_unregistered" in result["blockers"]
+    assert result["readyForPerformanceEvaluation"] is False
+
+
 def test_strategy_hash_is_canonical_and_changes_with_any_rule():
     spec = preflight.strategy_spec()
     reordered = json.loads(json.dumps(spec, sort_keys=False))
@@ -131,7 +172,7 @@ def test_strategy_hash_is_canonical_and_changes_with_any_rule():
         changed[path[0]][path[1]] = value
         mutations.append(changed)
     version_changed = copy.deepcopy(spec)
-    version_changed["strategyTrackerVersion"] = "2.1"
+    version_changed["strategyTrackerVersion"] = "2.2"
     mutations.append(version_changed)
     assert all(preflight.digest(item) != preflight.strategy_spec_hash() for item in mutations)
 
@@ -230,8 +271,17 @@ def test_registered_source_pins_match_the_current_production_path():
     producer_actual = {
         name: canonical_source_hash(ROOT / name)
         for name in preflight.EVIDENCE_PRODUCER_PINS
+        if name != "strategy_backtest.py"
     }
-    assert producer_actual == preflight.EVIDENCE_PRODUCER_PINS
+    registered_without_runner = {
+        name: value for name, value in preflight.EVIDENCE_PRODUCER_PINS.items()
+        if name != "strategy_backtest.py"
+    }
+    assert producer_actual == registered_without_runner
+    assert preflight.EVIDENCE_PRODUCER_PINS["strategy_backtest.py"] \
+        == preflight.REGISTERED_LEGACY_RUNNER_HASH
+    assert canonical_source_hash(ROOT / "strategy_backtest.py") \
+        == preflight.CORRECTED_LEGACY_RUNNER_HASH
 
 
 def test_missing_entity_requirement_remains_in_fixed_denominator():
@@ -408,18 +458,23 @@ def test_output_is_metadata_only_and_replay_is_deterministic():
     second = preflight.evaluate(copy.deepcopy(payload()))
     assert first == second
     encoded = json.dumps(first, sort_keys=True)
-    for forbidden in ("2330", "2454", "entryPrice", "score", "rank", "return"):
+    for forbidden in ("2330", "2454", "entryPrice", "score", "rank"):
         assert forbidden not in encoded
+    assert '"return":' not in encoded
 
 
 def test_unregistered_execution_risk_and_pool_always_block():
     result = preflight.evaluate(payload())
+    assert result["strategySpecRegistered"] is False
+    assert result["sourcePinsRegistered"] is False
     assert result["executionSpecStatus"] == "unregistered"
     assert result["riskPolicyStatus"] == "unregistered"
     assert result["eligiblePoolBenchmarkStatus"] == "unregistered"
     assert result["validationOutcomeAccountingStatus"] == "registered_for_measurement_only"
     assert result["eligiblePoolAccountingStatus"] == "registered_for_measurement_only"
     for blocker in (
+        "successor_strategy_spec_not_preregistered",
+        "successor_source_pins_not_registered",
         "execution_spec_unregistered", "risk_policy_unregistered",
         "eligible_pool_benchmark_unregistered",
     ):

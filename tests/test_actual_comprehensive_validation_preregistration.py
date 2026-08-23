@@ -425,7 +425,11 @@ def test_source_strategy_and_pit_pins_match_the_exact_node56_main_tree():
         return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
 
     assert {name: source_hash_at_base(name) for name in prereg.SOURCE_PINS} == dict(prereg.SOURCE_PINS)
-    assert prereg.STRATEGY_SPEC_HASH == preflight.strategy_spec_hash()
+    assert prereg.STRATEGY_SPEC_HASH != preflight.strategy_spec_hash()
+    assert preflight.STRATEGY_IDENTITY == "production-comprehensive-finite-input-v2"
+    assert preflight.strategy_spec()["registrationStatus"] == (
+        "successor_unregistered_requires_new_preregistration"
+    )
     expected_pit_hash = preflight.digest({
         "requirements": list(preflight.REQUIRED_REQUIREMENTS),
         "requirementPolicies": preflight.REQUIREMENT_POLICIES,
@@ -460,7 +464,7 @@ def test_drift_from_the_registered_code_is_detectable():
     assert len(prereg.drifted_sources(None)) == len(prereg.SOURCE_PINS), "a bad argument fails closed"
 
 
-def test_the_working_tree_drift_is_reported_for_the_record(capsys):
+def test_the_working_tree_drift_is_reported_for_the_record():
     """Not an assertion about the tree: a statement of where it currently sits."""
     current = {}
     for name in prereg.SOURCE_PINS:
@@ -468,11 +472,10 @@ def test_the_working_tree_drift_is_reported_for_the_record(capsys):
         if path.exists():
             current[name] = path.read_text(encoding="utf-8")
     drifted = prereg.drifted_sources(current)
-    with capsys.disabled():
-        if drifted:
-            print(f"\n  [preregistration] 已與 {prereg.POLICY_VERSION} 登錄版本不同："
-                  f"{', '.join(drifted)}")
-            print("  確認性驗證前必須重新登錄；登錄書本身不得修改。")
+    if drifted:
+        print(f"\n  [preregistration] 已與 {prereg.POLICY_VERSION} 登錄版本不同："
+              f"{', '.join(drifted)}")
+        print("  確認性驗證前必須重新登錄；登錄書本身不得修改。")
     assert isinstance(drifted, tuple)
 
 

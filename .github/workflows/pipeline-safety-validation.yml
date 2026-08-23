@@ -50,6 +50,8 @@ on:
       - "market_population_contract.py"
       - "official_population_artifact_receipt.py"
       - "official_population_source_admission.py"
+      - "paper_trading.py"
+      - "model_advice.py"
       - "official_population_source_admission_registry_v1.json"
       - "forward_population_observation.py"
       - "forward_population_ledger_store.py"
@@ -71,6 +73,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -112,6 +116,8 @@ jobs:
           market_population_contract.py
           official_population_artifact_receipt.py
           official_population_source_admission.py
+          paper_trading.py
+          model_advice.py
           forward_population_observation.py
           forward_population_ledger_store.py
           decision_outcome_export.py

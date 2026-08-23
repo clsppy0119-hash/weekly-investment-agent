@@ -12,7 +12,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 from point_in_time_fundamentals import period_end, quarter_publication
-from provenance import record, utc_now
+from provenance import record, schema_hash, stable_hash, utc_now
 
 # Figures both sources take straight off the statements, so they should match;
 # a difference means one of them is wrong and the score depended on whichever
@@ -253,6 +253,13 @@ def main() -> None:
         conflict_status="no_conflict" if not conflicts else "conflict_unresolved",
     )
     market["provenance"]["fundamentals"]["sourceDisagreements"] = conflicts
+    # The provider receipt above describes this fetch batch.  Paper evaluation
+    # consumes the merged snapshot, so seal that full projection separately;
+    # otherwise a local edit outside the latest batch is invisible to the
+    # batch contentHash.
+    market["provenance"]["fundamentals"]["snapshotContentHash"] = stable_hash(fundamentals)
+    market["provenance"]["fundamentals"]["snapshotSchemaHash"] = schema_hash(fundamentals)
+    market["provenance"]["fundamentals"]["snapshotCodeCount"] = len(fundamentals)
     if filed_at:
         market["provenance"]["fundamentals"]["availableAtBasis"] = (
             "public no later than this: the earlier of the statutory TWSE filing "

@@ -3,19 +3,15 @@ import json
 import os
 from pathlib import Path
 
-
+from actual_comprehensive_selection import display_name
 from backtest import BUY_FEE, ETF_SELL_TAX, SELL_FEE, SLIPPAGE_BPS, STOCK_SELL_TAX
+from scoring import number
 
 
 DEFAULT_PATH = Path("strategy_data/recommendations.json")
 HORIZONS = (5, 20, 60)
-STRATEGY_VERSION = "2.0"
+STRATEGY_VERSION = "2.1"
 BENCHMARK_CODE = "0050"
-
-
-def number(value):
-    return isinstance(value, (int, float)) and not isinstance(value, bool)
-
 
 def load_state(path=DEFAULT_PATH):
     path = Path(path)
@@ -31,7 +27,7 @@ def save_state(state, path=DEFAULT_PATH):
     temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
     try:
         with temporary.open("w", encoding="utf-8", newline="\n") as output:
-            json.dump(state, output, ensure_ascii=False, indent=2)
+            json.dump(state, output, ensure_ascii=False, indent=2, allow_nan=False)
             output.write("\n")
         os.replace(temporary, path)
     finally:
@@ -47,6 +43,24 @@ def _net(gross, sell_tax=STOCK_SELL_TAX):
     return (1 + gross) * (1 - BUY_FEE - SLIPPAGE_BPS / 10_000) * (1 - SELL_FEE - sell_tax - SLIPPAGE_BPS / 10_000) - 1
 
 
+def _bounded_ratio(numerator, denominator):
+    """Return a positive finite ratio inside the registered numeric domain."""
+    if not (
+        number(numerator) and numerator > 0
+        and number(denominator) and denominator > 0
+    ):
+        return None
+    ratio = numerator / denominator
+    return ratio if number(ratio) and ratio > 0 else None
+
+
+def _bounded_percent(value):
+    if not number(value):
+        return None
+    percent = round(value * 100, 2)
+    return percent if number(percent) else None
+
+
 def _extend_trail(trail, history, entry_date):
     """Accumulate observed closes after ``entry_date`` into an append-only trail.
 
@@ -58,7 +72,7 @@ def _extend_trail(trail, history, entry_date):
     for row in history:
         day = row.get("date", "")
         close = row.get("close")
-        if day > entry_date and number(close) and day not in trail:
+        if day > entry_date and number(close) and close > 0 and day not in trail:
             trail[day] = float(close)
     return trail
 
@@ -79,10 +93,13 @@ def _extend_pool_trail(trail, history, pool_prices, entry_date):
         for row in history.get(code, []):
             day = row.get("date", "")
             close = row.get("close")
-            if day > entry_date and number(close) and day not in trail:
-                ratios.setdefault(day, []).append(close / entry_price)
+            ratio = _bounded_ratio(close, entry_price)
+            if day > entry_date and ratio is not None and day not in trail:
+                ratios.setdefault(day, []).append(ratio)
     for day, values in ratios.items():
-        trail[day] = sum(values) / len(values)
+        average = sum(values) / len(values)
+        if number(average):
+            trail[day] = average
     return trail
 
 
@@ -99,8 +116,9 @@ def _extend_dividend_factors(factors, events, code, entry_date):
             continue
         day = str(event.get("date", ""))[:10]
         before, reference = event.get("before_close"), event.get("reference_price")
-        if day > entry_date and day not in factors and number(before) and number(reference) and reference > 0:
-            factors[day] = before / reference
+        factor = _bounded_ratio(before, reference)
+        if day > entry_date and day not in factors and factor is not None:
+            factors[day] = factor
     return factors
 
 
@@ -108,7 +126,11 @@ def _dividend_factor(factors, day):
     product = 1.0
     for event_day, factor in factors.items():
         if event_day <= day:
+            if not (number(factor) and factor > 0):
+                return None
             product *= factor
+            if not number(product) or product <= 0:
+                return None
     return product
 
 
@@ -128,40 +150,78 @@ def _settle(outcomes, trail, entry_price, benchmark_trail, benchmark_entry, pool
             outcomes[key] = {"status": "pending", "observations": len(days)}
             continue
         day = days[horizon - 1]
-        gross = trail[day] / entry_price - 1
+        price_ratio = _bounded_ratio(trail.get(day), entry_price)
         # Two figures, because the two comparisons need different ones. 0050 is
         # a total-return index, so the holding has to include its distributions
         # to be comparable. The pool is an equal-weighted price series with no
         # dividend data of its own, so that comparison stays price-only on both
         # sides rather than crediting one and not the other.
         factor = _dividend_factor(dividend_factors or {}, day)
-        total_gross = (trail[day] * factor) / entry_price - 1
+        total_ratio = price_ratio * factor if price_ratio is not None and factor is not None else None
+        gross = price_ratio - 1 if price_ratio is not None else None
+        total_gross = (
+            total_ratio - 1
+            if number(total_ratio) and total_ratio > 0 else None
+        )
+        net = _net(gross) if number(gross) else None
+        total_net = _net(total_gross) if number(total_gross) else None
+        gross_pct = _bounded_percent(gross)
+        net_pct = _bounded_percent(net)
+        total_net_pct = _bounded_percent(total_net)
+        rounded_factor = round(factor, 6) if number(factor) and factor > 0 else None
+        if rounded_factor == 0:
+            rounded_factor = None
+        if None in (rounded_factor, gross_pct, net_pct, total_net_pct):
+            outcomes[key] = {
+                "status": "pending",
+                "observations": len(days),
+                "reason": "derived_return_out_of_numeric_domain",
+            }
+            continue
         record = {
             "status": "complete",
             "date": day,
             "price": trail[day],
-            "grossReturnPct": round(gross * 100, 2),
-            "netReturnPct": round(_net(gross) * 100, 2),
-            "totalReturnNetPct": round(_net(total_gross) * 100, 2),
-            "exRightsFactor": round(factor, 6),
+            "grossReturnPct": gross_pct,
+            "netReturnPct": net_pct,
+            "totalReturnNetPct": total_net_pct,
+            "exRightsFactor": rounded_factor,
             # True while no ex-rights event is known for this holding: either
             # none occurred, or none was fetched. The distinction matters, so
             # the factor above is reported rather than folded in silently.
             "priceReturnOnly": factor == 1.0,
         }
         if number(benchmark_entry) and benchmark_entry > 0 and day in benchmark_trail:
-            benchmark_net = _net(benchmark_trail[day] / benchmark_entry - 1, ETF_SELL_TAX)
-            record["benchmarkNetReturnPct"] = round(benchmark_net * 100, 2)
-            # Total return on both sides: 0050 is a total-return index.
-            record["excessReturnPct"] = round((_net(total_gross) - benchmark_net) * 100, 2)
+            benchmark_ratio = _bounded_ratio(benchmark_trail[day], benchmark_entry)
+            benchmark_net = (
+                _net(benchmark_ratio - 1, ETF_SELL_TAX)
+                if benchmark_ratio is not None else None
+            )
+            benchmark_pct = _bounded_percent(benchmark_net)
+            excess_pct = _bounded_percent(total_net - benchmark_net) if number(benchmark_net) else None
+            if benchmark_pct is not None and excess_pct is not None:
+                record["benchmarkNetReturnPct"] = benchmark_pct
+                # Total return on both sides: 0050 is a total-return index.
+                record["excessReturnPct"] = excess_pct
+            else:
+                record["benchmarkAvailable"] = False
         else:
             record["benchmarkAvailable"] = False
         if pool_trail and day in pool_trail:
             # The pool is charged the same round trip, so this compares
             # selection skill rather than a costs artefact.
-            pool_net = _net(pool_trail[day] - 1)
-            record["poolNetReturnPct"] = round(pool_net * 100, 2)
-            record["poolExcessPct"] = round((_net(gross) - pool_net) * 100, 2)
+            pool_ratio = pool_trail[day]
+            pool_net = (
+                _net(pool_ratio - 1)
+                if number(pool_ratio) and pool_ratio > 0 else None
+            )
+            pool_pct = _bounded_percent(pool_net)
+            pool_excess_pct = _bounded_percent(net - pool_net) if number(pool_net) else None
+            if pool_pct is not None and pool_excess_pct is not None:
+                record["poolNetReturnPct"] = pool_pct
+                record["poolExcessPct"] = pool_excess_pct
+            else:
+                record["poolAvailable"] = False
         else:
             record["poolAvailable"] = False
         outcomes[key] = record
@@ -180,7 +240,8 @@ def _risk_flags(quote, fund, coverage):
         flags.append("缺少 ROE")
     if not number(fund.get("debtRatio")):
         flags.append("缺少負債比")
-    if fund.get("financialHistoryYears", 0) < 5:
+    history_years = fund.get("financialHistoryYears")
+    if not number(history_years) or history_years < 5:
         flags.append("近五年財務歷史不足")
     if number(fund.get("revenueYoY")) and fund["revenueYoY"] < 0:
         flags.append("月營收年增為負")
@@ -196,7 +257,8 @@ def _risk_flags(quote, fund, coverage):
 def _decision_snapshot(report_date, score, coverage, quote, fund):
     required = ("revenueYoY", "eps", "roe", "debtRatio")
     missing = [field for field in required if not number(fund.get(field))]
-    five_year_ready = fund.get("financialHistoryYears", 0) >= 5
+    history_years = fund.get("financialHistoryYears")
+    five_year_ready = number(history_years) and history_years >= 5
     eligible = coverage >= 80 and not missing and five_year_ready
     if eligible:
         decision = "正式研究候選"
@@ -226,17 +288,17 @@ def _decision_snapshot(report_date, score, coverage, quote, fund):
             "financialPeriod": fund.get("financialPeriod"),
         },
         "snapshot": {
-            "price": quote.get("price"),
-            "change": quote.get("change"),
-            "ma5": quote.get("ma5"),
-            "ma20": quote.get("ma20"),
-            "revenueYoY": fund.get("revenueYoY"),
-            "epsTTM": fund.get("eps"),
-            "roeTTM": fund.get("roe"),
-            "debtRatio": fund.get("debtRatio"),
-            "pe": fund.get("pe"),
-            "pb": fund.get("pb"),
-            "dividendYield": fund.get("dividendYield"),
+            "price": quote.get("price") if number(quote.get("price")) else None,
+            "change": quote.get("change") if number(quote.get("change")) else None,
+            "ma5": quote.get("ma5") if number(quote.get("ma5")) else None,
+            "ma20": quote.get("ma20") if number(quote.get("ma20")) else None,
+            "revenueYoY": fund.get("revenueYoY") if number(fund.get("revenueYoY")) else None,
+            "epsTTM": fund.get("eps") if number(fund.get("eps")) else None,
+            "roeTTM": fund.get("roe") if number(fund.get("roe")) else None,
+            "debtRatio": fund.get("debtRatio") if number(fund.get("debtRatio")) else None,
+            "pe": fund.get("pe") if number(fund.get("pe")) else None,
+            "pb": fund.get("pb") if number(fund.get("pb")) else None,
+            "dividendYield": fund.get("dividendYield") if number(fund.get("dividendYield")) else None,
         },
         "riskFlags": _risk_flags(quote, fund, coverage),
     }
@@ -251,6 +313,7 @@ def record_recommendations(report_date, report_mode, ranked, quote_data, path=DE
     history = quote_data.get("history", {})
     benchmark_history = history.get(BENCHMARK_CODE, [])
     benchmark_price = quote_data.get("quotes", {}).get(BENCHMARK_CODE, {}).get("price")
+    benchmark_price = benchmark_price if number(benchmark_price) and benchmark_price > 0 else None
     action_events = (actions or {}).get("events", []) if isinstance(actions, dict) else (actions or [])
     for style, items in ranked.items():
         pool_key = f"{report_date}:{report_mode}:{style}"
@@ -260,7 +323,7 @@ def record_recommendations(report_date, report_mode, ranked, quote_data, path=DE
             stored_pools[pool_key] = {
                 "entryDate": report_date,
                 "prices": {entry[2]: entry[3].get("price") for entry in pools[style]
-                           if number(entry[3].get("price"))},
+                           if number(entry[3].get("price")) and entry[3].get("price") > 0},
             }
         for rank, item in enumerate(items, 1):
             score, coverage, code, quote, fund = item
@@ -268,7 +331,7 @@ def record_recommendations(report_date, report_mode, ranked, quote_data, path=DE
             if record_id in existing:
                 continue
             snapshot_quote = {**quote, "updatedAt": quote_data.get("updatedAt")}
-            recommendations.append({"id": record_id, "date": report_date, "mode": report_mode, "style": style, "rank": rank, "code": code, "name": quote.get("name", code), "entryPrice": quote.get("price"), "benchmarkEntryPrice": benchmark_price, "poolKey": pool_key, "score": score, "coverage": coverage, "strategyVersion": STRATEGY_VERSION, "quoteUpdatedAt": quote_data.get("updatedAt"), "decisionRecord": _decision_snapshot(report_date, score, coverage, snapshot_quote, fund), "outcomes": {}, "priceTrail": {}})
+            recommendations.append({"id": record_id, "date": report_date, "mode": report_mode, "style": style, "rank": rank, "code": code, "name": display_name(quote.get("name"), str(code)), "entryPrice": quote.get("price"), "benchmarkEntryPrice": benchmark_price, "poolKey": pool_key, "score": score, "coverage": coverage, "strategyVersion": STRATEGY_VERSION, "quoteUpdatedAt": quote_data.get("updatedAt"), "decisionRecord": _decision_snapshot(report_date, score, coverage, snapshot_quote, fund), "outcomes": {}, "priceTrail": {}})
             existing.add(record_id)
     for item in recommendations:
         price = item.get("entryPrice")

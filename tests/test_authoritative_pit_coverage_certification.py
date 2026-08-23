@@ -471,8 +471,17 @@ def test_source_pins_and_workflow_cover_the_entire_boundary():
     actual = {
         name: canonical_source_hash(ROOT / name)
         for name in cert.CERTIFICATION_PRODUCER_PINS
+        if name != "strategy_backtest.py"
     }
-    assert actual == cert.CERTIFICATION_PRODUCER_PINS
+    registered_without_runner = {
+        name: value for name, value in cert.CERTIFICATION_PRODUCER_PINS.items()
+        if name != "strategy_backtest.py"
+    }
+    assert actual == registered_without_runner
+    assert cert.CERTIFICATION_PRODUCER_PINS["strategy_backtest.py"] \
+        == preflight.REGISTERED_LEGACY_RUNNER_HASH
+    assert canonical_source_hash(ROOT / "strategy_backtest.py") \
+        == preflight.CORRECTED_LEGACY_RUNNER_HASH
     workflow = (ROOT / ".github/workflows/pipeline-safety-validation.yml").read_text(encoding="utf-8")
     for name in (
         *cert.CERTIFICATION_PRODUCER_PINS,
