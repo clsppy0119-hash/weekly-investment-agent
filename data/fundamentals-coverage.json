@@ -2,46 +2,46 @@
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
   "credentialMode": "authenticated",
-  "updatedAt": "2026-08-21T03:31:50.932947+00:00",
+  "updatedAt": "2026-08-24T03:33:34.908232+00:00",
   "activeStage": "電子其他",
-  "universeCodes": 2785,
-  "currentStageCodes": 930,
+  "universeCodes": 2786,
+  "currentStageCodes": 931,
   "queriedCodes": [
-    "3576",
-    "3577",
-    "3580",
-    "3583",
-    "3585",
-    "3587",
-    "3588",
-    "3591",
-    "3592",
-    "3593",
-    "3594",
-    "3595",
-    "3596",
-    "3597",
-    "3603",
-    "3605",
-    "3607",
-    "3609",
-    "3611",
-    "3615",
-    "3617",
-    "3622",
-    "3623",
-    "3624",
-    "3625",
-    "3628",
-    "3630",
-    "3631",
-    "3632",
-    "3633"
+    "3645",
+    "3646",
+    "3652",
+    "3653",
+    "3659",
+    "3661",
+    "3663",
+    "3664",
+    "3665",
+    "3666",
+    "3669",
+    "3672",
+    "3673",
+    "3678",
+    "3679",
+    "3684",
+    "3686",
+    "3687",
+    "3689",
+    "3691",
+    "3693",
+    "3694",
+    "3701",
+    "3702",
+    "3704",
+    "3706",
+    "3709",
+    "3710",
+    "3711",
+    "3712"
   ],
   "priorityCodes": [],
   "successfulCodes": 30,
-  "enrichedCodes": 1868,
-  "remainingCodes": 917,
+  "enrichedCodes": 1887,
+  "remainingCodes": 899,
   "stageCoverage": {
     "半導體": {
       "total": 158,
@@ -49,9 +49,9 @@
       "remaining": 0
     },
     "電子其他": {
-      "total": 930,
-      "reviewed": 360,
-      "remaining": 570
+      "total": 931,
+      "reviewed": 390,
+      "remaining": 541
     },
     "金融": {
       "total": 63,
@@ -71,167 +71,161 @@
   },
   "failures": {},
   "sourceDisagreements": {
-    "3577": {
+    "3645": {
       "eps": {
-        "openData": 3.28,
-        "finmind": 4.34
+        "openData": 1.52,
+        "finmind": 2.6
       }
     },
-    "3580": {
+    "3646": {
       "eps": {
-        "openData": 0.65,
-        "finmind": 1.62
+        "openData": -0.43,
+        "finmind": -0.37
       }
     },
-    "3576": {
+    "3652": {
       "eps": {
-        "openData": 0.93,
-        "finmind": 0.54
+        "openData": 1.12,
+        "finmind": 2.05
       }
     },
-    "3583": {
+    "3653": {
       "eps": {
-        "openData": 9.16,
-        "finmind": 20.58
+        "openData": 25.33,
+        "finmind": 44.65
       }
     },
-    "3587": {
+    "3661": {
       "eps": {
-        "openData": 2.99,
-        "finmind": 6.99
+        "openData": 37.57,
+        "finmind": 72.25
       }
     },
-    "3588": {
+    "3663": {
       "eps": {
-        "openData": 1.0,
-        "finmind": 1.2
+        "openData": 0.28,
+        "finmind": 0.22
       }
     },
-    "3591": {
+    "3669": {
       "eps": {
-        "openData": 0.16,
-        "finmind": -0.15
+        "openData": 1.4,
+        "finmind": 2.95
       }
     },
-    "3592": {
+    "3666": {
       "eps": {
-        "openData": 8.35,
-        "finmind": 17.04
+        "openData": -0.68,
+        "finmind": -2.27
       }
     },
-    "3593": {
+    "3672": {
       "eps": {
-        "openData": -1.45,
-        "finmind": -1.59
+        "openData": -0.82,
+        "finmind": -1.79
       }
     },
-    "3594": {
+    "3684": {
       "eps": {
-        "openData": 0.37,
-        "finmind": 1.28
+        "openData": 1.78,
+        "finmind": 4.05
       }
     },
-    "3596": {
+    "3686": {
       "eps": {
-        "openData": 6.5,
-        "finmind": 13.0
+        "openData": -0.13,
+        "finmind": -0.45
       }
     },
-    "3597": {
+    "3679": {
       "eps": {
-        "openData": 0.35,
-        "finmind": 0.8
+        "openData": 4.18,
+        "finmind": 11.83
       }
     },
-    "3605": {
+    "3689": {
       "eps": {
-        "openData": 1.89,
-        "finmind": 4.2
+        "openData": 4.47,
+        "finmind": 8.17
       }
     },
-    "3609": {
+    "3691": {
       "eps": {
-        "openData": -1.88,
-        "finmind": 6.48
+        "openData": 3.34,
+        "finmind": 2.74
       }
     },
-    "3607": {
+    "3687": {
       "eps": {
-        "openData": 0.07,
-        "finmind": 0.47
+        "openData": 0.6,
+        "finmind": 4.36
       }
     },
-    "3611": {
+    "3693": {
       "eps": {
-        "openData": 9.67,
-        "finmind": 20.66
+        "openData": 8.66,
+        "finmind": 15.41
       }
     },
-    "3615": {
+    "3694": {
       "eps": {
-        "openData": 2.17,
-        "finmind": 3.12
+        "openData": 1.82,
+        "finmind": 4.01
       }
     },
-    "3617": {
+    "3701": {
       "eps": {
-        "openData": 11.12,
-        "finmind": 21.01
+        "openData": -1.28,
+        "finmind": -2.62
       }
     },
-    "3622": {
+    "3706": {
       "eps": {
-        "openData": 1.1,
-        "finmind": 5.1
+        "openData": 2.58,
+        "finmind": 5.6
       }
     },
-    "3623": {
+    "3704": {
       "eps": {
-        "openData": 0.64,
-        "finmind": 0.94
+        "openData": 1.55,
+        "finmind": 3.35
       }
     },
-    "3624": {
+    "3710": {
       "eps": {
-        "openData": 1.86,
-        "finmind": 3.19
+        "openData": -1.41,
+        "finmind": -2.97
       }
     },
-    "3625": {
+    "3709": {
       "eps": {
-        "openData": -0.42,
-        "finmind": -0.97
+        "openData": 6.54,
+        "finmind": 11.41
       }
     },
-    "3628": {
+    "3702": {
       "eps": {
-        "openData": 0.97,
-        "finmind": 4.13
+        "openData": 8.42,
+        "finmind": 12.01
       }
     },
-    "3630": {
+    "3711": {
       "eps": {
-        "openData": -0.75,
-        "finmind": -1.44
+        "openData": 8.04,
+        "finmind": 13.92
       }
     },
-    "3631": {
+    "3712": {
       "eps": {
-        "openData": -0.35,
-        "finmind": -0.47
-      }
-    },
-    "3632": {
-      "eps": {
-        "openData": -0.11,
-        "finmind": -0.23
+        "openData": 2.11,
+        "finmind": -13.37
       }
     }
   },
   "metrics": {
-    "eps": 1871,
-    "roe": 1868,
-    "debtRatio": 1888
+    "eps": 1890,
+    "roe": 1887,
+    "debtRatio": 1906
   },
-  "fiveYearHistory": 489
+  "fiveYearHistory": 519
 }
