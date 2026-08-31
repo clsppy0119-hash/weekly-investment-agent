@@ -40,7 +40,7 @@
         },
         "60": {
           "status": "pending",
-          "observations": 21
+          "observations": 22
         }
       },
       "decisionRecord": {
@@ -107,7 +107,8 @@
         "2026-08-25": 316.0,
         "2026-08-26": 299.0,
         "2026-08-27": 301.0,
-        "2026-08-28": 298.0
+        "2026-08-28": 298.0,
+        "2026-08-31": 294.0
       },
       "benchmarkTrail": {
         "2026-08-03": 102.0,
@@ -130,7 +131,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.85,
       "exRightsFactors": {}
@@ -174,7 +176,7 @@
         },
         "60": {
           "status": "pending",
-          "observations": 21
+          "observations": 22
         }
       },
       "decisionRecord": {
@@ -241,7 +243,8 @@
         "2026-08-25": 282.0,
         "2026-08-26": 270.0,
         "2026-08-27": 273.5,
-        "2026-08-28": 274.0
+        "2026-08-28": 274.0,
+        "2026-08-31": 269.5
       },
       "benchmarkTrail": {
         "2026-08-03": 102.0,
@@ -264,7 +267,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.85,
       "exRightsFactors": {}
@@ -308,7 +312,7 @@
         },
         "60": {
           "status": "pending",
-          "observations": 21
+          "observations": 22
         }
       },
       "decisionRecord": {
@@ -375,7 +379,8 @@
         "2026-08-25": 123.5,
         "2026-08-26": 125.0,
         "2026-08-27": 123.5,
-        "2026-08-28": 118.5
+        "2026-08-28": 118.5,
+        "2026-08-31": 130.0
       },
       "benchmarkTrail": {
         "2026-08-03": 102.0,
@@ -398,7 +403,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.85,
       "exRightsFactors": {}
@@ -482,7 +488,7 @@
         },
         "60": {
           "status": "pending",
-          "observations": 21
+          "observations": 22
         }
       },
       "priceTrail": {
@@ -506,7 +512,8 @@
         "2026-08-25": 316.0,
         "2026-08-26": 299.0,
         "2026-08-27": 301.0,
-        "2026-08-28": 298.0
+        "2026-08-28": 298.0,
+        "2026-08-31": 294.0
       },
       "benchmarkTrail": {
         "2026-08-03": 102.0,
@@ -529,7 +536,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.85,
       "exRightsFactors": {}
@@ -600,12 +608,21 @@
           "excessReturnPct": 8.85
         },
         "20": {
-          "status": "pending",
-          "observations": 19
+          "status": "complete",
+          "date": "2026-08-31",
+          "price": 62.2,
+          "grossReturnPct": 15.83,
+          "netReturnPct": 14.92,
+          "totalReturnNetPct": 14.92,
+          "exRightsFactor": 1.0,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": 3.38,
+          "excessReturnPct": 11.54,
+          "poolAvailable": false
         },
         "60": {
           "status": "pending",
-          "observations": 19
+          "observations": 20
         }
       },
       "priceTrail": {
@@ -627,7 +644,8 @@
         "2026-08-25": 61.0,
         "2026-08-26": 62.3,
         "2026-08-27": 61.4,
-        "2026-08-28": 62.9
+        "2026-08-28": 62.9,
+        "2026-08-31": 62.2
       },
       "benchmarkTrail": {
         "2026-08-03": 102.0,
@@ -650,7 +668,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.85,
       "exRightsFactors": {}
@@ -721,12 +740,21 @@
           "excessReturnPct": 3.49
         },
         "20": {
-          "status": "pending",
-          "observations": 19
+          "status": "complete",
+          "date": "2026-08-31",
+          "price": 50.0,
+          "grossReturnPct": 6.38,
+          "netReturnPct": 5.55,
+          "totalReturnNetPct": 5.55,
+          "exRightsFactor": 1.0,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": 3.38,
+          "excessReturnPct": 2.17,
+          "poolAvailable": false
         },
         "60": {
           "status": "pending",
-          "observations": 19
+          "observations": 20
         }
       },
       "priceTrail": {
@@ -748,7 +776,8 @@
         "2026-08-25": 48.65,
         "2026-08-26": 50.2,
         "2026-08-27": 50.0,
-        "2026-08-28": 50.5
+        "2026-08-28": 50.5,
+        "2026-08-31": 50.0
       },
       "benchmarkTrail": {
         "2026-08-03": 102.0,
@@ -771,7 +800,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.85,
       "exRightsFactors": {}
@@ -841,12 +871,21 @@
           "excessReturnPct": 6.78
         },
         "20": {
-          "status": "pending",
-          "observations": 19
+          "status": "complete",
+          "date": "2026-08-31",
+          "price": 192.0,
+          "grossReturnPct": 0.0,
+          "netReturnPct": -0.78,
+          "totalReturnNetPct": -0.78,
+          "exRightsFactor": 1.0,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": 3.38,
+          "excessReturnPct": -4.16,
+          "poolAvailable": false
         },
         "60": {
           "status": "pending",
-          "observations": 19
+          "observations": 20
         }
       },
       "priceTrail": {
@@ -868,7 +907,8 @@
         "2026-08-25": 194.0,
         "2026-08-26": 197.5,
         "2026-08-27": 198.0,
-        "2026-08-28": 197.0
+        "2026-08-28": 197.0,
+        "2026-08-31": 192.0
       },
       "benchmarkTrail": {
         "2026-08-03": 102.0,
@@ -891,7 +931,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.85,
       "exRightsFactors": {}
@@ -975,7 +1016,7 @@
         },
         "60": {
           "status": "pending",
-          "observations": 20
+          "observations": 21
         }
       },
       "priceTrail": {
@@ -998,7 +1039,8 @@
         "2026-08-25": 316.0,
         "2026-08-26": 299.0,
         "2026-08-27": 301.0,
-        "2026-08-28": 298.0
+        "2026-08-28": 298.0,
+        "2026-08-31": 294.0
       },
       "benchmarkTrail": {
         "2026-08-04": 100.65,
@@ -1020,7 +1062,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.0,
       "exRightsFactors": {}
@@ -1091,12 +1134,21 @@
           "excessReturnPct": 8.03
         },
         "20": {
-          "status": "pending",
-          "observations": 19
+          "status": "complete",
+          "date": "2026-08-31",
+          "price": 62.2,
+          "grossReturnPct": 15.83,
+          "netReturnPct": 14.92,
+          "totalReturnNetPct": 14.92,
+          "exRightsFactor": 1.0,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": 4.24,
+          "excessReturnPct": 10.68,
+          "poolAvailable": false
         },
         "60": {
           "status": "pending",
-          "observations": 19
+          "observations": 20
         }
       },
       "priceTrail": {
@@ -1118,7 +1170,8 @@
         "2026-08-25": 61.0,
         "2026-08-26": 62.3,
         "2026-08-27": 61.4,
-        "2026-08-28": 62.9
+        "2026-08-28": 62.9,
+        "2026-08-31": 62.2
       },
       "benchmarkTrail": {
         "2026-08-04": 100.65,
@@ -1140,7 +1193,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.0,
       "exRightsFactors": {}
@@ -1210,12 +1264,21 @@
           "excessReturnPct": 5.95
         },
         "20": {
-          "status": "pending",
-          "observations": 19
+          "status": "complete",
+          "date": "2026-08-31",
+          "price": 192.0,
+          "grossReturnPct": 0.0,
+          "netReturnPct": -0.78,
+          "totalReturnNetPct": -0.78,
+          "exRightsFactor": 1.0,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": 4.24,
+          "excessReturnPct": -5.02,
+          "poolAvailable": false
         },
         "60": {
           "status": "pending",
-          "observations": 19
+          "observations": 20
         }
       },
       "priceTrail": {
@@ -1237,7 +1300,8 @@
         "2026-08-25": 194.0,
         "2026-08-26": 197.5,
         "2026-08-27": 198.0,
-        "2026-08-28": 197.0
+        "2026-08-28": 197.0,
+        "2026-08-31": 192.0
       },
       "benchmarkTrail": {
         "2026-08-04": 100.65,
@@ -1259,7 +1323,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.0,
       "exRightsFactors": {}
@@ -1344,7 +1409,7 @@
         },
         "60": {
           "status": "pending",
-          "observations": 20
+          "observations": 21
         }
       },
       "priceTrail": {
@@ -1367,7 +1432,8 @@
         "2026-08-25": 278.0,
         "2026-08-26": 272.5,
         "2026-08-27": 272.5,
-        "2026-08-28": 275.5
+        "2026-08-28": 275.5,
+        "2026-08-31": 273.5
       },
       "benchmarkTrail": {
         "2026-08-04": 100.65,
@@ -1389,7 +1455,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 102.0,
       "exRightsFactors": {}
@@ -1462,12 +1529,21 @@
           "poolAvailable": false
         },
         "20": {
-          "status": "pending",
-          "observations": 19
+          "status": "complete",
+          "date": "2026-08-31",
+          "price": 294.0,
+          "grossReturnPct": 0.34,
+          "netReturnPct": -0.45,
+          "totalReturnNetPct": -0.45,
+          "exRightsFactor": 1.0,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": 5.64,
+          "excessReturnPct": -6.08,
+          "poolAvailable": false
         },
         "60": {
           "status": "pending",
-          "observations": 19
+          "observations": 20
         }
       },
       "priceTrail": {
@@ -1489,7 +1565,8 @@
         "2026-08-25": 316.0,
         "2026-08-26": 299.0,
         "2026-08-27": 301.0,
-        "2026-08-28": 298.0
+        "2026-08-28": 298.0,
+        "2026-08-31": 294.0
       },
       "benchmarkTrail": {
         "2026-08-05": 103.8,
@@ -1510,7 +1587,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 100.65,
       "exRightsFactors": {}
@@ -1585,11 +1663,11 @@
         },
         "20": {
           "status": "pending",
-          "observations": 18
+          "observations": 19
         },
         "60": {
           "status": "pending",
-          "observations": 18
+          "observations": 19
         }
       },
       "priceTrail": {
@@ -1610,7 +1688,8 @@
         "2026-08-25": 61.0,
         "2026-08-26": 62.3,
         "2026-08-27": 61.4,
-        "2026-08-28": 62.9
+        "2026-08-28": 62.9,
+        "2026-08-31": 62.2
       },
       "benchmarkTrail": {
         "2026-08-05": 103.8,
@@ -1631,7 +1710,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 100.65,
       "exRightsFactors": {}
@@ -1705,12 +1785,21 @@
           "poolAvailable": false
         },
         "20": {
-          "status": "pending",
-          "observations": 19
+          "status": "complete",
+          "date": "2026-08-31",
+          "price": 273.5,
+          "grossReturnPct": 17.13,
+          "netReturnPct": 16.21,
+          "totalReturnNetPct": 16.21,
+          "exRightsFactor": 1.0,
+          "priceReturnOnly": true,
+          "benchmarkNetReturnPct": 5.64,
+          "excessReturnPct": 10.57,
+          "poolAvailable": false
         },
         "60": {
           "status": "pending",
-          "observations": 19
+          "observations": 20
         }
       },
       "priceTrail": {
@@ -1732,7 +1821,8 @@
         "2026-08-25": 278.0,
         "2026-08-26": 272.5,
         "2026-08-27": 272.5,
-        "2026-08-28": 275.5
+        "2026-08-28": 275.5,
+        "2026-08-31": 273.5
       },
       "benchmarkTrail": {
         "2026-08-05": 103.8,
@@ -1753,7 +1843,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 100.65,
       "exRightsFactors": {}
@@ -1827,11 +1918,11 @@
         },
         "20": {
           "status": "pending",
-          "observations": 18
+          "observations": 19
         },
         "60": {
           "status": "pending",
-          "observations": 18
+          "observations": 19
         }
       },
       "priceTrail": {
@@ -1852,7 +1943,8 @@
         "2026-08-25": 194.0,
         "2026-08-26": 197.5,
         "2026-08-27": 198.0,
-        "2026-08-28": 197.0
+        "2026-08-28": 197.0,
+        "2026-08-31": 192.0
       },
       "benchmarkTrail": {
         "2026-08-05": 103.8,
@@ -1873,7 +1965,8 @@
         "2026-08-25": 103.8,
         "2026-08-26": 104.4,
         "2026-08-27": 105.9,
-        "2026-08-28": 106.05
+        "2026-08-28": 106.05,
+        "2026-08-31": 106.95
       },
       "benchmarkEntryPrice": 100.65,
       "exRightsFactors": {}
