@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-08-28T10:42:18.644202+00:00",
+  "updatedAt": "2026-08-31T04:45:12.200858+00:00",
   "providers": {
     "finmind": {
       "provider": "FinMind",
       "credential": "FINMIND_TOKEN",
-      "verifiedAt": "2026-08-28T10:42:20.555276+00:00",
+      "verifiedAt": "2026-08-31T04:45:14.674162+00:00",
       "probes": {
         "TaiwanStockInfo": {
           "rows": 4312
