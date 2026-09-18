@@ -2,68 +2,66 @@
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
   "credentialMode": "authenticated",
-  "updatedAt": "2026-09-17T04:17:17.743164+00:00",
-  "activeStage": "電子其他",
+  "updatedAt": "2026-09-18T04:01:02.163920+00:00",
+  "activeStage": "金融",
   "universeCodes": 2800,
-  "currentStageCodes": 935,
+  "currentStageCodes": 63,
   "queriedCodes": [
-    "8109",
-    "8093",
-    "8096",
-    "8097",
-    "8099",
-    "8101",
-    "8103",
-    "8104",
-    "8105",
-    "8111",
-    "8112",
-    "8112A",
-    "8114",
-    "8119",
-    "8121",
-    "8131",
-    "8147",
-    "8150",
-    "8155",
-    "8162",
-    "8163",
-    "8176",
-    "8182",
-    "8183",
-    "8201",
-    "8210",
-    "8213",
-    "8215",
-    "8234",
-    "8240"
+    "2801",
+    "2812",
+    "2816",
+    "2820",
+    "2832",
+    "2834",
+    "2836",
+    "2836A",
+    "2838",
+    "2838A",
+    "2845",
+    "2849",
+    "2850",
+    "2851",
+    "2852",
+    "2855",
+    "2867",
+    "2880",
+    "2881",
+    "2881A",
+    "2881B",
+    "2881C",
+    "2882",
+    "2882A",
+    "2882B",
+    "2883",
+    "2883B",
+    "2884",
+    "2885",
+    "2886"
   ],
-  "priorityCodes": [
-    "8109"
-  ],
+  "priorityCodes": [],
   "successfulCodes": 30,
   "enrichedCodes": 2086,
   "remainingCodes": 714,
   "stageCoverage": {
     "半導體": {
-      "total": 161,
+      "total": 166,
       "reviewed": 171,
       "remaining": 0
     },
     "電子其他": {
-      "total": 935,
+      "total": 929,
       "reviewed": 930,
-      "remaining": 5
+      "remaining": 0
     },
     "金融": {
       "total": 63,
-      "reviewed": 0,
-      "remaining": 63
+      "reviewed": 30,
+      "remaining": 33
     },
     "傳產與其他": {
-      "total": 1426,
+      "total": 1427,
       "reviewed": 0,
-      "remaining": 1426
+      "remaining": 1427
     },
     "興櫃": {
       "total": 215,
@@ -73,160 +71,136 @@
   },
   "failures": {},
   "sourceDisagreements": {
-    "8109": {
+    "2816": {
       "eps": {
-        "openData": 3.84,
-        "finmind": 7.44
+        "openData": 7.84,
+        "finmind": 4.66
       }
     },
-    "8096": {
+    "2812": {
       "eps": {
-        "openData": 3.31,
-        "finmind": 3.61
+        "openData": 0.87,
+        "finmind": 1.53
       }
     },
-    "8093": {
+    "2801": {
       "eps": {
-        "openData": -0.66,
-        "finmind": -2.16
+        "openData": 0.94,
+        "finmind": 1.51
       }
     },
-    "8097": {
+    "2832": {
       "eps": {
-        "openData": -1.14,
-        "finmind": -1.41
+        "openData": 3.33,
+        "finmind": 3.91
       }
     },
-    "8099": {
+    "2820": {
       "eps": {
-        "openData": 1.58,
-        "finmind": 3.29
-      }
-    },
-    "8101": {
-      "eps": {
-        "openData": -1.46,
-        "finmind": -2.92
-      }
-    },
-    "8103": {
-      "eps": {
-        "openData": 2.75,
-        "finmind": 5.55
-      }
-    },
-    "8104": {
-      "eps": {
-        "openData": -0.21,
-        "finmind": -0.84
-      }
-    },
-    "8105": {
-      "eps": {
-        "openData": 0.59,
-        "finmind": 0.86
-      }
-    },
-    "8111": {
-      "eps": {
-        "openData": 0.43,
-        "finmind": 1.14
-      }
-    },
-    "8112": {
-      "eps": {
-        "openData": 9.45,
-        "finmind": 13.86
-      }
-    },
-    "8114": {
-      "eps": {
-        "openData": 7.09,
-        "finmind": 13.32
-      }
-    },
-    "8131": {
-      "eps": {
-        "openData": 1.93,
-        "finmind": 3.44
-      }
-    },
-    "8147": {
-      "eps": {
-        "openData": 1.38,
-        "finmind": 2.59
-      }
-    },
-    "8150": {
-      "eps": {
-        "openData": 2.0,
-        "finmind": 3.21
-      }
-    },
-    "8155": {
-      "eps": {
-        "openData": 6.69,
-        "finmind": 12.45
-      }
-    },
-    "8162": {
-      "eps": {
-        "openData": 0.66,
+        "openData": 1.07,
         "finmind": 1.34
       }
     },
-    "8163": {
+    "2834": {
       "eps": {
-        "openData": 0.51,
-        "finmind": 0.59
+        "openData": 0.71,
+        "finmind": 1.26
       }
     },
-    "8182": {
+    "2836": {
       "eps": {
-        "openData": 0.32,
-        "finmind": 1.05
+        "openData": 0.39,
+        "finmind": 0.68
       }
     },
-    "8183": {
+    "2845": {
       "eps": {
-        "openData": 1.04,
-        "finmind": 3.46
+        "openData": 0.54,
+        "finmind": 0.93
       }
     },
-    "8201": {
+    "2838": {
       "eps": {
-        "openData": -0.1,
-        "finmind": -0.11
+        "openData": 0.67,
+        "finmind": 1.29
       }
     },
-    "8210": {
+    "2849": {
       "eps": {
-        "openData": 21.83,
-        "finmind": 38.45
+        "openData": 0.54,
+        "finmind": 0.79
       }
     },
-    "8213": {
+    "2850": {
       "eps": {
-        "openData": 0.93,
-        "finmind": 1.97
+        "openData": 8.51,
+        "finmind": 12.28
       }
     },
-    "8215": {
+    "2851": {
       "eps": {
-        "openData": -0.96,
-        "finmind": -2.26
+        "openData": 7.91,
+        "finmind": 3.66
       }
     },
-    "8234": {
+    "2852": {
       "eps": {
-        "openData": -0.16,
-        "finmind": -0.17
+        "openData": 1.91,
+        "finmind": 2.92
       }
     },
-    "8240": {
+    "2867": {
       "eps": {
-        "openData": 1.18,
-        "finmind": 2.35
+        "openData": 0.87,
+        "finmind": 0.2
+      }
+    },
+    "2855": {
+      "eps": {
+        "openData": 6.96,
+        "finmind": 3.0
+      }
+    },
+    "2880": {
+      "eps": {
+        "openData": 1.24,
+        "finmind": 1.9
+      }
+    },
+    "2881": {
+      "eps": {
+        "openData": 6.67,
+        "finmind": 8.37
+      }
+    },
+    "2882": {
+      "eps": {
+        "openData": 4.95,
+        "finmind": 7.06
+      }
+    },
+    "2883": {
+      "eps": {
+        "openData": 1.64,
+        "finmind": 1.74
+      }
+    },
+    "2884": {
+      "eps": {
+        "openData": 1.32,
+        "finmind": 2.12
+      }
+    },
+    "2886": {
+      "eps": {
+        "openData": 1.44,
+        "finmind": 2.36
+      }
+    },
+    "2885": {
+      "eps": {
+        "openData": 2.64,
+        "finmind": 2.74
       }
     }
   },
@@ -235,5 +209,5 @@
     "roe": 2086,
     "debtRatio": 2118
   },
-  "fiveYearHistory": 984
+  "fiveYearHistory": 1006
 }
