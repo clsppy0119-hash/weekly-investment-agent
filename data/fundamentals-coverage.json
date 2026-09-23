@@ -2,29 +2,60 @@
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
   "credentialMode": "authenticated",
-  "updatedAt": "2026-09-22T04:10:08.119402+00:00",
-  "activeStage": "金融",
+  "updatedAt": "2026-09-23T04:07:04.373214+00:00",
+  "activeStage": "傳產與其他",
   "universeCodes": 2800,
-  "currentStageCodes": 63,
+  "currentStageCodes": 1427,
   "queriedCodes": [
-    "6028",
-    "6035",
-    "6878"
+    "2605",
+    "4167",
+    "4736",
+    "00400A",
+    "00401A",
+    "00402A",
+    "00403A",
+    "00404A",
+    "00405A",
+    "00406A",
+    "00407A",
+    "00408A",
+    "00409A",
+    "00410A",
+    "00411A",
+    "0050",
+    "0051",
+    "0052",
+    "0053",
+    "0055",
+    "0056",
+    "0057",
+    "0061",
+    "006201",
+    "006203",
+    "006204",
+    "006205",
+    "006206",
+    "006207",
+    "006208"
   ],
-  "priorityCodes": [],
-  "successfulCodes": 3,
+  "priorityCodes": [
+    "2605",
+    "4167",
+    "4736"
+  ],
+  "successfulCodes": 30,
   "enrichedCodes": 2090,
   "remainingCodes": 710,
   "stageCoverage": {
     "半導體": {
-      "total": 162,
+      "total": 161,
       "reviewed": 171,
       "remaining": 0
     },
     "電子其他": {
-      "total": 933,
+      "total": 934,
       "reviewed": 930,
-      "remaining": 3
+      "remaining": 4
     },
     "金融": {
       "total": 63,
@@ -33,8 +64,8 @@
     },
     "傳產與其他": {
       "total": 1427,
-      "reviewed": 0,
-      "remaining": 1427
+      "reviewed": 30,
+      "remaining": 1397
     },
     "興櫃": {
       "total": 215,
@@ -44,10 +75,22 @@
   },
   "failures": {},
   "sourceDisagreements": {
-    "6028": {
+    "2605": {
       "eps": {
-        "openData": 7.31,
-        "finmind": 10.97
+        "openData": 3.67,
+        "finmind": 4.9
+      }
+    },
+    "4167": {
+      "eps": {
+        "openData": 2.6,
+        "finmind": 3.17
+      }
+    },
+    "4736": {
+      "eps": {
+        "openData": 16.6,
+        "finmind": 27.03
       }
     }
   },
@@ -56,5 +99,5 @@
     "roe": 2090,
     "debtRatio": 2123
   },
-  "fiveYearHistory": 1030
+  "fiveYearHistory": 1033
 }
