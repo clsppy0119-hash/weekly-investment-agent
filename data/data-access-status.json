@@ -1,19 +1,19 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-09-30T04:53:21.503594+00:00",
+  "updatedAt": "2026-10-01T05:06:30.034976+00:00",
   "providers": {
     "finmind": {
       "provider": "FinMind",
       "credential": "FINMIND_TOKEN",
-      "verifiedAt": "2026-09-30T04:53:23.319386+00:00",
+      "verifiedAt": "2026-10-01T05:06:32.497616+00:00",
       "probes": {
         "TaiwanStockInfo": {
-          "rows": 4327
+          "rows": 4329
         },
         "TaiwanStockPrice": {
-          "rows": 421,
+          "rows": 422,
           "firstDate": "2025-01-02",
-          "lastDate": "2026-09-29"
+          "lastDate": "2026-09-30"
         }
       }
     }
