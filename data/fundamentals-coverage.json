@@ -2,54 +2,56 @@
   "scope": "自動產業隊列：半導體優先，完成後依序電子其他、金融、傳產與其他、興櫃；候選股在當前隊列中優先。",
   "strategy": "industry-queue-v3",
   "credentialMode": "authenticated",
-  "updatedAt": "2026-10-09T05:27:22.992301+00:00",
+  "updatedAt": "2026-10-12T05:15:37.512820+00:00",
   "activeStage": "傳產與其他",
   "universeCodes": 2805,
-  "currentStageCodes": 1432,
+  "currentStageCodes": 1430,
   "queriedCodes": [
-    "009829",
-    "00982A",
-    "00982B",
-    "00982D",
-    "00982T",
-    "00983A",
-    "00983B",
-    "00983D",
-    "00984A",
-    "00984B",
-    "00984D",
-    "00985A",
-    "00985B",
-    "00985D",
-    "00986A",
-    "00986B",
-    "00986D",
-    "00987A",
-    "00987B",
-    "00987D",
-    "00988A",
-    "00988B",
-    "00989A",
-    "00989B",
-    "00990A",
-    "00990B",
-    "00991A",
-    "00991B",
-    "00992A",
-    "00992B"
+    "1615",
+    "00993A",
+    "00994A",
+    "00995A",
+    "00996A",
+    "00997A",
+    "00998A",
+    "00999A",
+    "01001T",
+    "01002T",
+    "01004T",
+    "01007T",
+    "01009T",
+    "020000",
+    "020001",
+    "020011",
+    "020012",
+    "02001L",
+    "020020",
+    "020025",
+    "020028",
+    "020029",
+    "020030",
+    "020031",
+    "020032",
+    "020033",
+    "020034",
+    "020035",
+    "020036",
+    "020037"
   ],
-  "priorityCodes": [],
+  "priorityCodes": [
+    "1615"
+  ],
   "successfulCodes": 30,
   "enrichedCodes": 2091,
   "remainingCodes": 714,
   "stageCoverage": {
     "半導體": {
-      "total": 168,
+      "total": 171,
       "reviewed": 171,
       "remaining": 0
     },
     "電子其他": {
-      "total": 926,
+      "total": 925,
       "reviewed": 930,
       "remaining": 0
     },
@@ -59,9 +61,9 @@
       "remaining": 0
     },
     "傳產與其他": {
-      "total": 1432,
-      "reviewed": 360,
-      "remaining": 1072
+      "total": 1430,
+      "reviewed": 390,
+      "remaining": 1040
     },
     "興櫃": {
       "total": 216,
@@ -70,11 +72,18 @@
     }
   },
   "failures": {},
-  "sourceDisagreements": {},
+  "sourceDisagreements": {
+    "1615": {
+      "eps": {
+        "openData": 2.53,
+        "finmind": 5.18
+      }
+    }
+  },
   "metrics": {
     "eps": 2095,
     "roe": 2091,
     "debtRatio": 2124
   },
-  "fiveYearHistory": 1037
+  "fiveYearHistory": 1038
 }
