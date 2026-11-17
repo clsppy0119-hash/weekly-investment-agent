@@ -26,25 +26,197 @@
     },
     "fundamentals": {
       "schemaVersion": 1,
-      "provider": "TWSE/TPEx OpenAPI",
-      "source": "TWSE/TPEx OpenAPI",
-      "sourceDataset": "BWIBBU_ALL + t187ap05/06/07 (MOPS open data)",
-      "dataset": "BWIBBU_ALL + t187ap05/06/07 (MOPS open data)",
-      "endpoint": "https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL",
-      "scopeHash": "18b8e947c16d43cf9c6ad78ba33d8ea69f2287bff0149b8a2b4a055f09058cd6",
+      "provider": "FinMind authorized API",
+      "source": "FinMind authorized API",
+      "sourceDataset": "TaiwanStockFinancialStatements,TaiwanStockBalanceSheet,TaiwanStockInfo",
+      "dataset": "TaiwanStockFinancialStatements,TaiwanStockBalanceSheet,TaiwanStockInfo",
+      "endpoint": "https://api.finmindtrade.com/api/v4/data",
+      "scopeHash": "049c99a6d220fffd47b70f6c48678f10c9c35d0aba3155f39e266a1dd762d388",
       "observationTime": null,
-      "effectiveDate": "2026-11-16",
-      "availableAt": "2026-11-16T14:00:00+08:00",
-      "retrievedAt": "2026-11-16T17:05:20.793038+00:00",
-      "ingestedAt": "2026-11-16T17:05:20.793038+00:00",
+      "effectiveDate": "None",
+      "availableAt": null,
+      "retrievedAt": "2026-11-17T07:20:08.127136+00:00",
+      "ingestedAt": "2026-11-17T07:20:08.127136+00:00",
       "timezone": "UTC",
-      "contentHash": "9c576e9655f89c78e312fb2e6586816649ca84d27cbba553ff42e9b5bb12dd08",
-      "schemaHash": "18b8e947c16d43cf9c6ad78ba33d8ea69f2287bff0149b8a2b4a055f09058cd6",
+      "contentHash": "9a901d47e5ad9cec72013ece4b46f670a8e0e7b07954984f0d78be8bfe8fb1b7",
+      "schemaHash": "67bcf039304908671e2473fc50e86e4dd89e9054fa4f28bcbfadd7673bb47f90",
       "status": "success",
-      "quality": "verified",
-      "conflictStatus": "no_conflict",
-      "visibility": "public_source",
-      "availableAtBasis": "modelled: 14:00 Taipei on the trading date, after the 13:30 close"
+      "quality": "as_of_missing",
+      "conflictStatus": "conflict_unresolved",
+      "visibility": "private_cache",
+      "sourceDisagreements": {
+        "6569": {
+          "eps": {
+            "openData": 3.08,
+            "finmind": 4.3
+          }
+        },
+        "6576": {
+          "eps": {
+            "openData": 0.86,
+            "finmind": -0.06
+          }
+        },
+        "6585": {
+          "eps": {
+            "openData": 7.09,
+            "finmind": 8.91
+          }
+        },
+        "6578": {
+          "eps": {
+            "openData": 0.27,
+            "finmind": -0.34
+          }
+        },
+        "6589": {
+          "eps": {
+            "openData": -1.1,
+            "finmind": -1.66
+          }
+        },
+        "6582": {
+          "eps": {
+            "openData": 0.92,
+            "finmind": 0.69
+          }
+        },
+        "6592": {
+          "eps": {
+            "openData": 3.61,
+            "finmind": 5.19
+          }
+        },
+        "6596": {
+          "eps": {
+            "openData": 9.84,
+            "finmind": 11.26
+          }
+        },
+        "6598": {
+          "eps": {
+            "openData": 0.29,
+            "finmind": -0.35
+          }
+        },
+        "6603": {
+          "eps": {
+            "openData": 0.22,
+            "finmind": 0.56
+          }
+        },
+        "6604": {
+          "eps": {
+            "openData": 2.76,
+            "finmind": 4.48
+          }
+        },
+        "6605": {
+          "eps": {
+            "openData": 11.8,
+            "finmind": 16.93
+          }
+        },
+        "6606": {
+          "eps": {
+            "openData": 1.3,
+            "finmind": 1.62
+          }
+        },
+        "6609": {
+          "eps": {
+            "openData": 0.12,
+            "finmind": -0.32
+          }
+        },
+        "6612": {
+          "eps": {
+            "openData": 1.43,
+            "finmind": 1.96
+          }
+        },
+        "6615": {
+          "eps": {
+            "openData": 2.13,
+            "finmind": 1.92
+          }
+        },
+        "6616": {
+          "eps": {
+            "openData": -0.82,
+            "finmind": -1.18
+          }
+        },
+        "6617": {
+          "eps": {
+            "openData": -0.84,
+            "finmind": -1.22
+          }
+        },
+        "6620": {
+          "eps": {
+            "openData": 0.76,
+            "finmind": 1.84
+          }
+        },
+        "6624": {
+          "eps": {
+            "openData": -0.15,
+            "finmind": 0.24
+          }
+        },
+        "6625": {
+          "eps": {
+            "openData": 6.16,
+            "finmind": 8.8
+          }
+        },
+        "6629": {
+          "eps": {
+            "openData": 9.03,
+            "finmind": 11.21
+          }
+        },
+        "6637": {
+          "eps": {
+            "openData": 4.08,
+            "finmind": 5.44
+          }
+        },
+        "6645": {
+          "eps": {
+            "openData": -1.5,
+            "finmind": -1.95
+          }
+        },
+        "6641": {
+          "eps": {
+            "openData": 0.25,
+            "finmind": 0.6
+          }
+        },
+        "6649": {
+          "eps": {
+            "openData": 0.1,
+            "finmind": 0.18
+          }
+        },
+        "6657": {
+          "eps": {
+            "openData": -4.17,
+            "finmind": -4.91
+          }
+        },
+        "6655": {
+          "eps": {
+            "openData": 4.26,
+            "finmind": 5.7
+          }
+        }
+      },
+      "snapshotContentHash": "dec93ff9ce196685776d284460f576e0c332508ab6fa25d3694708a493c480e9",
+      "snapshotSchemaHash": "18b8e947c16d43cf9c6ad78ba33d8ea69f2287bff0149b8a2b4a055f09058cd6",
+      "snapshotCodeCount": 2834
     }
   },
   "quotes": {
@@ -160267,12 +160439,15 @@
       "cumulativeRevenueYoY": -40.93300063837314,
       "revenuePeriod": "11510",
       "industry": "橡膠工業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.92,
-      "roe": 1.8119126395347989,
-      "debtRatio": 4.680805676218727,
-      "roeBasis": "opendata_annualised_over_closing_equity"
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 0.69,
+      "roe": 1.11,
+      "debtRatio": 4.68,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:51.315657+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6585": {
       "pe": 10.65,
@@ -160284,12 +160459,15 @@
       "cumulativeRevenueYoY": 18.644591935739495,
       "revenuePeriod": "11510",
       "industry": "其他",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 7.09,
-      "roe": 16.47275878167996,
-      "debtRatio": 22.08620378448302,
-      "roeBasis": "opendata_annualised_over_closing_equity"
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 8.91,
+      "roe": 16.32,
+      "debtRatio": 22.09,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:48.935507+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6589": {
       "pe": null,
@@ -160301,12 +160479,15 @@
       "cumulativeRevenueYoY": 94.67197506383708,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": -1.1,
-      "roe": -5.662837388405637,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 30.675376739923117
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": -1.66,
+      "roe": -6.2,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 30.68,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:50.976311+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6591": {
       "pe": 49.17,
@@ -160338,12 +160519,15 @@
       "cumulativeRevenueYoY": -3.7677371496012007,
       "revenuePeriod": "11510",
       "industry": "其他",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 3.61,
-      "roe": 8.434238587833386,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 87.03745675680833
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 5.19,
+      "roe": 8.88,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 87.04,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:52.915152+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6598": {
       "pe": null,
@@ -160355,12 +160539,15 @@
       "cumulativeRevenueYoY": 65.48415845882374,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.29,
-      "roe": 5.766044577823627,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 35.38732177668959
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": -0.35,
+      "roe": -5.07,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 35.39,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:54.828293+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6605": {
       "pe": 7.86,
@@ -160372,12 +160559,15 @@
       "cumulativeRevenueYoY": 4.903462129519888,
       "revenuePeriod": "11510",
       "industry": "汽車工業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 11.8,
-      "roe": 12.26357835779069,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 39.41987106349005
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 16.93,
+      "roe": 13.79,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 39.42,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:57.142945+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6606": {
       "pe": 14.51,
@@ -160389,12 +160579,15 @@
       "cumulativeRevenueYoY": 23.340016180560887,
       "revenuePeriod": "11510",
       "industry": "電機機械",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 1.3,
-      "roe": 10.828709819462793,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 21.9412492061183
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 1.62,
+      "roe": 10.72,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 21.94,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:57.577333+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6614": {
       "pe": 25.41,
@@ -160426,12 +160619,15 @@
       "cumulativeRevenueYoY": 11.407234207096163,
       "revenuePeriod": "11510",
       "industry": "其他",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 6.16,
-      "roe": 23.99931675593975,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 48.89029530980065
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 8.8,
+      "roe": 27.48,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 48.89,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:03.712611+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6641": {
       "pe": 26.72,
@@ -160443,12 +160639,15 @@
       "cumulativeRevenueYoY": 14.325275352825331,
       "revenuePeriod": "11510",
       "industry": "綠能環保",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.25,
-      "roe": 0.028913797655425986,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 30.855760206663536
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 0.6,
+      "roe": 0.81,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 30.86,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:05.908477+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6645": {
       "pe": null,
@@ -160460,12 +160659,15 @@
       "cumulativeRevenueYoY": 33.940421903384866,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": -1.5,
-      "roe": -30.101047251260145,
-      "debtRatio": 58.75277512785281,
-      "roeBasis": "opendata_annualised_over_closing_equity"
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": -1.95,
+      "roe": -25.73,
+      "debtRatio": 58.75,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:05.840394+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6655": {
       "pe": 23.89,
@@ -160477,12 +160679,15 @@
       "cumulativeRevenueYoY": 27.440696835358196,
       "revenuePeriod": "11510",
       "industry": "其他",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 4.26,
-      "roe": 13.183735451262402,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 67.43740529502116
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 5.7,
+      "roe": 15.18,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 67.44,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:08.123280+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6657": {
       "pe": null,
@@ -160494,12 +160699,15 @@
       "cumulativeRevenueYoY": -8.63621207069023,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": -4.17,
-      "roe": -65.24643187322326,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 15.686532178265084
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": -4.91,
+      "roe": -49.54,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 15.69,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:07.854787+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6658": {
       "pe": 31.84,
@@ -176724,12 +176932,15 @@
       "cumulativeRevenueYoY": 10.32089307634466,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 3.08,
-      "roe": 8.584753228660203,
-      "debtRatio": 19.74707871527196,
-      "roeBasis": "opendata_annualised_over_closing_equity"
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 4.3,
+      "roe": 9.88,
+      "debtRatio": 19.75,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:48.878948+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6570": {
       "pe": 13.73,
@@ -176781,12 +176992,15 @@
       "cumulativeRevenueYoY": 11.418484808751822,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.86,
-      "roe": 15.866654897460792,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 39.5413919194981
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": -0.06,
+      "roe": -1.05,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 39.54,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:48.909618+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6577": {
       "pe": 10.55,
@@ -176818,12 +177032,15 @@
       "cumulativeRevenueYoY": 31.236572160720005,
       "revenuePeriod": "11510",
       "industry": "農業科技業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.27,
-      "roe": 2.5067282875034924,
-      "debtRatio": 13.891405094383149,
-      "roeBasis": "opendata_annualised_over_closing_equity"
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": -0.34,
+      "roe": -2.47,
+      "debtRatio": 13.89,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:50.952080+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6584": {
       "pe": 24.94,
@@ -176915,12 +177132,15 @@
       "cumulativeRevenueYoY": -25.528532191011397,
       "revenuePeriod": "11510",
       "industry": "文化創意業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 9.84,
-      "roe": 37.614820090045505,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 42.562989744505245
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 11.26,
+      "roe": 29.11,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 42.56,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:54.238669+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6597": {
       "pe": 816.25,
@@ -176952,12 +177172,15 @@
       "cumulativeRevenueYoY": -5.532327977654399,
       "revenuePeriod": "11510",
       "industry": "電機機械",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.22,
-      "roe": 1.8343322858811684,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 67.4435453749874
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 0.56,
+      "roe": 3.59,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 67.44,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:55.261888+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6609": {
       "pe": null,
@@ -176969,12 +177192,15 @@
       "cumulativeRevenueYoY": 22.58470309112943,
       "revenuePeriod": "11510",
       "industry": "電機機械",
-      "financialPeriod": "115Q2",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.12,
-      "roe": 0.759204100054985,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 37.23620048552188
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": -0.32,
+      "roe": -0.95,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 37.22,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:57.952835+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6612": {
       "pe": 32.3,
@@ -176986,12 +177212,15 @@
       "cumulativeRevenueYoY": 20.79384136838235,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 1.43,
-      "roe": 1.4135558382441893,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 39.39376899196365
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 1.96,
+      "roe": 1.19,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 39.39,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:59.478612+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6613": {
       "pe": 11.9,
@@ -177023,12 +177252,15 @@
       "cumulativeRevenueYoY": -1.946935724962631,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 2.13,
-      "roe": 9.07979227852332,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 12.14329304392972
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 1.92,
+      "roe": 6.42,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 12.14,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:19:59.677681+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6616": {
       "pe": null,
@@ -177040,12 +177272,15 @@
       "cumulativeRevenueYoY": -18.114759895603257,
       "revenuePeriod": "11510",
       "industry": "居家生活類",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": -0.82,
-      "roe": -9.12021021191327,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 35.569071960902235
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": -1.18,
+      "roe": -9.87,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 35.57,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:00.020141+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6617": {
       "pe": null,
@@ -177057,12 +177292,15 @@
       "cumulativeRevenueYoY": 42.189195409857625,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": -0.84,
-      "roe": -6.546786511635272,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 12.01723431368262
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": -1.22,
+      "roe": -6.8,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 12.02,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:01.462542+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6620": {
       "pe": 60.06,
@@ -177074,12 +177312,15 @@
       "cumulativeRevenueYoY": -54.0997871986963,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.76,
-      "roe": 3.297699268052572,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 3.46416490696688
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 1.84,
+      "roe": 6.24,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 3.46,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:01.585727+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6624": {
       "pe": 164.52,
@@ -177091,12 +177332,15 @@
       "cumulativeRevenueYoY": -33.56322913987796,
       "revenuePeriod": "11510",
       "industry": "綠能環保類",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": -0.15,
-      "roe": -0.8080694150157505,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 30.207104792241545
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 0.24,
+      "roe": 1.13,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 30.21,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:02.159180+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6629": {
       "pe": 8.66,
@@ -177108,12 +177352,15 @@
       "cumulativeRevenueYoY": 57.340899449231266,
       "revenuePeriod": "11510",
       "industry": "居家生活類",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 9.03,
-      "roe": 25.375286359411252,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 23.835851484676613
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 11.21,
+      "roe": 24.94,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 23.84,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:03.722053+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6637": {
       "pe": 9.93,
@@ -177125,12 +177372,15 @@
       "cumulativeRevenueYoY": -12.749944767845124,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 4.08,
-      "roe": 13.069304207250367,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 37.097641437311026
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 5.44,
+      "roe": 13.37,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 37.1,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:04.030986+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6640": {
       "pe": 33.52,
@@ -177202,12 +177452,15 @@
       "cumulativeRevenueYoY": -38.056417884147955,
       "revenuePeriod": "11510",
       "industry": "生技醫療業",
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 0.1,
-      "roe": 0.8776320206957205,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 11.57317859445519
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 0.18,
+      "roe": 1.21,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 11.57,
+      "financialHistoryYears": 6,
+      "financialUpdatedAt": "2026-11-17T07:20:06.198343+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6651": {
       "pe": 13.03,
@@ -182451,15 +182704,18 @@
       "pb": 1.08,
       "dividendYield": 5.46,
       "dividendPerShare": 1.3,
-      "financialPeriod": "115Q3",
-      "financialSource": "TWSE/TPEx",
-      "eps": 2.76,
-      "roe": 16.49638342369224,
-      "roeBasis": "opendata_annualised_over_closing_equity",
-      "debtRatio": 72.61603188463705,
+      "financialPeriod": "2026-09-30",
+      "financialSource": "FinMind 授權基本面資料",
+      "eps": 4.48,
+      "roe": 21.02,
+      "roeBasis": "finmind_ttm_over_average_equity",
+      "debtRatio": 72.62,
       "revenueYoY": 5.551597582037997,
       "cumulativeRevenueYoY": 12.875446625326383,
-      "revenuePeriod": "11510"
+      "revenuePeriod": "11510",
+      "financialHistoryYears": 3,
+      "financialUpdatedAt": "2026-11-17T07:19:55.959914+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6610": {
       "market": "emerging",
@@ -185346,11 +185602,19 @@
     },
     "6592A": {
       "industry": "其他",
-      "market": "twse"
+      "market": "twse",
+      "financialHistoryYears": 0,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-11-17T07:19:51.999376+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "6592B": {
       "industry": "其他",
-      "market": "twse"
+      "market": "twse",
+      "financialHistoryYears": 0,
+      "financialSource": "FinMind 授權基本面資料",
+      "financialUpdatedAt": "2026-11-17T07:19:52.739186+00:00",
+      "financialNotes": "EPS 為近四季合計；ROE 為近四季稅後淨利／平均權益；負債比為負債／資產。"
     },
     "5871A": {
       "industry": "其他",
@@ -188245,7 +188509,8 @@
       "industry": "數位雲端"
     },
     "4548": {
-      "market": "emerging"
+      "market": "emerging",
+      "industry": "半導體業"
     }
   },
   "history": {
